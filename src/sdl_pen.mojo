@@ -87,19 +87,19 @@ struct PenInputFlags(Intable):
     fn __or__(lhs, rhs: Self) -> Self:
         return Self(lhs.value | rhs.value)
 
-    alias PEN_INPUT_DOWN = Self(1 << 0)
+    comptime PEN_INPUT_DOWN = Self(1 << 0)
     """Pen is pressed down."""
-    alias PEN_INPUT_BUTTON_1 = Self(1 << 1)
+    comptime PEN_INPUT_BUTTON_1 = Self(1 << 1)
     """Button 1 is pressed."""
-    alias PEN_INPUT_BUTTON_2 = Self(1 << 2)
+    comptime PEN_INPUT_BUTTON_2 = Self(1 << 2)
     """Button 2 is pressed."""
-    alias PEN_INPUT_BUTTON_3 = Self(1 << 3)
+    comptime PEN_INPUT_BUTTON_3 = Self(1 << 3)
     """Button 3 is pressed."""
-    alias PEN_INPUT_BUTTON_4 = Self(1 << 4)
+    comptime PEN_INPUT_BUTTON_4 = Self(1 << 4)
     """Button 4 is pressed."""
-    alias PEN_INPUT_BUTTON_5 = Self(1 << 5)
+    comptime PEN_INPUT_BUTTON_5 = Self(1 << 5)
     """Button 5 is pressed."""
-    alias PEN_INPUT_ERASER_TIP = Self(1 << 30)
+    comptime PEN_INPUT_ERASER_TIP = Self(1 << 30)
     """Eraser tip is used."""
 
 
@@ -136,21 +136,21 @@ struct PenAxis(Indexer, Intable):
 
     @always_inline("nodebug")
     fn __mlir_index__(self) -> __mlir_type.index:
-        return Int(self).__mlir_index__()
+        return Int(self)._mlir_value
 
-    alias PEN_AXIS_PRESSURE = Self(0)
+    comptime PEN_AXIS_PRESSURE = Self(0)
     """Pen pressure.  Unidirectional: 0 to 1.0."""
-    alias PEN_AXIS_XTILT = Self(1)
+    comptime PEN_AXIS_XTILT = Self(1)
     """Pen horizontal tilt angle.  Bidirectional: -90.0 to 90.0 (left-to-right)."""
-    alias PEN_AXIS_YTILT = Self(2)
+    comptime PEN_AXIS_YTILT = Self(2)
     """Pen vertical tilt angle.  Bidirectional: -90.0 to 90.0 (top-to-down)."""
-    alias PEN_AXIS_DISTANCE = Self(3)
+    comptime PEN_AXIS_DISTANCE = Self(3)
     """Pen distance to drawing surface.  Unidirectional: 0.0 to 1.0."""
-    alias PEN_AXIS_ROTATION = Self(4)
+    comptime PEN_AXIS_ROTATION = Self(4)
     """Pen barrel rotation.  Bidirectional: -180 to 179.9 (clockwise, 0 is facing up, -180.0 is facing down)."""
-    alias PEN_AXIS_SLIDER = Self(5)
+    comptime PEN_AXIS_SLIDER = Self(5)
     """Pen finger wheel or slider (e.g., Airbrush Pen).  Unidirectional: 0 to 1.0."""
-    alias PEN_AXIS_TANGENTIAL_PRESSURE = Self(6)
+    comptime PEN_AXIS_TANGENTIAL_PRESSURE = Self(6)
     """Pressure from squeezing the pen ("barrel pressure")."""
-    alias PEN_AXIS_COUNT = Self(7)
+    comptime PEN_AXIS_COUNT = Self(7)
     """Total known pen axis types in this version of SDL. This number may grow in future releases!."""

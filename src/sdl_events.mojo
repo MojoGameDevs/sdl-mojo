@@ -74,302 +74,302 @@ struct EventType(Indexer, Intable):
 
     @always_inline("nodebug")
     fn __mlir_index__(self) -> __mlir_type.index:
-        return Int(self).__mlir_index__()
+        return Int(self)._mlir_value
 
-    alias EVENT_FIRST = Self(0)
+    comptime EVENT_FIRST = Self(0)
     """Unused (do not remove)."""
 
     # Application events
-    alias EVENT_QUIT = Self(0x100)
+    comptime EVENT_QUIT = Self(0x100)
     """User-requested quit."""
 
     # These application events have special meaning on iOS and Android, see README-ios.md and README-android.md for details
-    alias EVENT_TERMINATING = Self(0x101)
+    comptime EVENT_TERMINATING = Self(0x101)
     """The application is being terminated by the OS. This event must be handled in a callback set with SDL_AddEventWatch().
                                          Called on iOS in applicationWillTerminate()
                                          Called on Android in onDestroy()."""
-    alias EVENT_LOW_MEMORY = Self(0x102)
+    comptime EVENT_LOW_MEMORY = Self(0x102)
     """The application is low on memory, free memory if possible. This event must be handled in a callback set with SDL_AddEventWatch().
                                          Called on iOS in applicationDidReceiveMemoryWarning()
                                          Called on Android in onTrimMemory()."""
-    alias EVENT_WILL_ENTER_BACKGROUND = Self(0x103)
+    comptime EVENT_WILL_ENTER_BACKGROUND = Self(0x103)
     """The application is about to enter the background. This event must be handled in a callback set with SDL_AddEventWatch().
                                          Called on iOS in applicationWillResignActive()
                                          Called on Android in onPause()."""
-    alias EVENT_DID_ENTER_BACKGROUND = Self(0x104)
+    comptime EVENT_DID_ENTER_BACKGROUND = Self(0x104)
     """The application did enter the background and may not get CPU for some time. This event must be handled in a callback set with SDL_AddEventWatch().
                                          Called on iOS in applicationDidEnterBackground()
                                          Called on Android in onPause()."""
-    alias EVENT_WILL_ENTER_FOREGROUND = Self(0x105)
+    comptime EVENT_WILL_ENTER_FOREGROUND = Self(0x105)
     """The application is about to enter the foreground. This event must be handled in a callback set with SDL_AddEventWatch().
                                          Called on iOS in applicationWillEnterForeground()
                                          Called on Android in onResume()."""
-    alias EVENT_DID_ENTER_FOREGROUND = Self(0x106)
+    comptime EVENT_DID_ENTER_FOREGROUND = Self(0x106)
     """The application is now interactive. This event must be handled in a callback set with SDL_AddEventWatch().
                                          Called on iOS in applicationDidBecomeActive()
                                          Called on Android in onResume()."""
 
-    alias EVENT_LOCALE_CHANGED = Self(0x107)
+    comptime EVENT_LOCALE_CHANGED = Self(0x107)
     """The user's locale preferences have changed."""
 
-    alias EVENT_SYSTEM_THEME_CHANGED = Self(0x108)
+    comptime EVENT_SYSTEM_THEME_CHANGED = Self(0x108)
     """The system theme changed."""
 
     # Display events
     # 0x150 was SDL_DISPLAYEVENT, reserve the number for sdl2-compat
-    alias EVENT_DISPLAY_ORIENTATION = Self(0x151)
+    comptime EVENT_DISPLAY_ORIENTATION = Self(0x151)
     """Display orientation has changed to data1."""
-    alias EVENT_DISPLAY_ADDED = Self(0x152)
+    comptime EVENT_DISPLAY_ADDED = Self(0x152)
     """Display has been added to the system."""
-    alias EVENT_DISPLAY_REMOVED = Self(0x153)
+    comptime EVENT_DISPLAY_REMOVED = Self(0x153)
     """Display has been removed from the system."""
-    alias EVENT_DISPLAY_MOVED = Self(0x154)
+    comptime EVENT_DISPLAY_MOVED = Self(0x154)
     """Display has changed position."""
-    alias EVENT_DISPLAY_DESKTOP_MODE_CHANGED = Self(0x155)
+    comptime EVENT_DISPLAY_DESKTOP_MODE_CHANGED = Self(0x155)
     """Display has changed desktop mode."""
-    alias EVENT_DISPLAY_CURRENT_MODE_CHANGED = Self(0x156)
+    comptime EVENT_DISPLAY_CURRENT_MODE_CHANGED = Self(0x156)
     """Display has changed current mode."""
-    alias EVENT_DISPLAY_CONTENT_SCALE_CHANGED = Self(0x157)
+    comptime EVENT_DISPLAY_CONTENT_SCALE_CHANGED = Self(0x157)
     """Display has changed content scale."""
-    alias EVENT_DISPLAY_FIRST = Self.EVENT_DISPLAY_ORIENTATION
-    alias EVENT_DISPLAY_LAST = Self.EVENT_DISPLAY_CONTENT_SCALE_CHANGED
+    comptime EVENT_DISPLAY_FIRST = Self.EVENT_DISPLAY_ORIENTATION
+    comptime EVENT_DISPLAY_LAST = Self.EVENT_DISPLAY_CONTENT_SCALE_CHANGED
 
     # Window events
     # 0x200 was SDL_WINDOWEVENT, reserve the number for sdl2-compat
     # 0x201 was SDL_SYSWMEVENT, reserve the number for sdl2-compat
-    alias EVENT_WINDOW_SHOWN = Self(0x202)
+    comptime EVENT_WINDOW_SHOWN = Self(0x202)
     """Window has been shown."""
-    alias EVENT_WINDOW_HIDDEN = Self(0x203)
+    comptime EVENT_WINDOW_HIDDEN = Self(0x203)
     """Window has been hidden."""
-    alias EVENT_WINDOW_EXPOSED = Self(0x204)
+    comptime EVENT_WINDOW_EXPOSED = Self(0x204)
     """Window has been exposed and should be redrawn, and can be redrawn directly from event watchers for this event."""
-    alias EVENT_WINDOW_MOVED = Self(0x205)
+    comptime EVENT_WINDOW_MOVED = Self(0x205)
     """Window has been moved to data1, data2."""
-    alias EVENT_WINDOW_RESIZED = Self(0x206)
+    comptime EVENT_WINDOW_RESIZED = Self(0x206)
     """Window has been resized to data1xdata2."""
-    alias EVENT_WINDOW_PIXEL_SIZE_CHANGED = Self(0x207)
+    comptime EVENT_WINDOW_PIXEL_SIZE_CHANGED = Self(0x207)
     """The pixel size of the window has changed to data1xdata2."""
-    alias EVENT_WINDOW_METAL_VIEW_RESIZED = Self(0x208)
+    comptime EVENT_WINDOW_METAL_VIEW_RESIZED = Self(0x208)
     """The pixel size of a Metal view associated with the window has changed."""
-    alias EVENT_WINDOW_MINIMIZED = Self(0x209)
+    comptime EVENT_WINDOW_MINIMIZED = Self(0x209)
     """Window has been minimized."""
-    alias EVENT_WINDOW_MAXIMIZED = Self(0x20A)
+    comptime EVENT_WINDOW_MAXIMIZED = Self(0x20A)
     """Window has been maximized."""
-    alias EVENT_WINDOW_RESTORED = Self(0x20B)
+    comptime EVENT_WINDOW_RESTORED = Self(0x20B)
     """Window has been restored to normal size and position."""
-    alias EVENT_WINDOW_MOUSE_ENTER = Self(0x20C)
+    comptime EVENT_WINDOW_MOUSE_ENTER = Self(0x20C)
     """Window has gained mouse focus."""
-    alias EVENT_WINDOW_MOUSE_LEAVE = Self(0x20D)
+    comptime EVENT_WINDOW_MOUSE_LEAVE = Self(0x20D)
     """Window has lost mouse focus."""
-    alias EVENT_WINDOW_FOCUS_GAINED = Self(0x20E)
+    comptime EVENT_WINDOW_FOCUS_GAINED = Self(0x20E)
     """Window has gained keyboard focus."""
-    alias EVENT_WINDOW_FOCUS_LOST = Self(0x20F)
+    comptime EVENT_WINDOW_FOCUS_LOST = Self(0x20F)
     """Window has lost keyboard focus."""
-    alias EVENT_WINDOW_CLOSE_REQUESTED = Self(0x210)
+    comptime EVENT_WINDOW_CLOSE_REQUESTED = Self(0x210)
     """The window manager requests that the window be closed."""
-    alias EVENT_WINDOW_HIT_TEST = Self(0x211)
+    comptime EVENT_WINDOW_HIT_TEST = Self(0x211)
     """Window had a hit test that wasn't SDL_HITTEST_NORMAL."""
-    alias EVENT_WINDOW_ICCPROF_CHANGED = Self(0x212)
+    comptime EVENT_WINDOW_ICCPROF_CHANGED = Self(0x212)
     """The ICC profile of the window's display has changed."""
-    alias EVENT_WINDOW_DISPLAY_CHANGED = Self(0x213)
+    comptime EVENT_WINDOW_DISPLAY_CHANGED = Self(0x213)
     """Window has been moved to display data1."""
-    alias EVENT_WINDOW_DISPLAY_SCALE_CHANGED = Self(0x214)
+    comptime EVENT_WINDOW_DISPLAY_SCALE_CHANGED = Self(0x214)
     """Window display scale has been changed."""
-    alias EVENT_WINDOW_SAFE_AREA_CHANGED = Self(0x215)
+    comptime EVENT_WINDOW_SAFE_AREA_CHANGED = Self(0x215)
     """The window safe area has been changed."""
-    alias EVENT_WINDOW_OCCLUDED = Self(0x216)
+    comptime EVENT_WINDOW_OCCLUDED = Self(0x216)
     """The window has been occluded."""
-    alias EVENT_WINDOW_ENTER_FULLSCREEN = Self(0x217)
+    comptime EVENT_WINDOW_ENTER_FULLSCREEN = Self(0x217)
     """The window has entered fullscreen mode."""
-    alias EVENT_WINDOW_LEAVE_FULLSCREEN = Self(0x218)
+    comptime EVENT_WINDOW_LEAVE_FULLSCREEN = Self(0x218)
     """The window has left fullscreen mode."""
-    alias EVENT_WINDOW_DESTROYED = Self(0x219)
+    comptime EVENT_WINDOW_DESTROYED = Self(0x219)
     """The window with the associated ID is being or has been destroyed. If this message is being handled
                                                  in an event watcher, the window handle is still valid and can still be used to retrieve any properties
                                                  associated with the window. Otherwise, the handle has already been destroyed and all resources
                                                  associated with it are invalid."""
-    alias EVENT_WINDOW_HDR_STATE_CHANGED = Self(0x21A)
+    comptime EVENT_WINDOW_HDR_STATE_CHANGED = Self(0x21A)
     """Window HDR properties have changed."""
-    alias EVENT_WINDOW_FIRST = Self.EVENT_WINDOW_SHOWN
-    alias EVENT_WINDOW_LAST = Self.EVENT_WINDOW_HDR_STATE_CHANGED
+    comptime EVENT_WINDOW_FIRST = Self.EVENT_WINDOW_SHOWN
+    comptime EVENT_WINDOW_LAST = Self.EVENT_WINDOW_HDR_STATE_CHANGED
 
     # Keyboard events
-    alias EVENT_KEY_DOWN = Self(0x300)
+    comptime EVENT_KEY_DOWN = Self(0x300)
     """Key pressed."""
-    alias EVENT_KEY_UP = Self(0x301)
+    comptime EVENT_KEY_UP = Self(0x301)
     """Key released."""
-    alias EVENT_TEXT_EDITING = Self(0x302)
+    comptime EVENT_TEXT_EDITING = Self(0x302)
     """Keyboard text editing (composition)."""
-    alias EVENT_TEXT_INPUT = Self(0x303)
+    comptime EVENT_TEXT_INPUT = Self(0x303)
     """Keyboard text input."""
-    alias EVENT_KEYMAP_CHANGED = Self(0x304)
+    comptime EVENT_KEYMAP_CHANGED = Self(0x304)
     """Keymap changed due to a system event such as an
                                                 input language or keyboard layout change."""
-    alias EVENT_KEYBOARD_ADDED = Self(0x305)
+    comptime EVENT_KEYBOARD_ADDED = Self(0x305)
     """A new keyboard has been inserted into the system."""
-    alias EVENT_KEYBOARD_REMOVED = Self(0x306)
+    comptime EVENT_KEYBOARD_REMOVED = Self(0x306)
     """A keyboard has been removed."""
-    alias EVENT_TEXT_EDITING_CANDIDATES = Self(0x307)
+    comptime EVENT_TEXT_EDITING_CANDIDATES = Self(0x307)
     """Keyboard text editing candidates."""
 
     # Mouse events
-    alias EVENT_MOUSE_MOTION = Self(0x400)
+    comptime EVENT_MOUSE_MOTION = Self(0x400)
     """Mouse moved."""
-    alias EVENT_MOUSE_BUTTON_DOWN = Self(0x401)
+    comptime EVENT_MOUSE_BUTTON_DOWN = Self(0x401)
     """Mouse button pressed."""
-    alias EVENT_MOUSE_BUTTON_UP = Self(0x402)
+    comptime EVENT_MOUSE_BUTTON_UP = Self(0x402)
     """Mouse button released."""
-    alias EVENT_MOUSE_WHEEL = Self(0x403)
+    comptime EVENT_MOUSE_WHEEL = Self(0x403)
     """Mouse wheel motion."""
-    alias EVENT_MOUSE_ADDED = Self(0x404)
+    comptime EVENT_MOUSE_ADDED = Self(0x404)
     """A new mouse has been inserted into the system."""
-    alias EVENT_MOUSE_REMOVED = Self(0x405)
+    comptime EVENT_MOUSE_REMOVED = Self(0x405)
     """A mouse has been removed."""
 
     # Joystick events
-    alias EVENT_JOYSTICK_AXIS_MOTION = Self(0x600)
+    comptime EVENT_JOYSTICK_AXIS_MOTION = Self(0x600)
     """Joystick axis motion."""
-    alias EVENT_JOYSTICK_BALL_MOTION = Self(0x601)
+    comptime EVENT_JOYSTICK_BALL_MOTION = Self(0x601)
     """Joystick trackball motion."""
-    alias EVENT_JOYSTICK_HAT_MOTION = Self(0x602)
+    comptime EVENT_JOYSTICK_HAT_MOTION = Self(0x602)
     """Joystick hat position change."""
-    alias EVENT_JOYSTICK_BUTTON_DOWN = Self(0x603)
+    comptime EVENT_JOYSTICK_BUTTON_DOWN = Self(0x603)
     """Joystick button pressed."""
-    alias EVENT_JOYSTICK_BUTTON_UP = Self(0x604)
+    comptime EVENT_JOYSTICK_BUTTON_UP = Self(0x604)
     """Joystick button released."""
-    alias EVENT_JOYSTICK_ADDED = Self(0x605)
+    comptime EVENT_JOYSTICK_ADDED = Self(0x605)
     """A new joystick has been inserted into the system."""
-    alias EVENT_JOYSTICK_REMOVED = Self(0x606)
+    comptime EVENT_JOYSTICK_REMOVED = Self(0x606)
     """An opened joystick has been removed."""
-    alias EVENT_JOYSTICK_BATTERY_UPDATED = Self(0x607)
+    comptime EVENT_JOYSTICK_BATTERY_UPDATED = Self(0x607)
     """Joystick battery level change."""
-    alias EVENT_JOYSTICK_UPDATE_COMPLETE = Self(0x608)
+    comptime EVENT_JOYSTICK_UPDATE_COMPLETE = Self(0x608)
     """Joystick update is complete."""
 
     # Gamepad events
-    alias EVENT_GAMEPAD_AXIS_MOTION = Self(0x650)
+    comptime EVENT_GAMEPAD_AXIS_MOTION = Self(0x650)
     """Gamepad axis motion."""
-    alias EVENT_GAMEPAD_BUTTON_DOWN = Self(0x651)
+    comptime EVENT_GAMEPAD_BUTTON_DOWN = Self(0x651)
     """Gamepad button pressed."""
-    alias EVENT_GAMEPAD_BUTTON_UP = Self(0x652)
+    comptime EVENT_GAMEPAD_BUTTON_UP = Self(0x652)
     """Gamepad button released."""
-    alias EVENT_GAMEPAD_ADDED = Self(0x653)
+    comptime EVENT_GAMEPAD_ADDED = Self(0x653)
     """A new gamepad has been inserted into the system."""
-    alias EVENT_GAMEPAD_REMOVED = Self(0x654)
+    comptime EVENT_GAMEPAD_REMOVED = Self(0x654)
     """A gamepad has been removed."""
-    alias EVENT_GAMEPAD_REMAPPED = Self(0x655)
+    comptime EVENT_GAMEPAD_REMAPPED = Self(0x655)
     """The gamepad mapping was updated."""
-    alias EVENT_GAMEPAD_TOUCHPAD_DOWN = Self(0x656)
+    comptime EVENT_GAMEPAD_TOUCHPAD_DOWN = Self(0x656)
     """Gamepad touchpad was touched."""
-    alias EVENT_GAMEPAD_TOUCHPAD_MOTION = Self(0x657)
+    comptime EVENT_GAMEPAD_TOUCHPAD_MOTION = Self(0x657)
     """Gamepad touchpad finger was moved."""
-    alias EVENT_GAMEPAD_TOUCHPAD_UP = Self(0x658)
+    comptime EVENT_GAMEPAD_TOUCHPAD_UP = Self(0x658)
     """Gamepad touchpad finger was lifted."""
-    alias EVENT_GAMEPAD_SENSOR_UPDATE = Self(0x659)
+    comptime EVENT_GAMEPAD_SENSOR_UPDATE = Self(0x659)
     """Gamepad sensor was updated."""
-    alias EVENT_GAMEPAD_UPDATE_COMPLETE = Self(0x65A)
+    comptime EVENT_GAMEPAD_UPDATE_COMPLETE = Self(0x65A)
     """Gamepad update is complete."""
-    alias EVENT_GAMEPAD_STEAM_HANDLE_UPDATED = Self(0x65B)
+    comptime EVENT_GAMEPAD_STEAM_HANDLE_UPDATED = Self(0x65B)
     """Gamepad Steam handle has changed."""
 
     # Touch events
-    alias EVENT_FINGER_DOWN = Self(0x700)
-    alias EVENT_FINGER_UP = Self(0x701)
-    alias EVENT_FINGER_MOTION = Self(0x702)
-    alias EVENT_FINGER_CANCELED = Self(0x703)
+    comptime EVENT_FINGER_DOWN = Self(0x700)
+    comptime EVENT_FINGER_UP = Self(0x701)
+    comptime EVENT_FINGER_MOTION = Self(0x702)
+    comptime EVENT_FINGER_CANCELED = Self(0x703)
 
     # 0x800, 0x801, and 0x802 were the Gesture events from SDL2. Do not reuse these values! sdl2-compat needs them!
 
     # Clipboard events
-    alias EVENT_CLIPBOARD_UPDATE = Self(0x900)
+    comptime EVENT_CLIPBOARD_UPDATE = Self(0x900)
     """The clipboard or primary selection changed."""
 
     # Drag and drop events
-    alias EVENT_DROP_FILE = Self(0x1000)
+    comptime EVENT_DROP_FILE = Self(0x1000)
     """The system requests a file open."""
-    alias EVENT_DROP_TEXT = Self(0x1001)
+    comptime EVENT_DROP_TEXT = Self(0x1001)
     """Text/plain drag-and-drop event."""
-    alias EVENT_DROP_BEGIN = Self(0x1002)
+    comptime EVENT_DROP_BEGIN = Self(0x1002)
     """A new set of drops is beginning (NULL filename)."""
-    alias EVENT_DROP_COMPLETE = Self(0x1003)
+    comptime EVENT_DROP_COMPLETE = Self(0x1003)
     """Current set of drops is now complete (NULL filename)."""
-    alias EVENT_DROP_POSITION = Self(0x1004)
+    comptime EVENT_DROP_POSITION = Self(0x1004)
     """Position while moving over the window."""
 
     # Audio hotplug events
-    alias EVENT_AUDIO_DEVICE_ADDED = Self(0x1100)
+    comptime EVENT_AUDIO_DEVICE_ADDED = Self(0x1100)
     """A new audio device is available."""
-    alias EVENT_AUDIO_DEVICE_REMOVED = Self(0x1101)
+    comptime EVENT_AUDIO_DEVICE_REMOVED = Self(0x1101)
     """An audio device has been removed."""
-    alias EVENT_AUDIO_DEVICE_FORMAT_CHANGED = Self(0x1102)
+    comptime EVENT_AUDIO_DEVICE_FORMAT_CHANGED = Self(0x1102)
     """An audio device's format has been changed by the system."""
 
     # Sensor events
-    alias EVENT_SENSOR_UPDATE = Self(0x1200)
+    comptime EVENT_SENSOR_UPDATE = Self(0x1200)
     """A sensor was updated."""
 
     # Pressure-sensitive pen events
-    alias EVENT_PEN_PROXIMITY_IN = Self(0x1300)
+    comptime EVENT_PEN_PROXIMITY_IN = Self(0x1300)
     """Pressure-sensitive pen has become available."""
-    alias EVENT_PEN_PROXIMITY_OUT = Self(0x1301)
+    comptime EVENT_PEN_PROXIMITY_OUT = Self(0x1301)
     """Pressure-sensitive pen has become unavailable."""
-    alias EVENT_PEN_DOWN = Self(0x1302)
+    comptime EVENT_PEN_DOWN = Self(0x1302)
     """Pressure-sensitive pen touched drawing surface."""
-    alias EVENT_PEN_UP = Self(0x1303)
+    comptime EVENT_PEN_UP = Self(0x1303)
     """Pressure-sensitive pen stopped touching drawing surface."""
-    alias EVENT_PEN_BUTTON_DOWN = Self(0x1304)
+    comptime EVENT_PEN_BUTTON_DOWN = Self(0x1304)
     """Pressure-sensitive pen button pressed."""
-    alias EVENT_PEN_BUTTON_UP = Self(0x1305)
+    comptime EVENT_PEN_BUTTON_UP = Self(0x1305)
     """Pressure-sensitive pen button released."""
-    alias EVENT_PEN_MOTION = Self(0x1306)
+    comptime EVENT_PEN_MOTION = Self(0x1306)
     """Pressure-sensitive pen is moving on the tablet."""
-    alias EVENT_PEN_AXIS = Self(0x1307)
+    comptime EVENT_PEN_AXIS = Self(0x1307)
     """Pressure-sensitive pen angle/pressure/etc changed."""
 
     # Camera hotplug events
-    alias EVENT_CAMERA_DEVICE_ADDED = Self(0x1400)
+    comptime EVENT_CAMERA_DEVICE_ADDED = Self(0x1400)
     """A new camera device is available."""
-    alias EVENT_CAMERA_DEVICE_REMOVED = Self(0x1401)
+    comptime EVENT_CAMERA_DEVICE_REMOVED = Self(0x1401)
     """A camera device has been removed."""
-    alias EVENT_CAMERA_DEVICE_APPROVED = Self(0x1402)
+    comptime EVENT_CAMERA_DEVICE_APPROVED = Self(0x1402)
     """A camera device has been approved for use by the user."""
-    alias EVENT_CAMERA_DEVICE_DENIED = Self(0x1403)
+    comptime EVENT_CAMERA_DEVICE_DENIED = Self(0x1403)
     """A camera device has been denied for use by the user."""
 
     # Render events
-    alias EVENT_RENDER_TARGETS_RESET = Self(0x2000)
+    comptime EVENT_RENDER_TARGETS_RESET = Self(0x2000)
     """The render targets have been reset and their contents need to be updated."""
-    alias EVENT_RENDER_DEVICE_RESET = Self(0x2001)
+    comptime EVENT_RENDER_DEVICE_RESET = Self(0x2001)
     """The device has been reset and all textures need to be recreated."""
-    alias EVENT_RENDER_DEVICE_LOST = Self(0x2002)
+    comptime EVENT_RENDER_DEVICE_LOST = Self(0x2002)
     """The device has been lost and can't be recovered."""
 
     # Reserved events for private platforms
-    alias EVENT_PRIVATE0 = Self(0x4000)
-    alias EVENT_PRIVATE1 = Self(0x4001)
-    alias EVENT_PRIVATE2 = Self(0x4002)
-    alias EVENT_PRIVATE3 = Self(0x4003)
+    comptime EVENT_PRIVATE0 = Self(0x4000)
+    comptime EVENT_PRIVATE1 = Self(0x4001)
+    comptime EVENT_PRIVATE2 = Self(0x4002)
+    comptime EVENT_PRIVATE3 = Self(0x4003)
 
     # Internal events
-    alias EVENT_POLL_SENTINEL = Self(0x7F00)
+    comptime EVENT_POLL_SENTINEL = Self(0x7F00)
     """Signals the end of an event poll cycle."""
 
     # Events SDL_EVENT_USER through SDL_EVENT_LAST are for your use,
     #      *  and should be allocated with SDL_RegisterEvents()
-    alias EVENT_USER = Self(0x8000)
+    comptime EVENT_USER = Self(0x8000)
 
     # *  This last event is only for bounding internal arrays
-    alias EVENT_LAST = Self(0xFFFF)
+    comptime EVENT_LAST = Self(0xFFFF)
 
     # This just makes sure the enum is the size of Uint32
-    alias EVENT_ENUM_PADDING = Self(0x7FFFFFFF)
+    comptime EVENT_ENUM_PADDING = Self(0x7FFFFFFF)
 
 
 @fieldwise_init
 struct CommonEvent(ImplicitlyCopyable, Movable):
     """Fields shared by every event.
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_CommonEvent.
+    Docs: https://wiki.libsdl.org/SDL3/CommonEvent.
     """
 
     var type: UInt32
@@ -383,7 +383,7 @@ struct CommonEvent(ImplicitlyCopyable, Movable):
 struct DisplayEvent(ImplicitlyCopyable, Movable):
     """Display state change event data (event.display.*).
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_DisplayEvent.
+    Docs: https://wiki.libsdl.org/SDL3/DisplayEvent.
     """
 
     var type: EventType
@@ -403,7 +403,7 @@ struct DisplayEvent(ImplicitlyCopyable, Movable):
 struct WindowEvent(ImplicitlyCopyable, Movable):
     """Window state change event data (event.window.*).
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_WindowEvent.
+    Docs: https://wiki.libsdl.org/SDL3/WindowEvent.
     """
 
     var type: EventType
@@ -423,7 +423,7 @@ struct WindowEvent(ImplicitlyCopyable, Movable):
 struct KeyboardDeviceEvent(ImplicitlyCopyable, Movable):
     """Keyboard device event structure (event.kdevice.*).
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_KeyboardDeviceEvent.
+    Docs: https://wiki.libsdl.org/SDL3/KeyboardDeviceEvent.
     """
 
     var type: EventType
@@ -445,7 +445,7 @@ struct KeyboardEvent(ImplicitlyCopyable, Movable):
     event scancode and modifiers directly from the keyboard layout, bypassing
     SDL_HINT_KEYCODE_OPTIONS, by calling SDL_GetKeyFromScancode().
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_KeyboardEvent.
+    Docs: https://wiki.libsdl.org/SDL3/KeyboardEvent.
     """
 
     var type: EventType
@@ -479,7 +479,7 @@ struct TextEditingEvent(ImplicitlyCopyable, Movable):
     will be inserted into the editing text. The length is the number of UTF-8
     characters that will be replaced by new typing.
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_TextEditingEvent.
+    Docs: https://wiki.libsdl.org/SDL3/TextEditingEvent.
     """
 
     var type: EventType
@@ -489,7 +489,7 @@ struct TextEditingEvent(ImplicitlyCopyable, Movable):
     """In nanoseconds, populated using SDL_GetTicksNS()."""
     var window_id: WindowID
     """The window with keyboard focus, if any."""
-    var text: Ptr[c_char, mut=False]
+    var text: Ptr[c_char, AnyOrigin[False]]
     """The editing text."""
     var start: Int32
     """The start cursor of selected editing text, or -1 if not set."""
@@ -501,7 +501,7 @@ struct TextEditingEvent(ImplicitlyCopyable, Movable):
 struct TextEditingCandidatesEvent(ImplicitlyCopyable, Movable):
     """Keyboard IME candidates event structure (event.edit_candidates.*).
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_TextEditingCandidatesEvent.
+    Docs: https://wiki.libsdl.org/SDL3/TextEditingCandidatesEvent.
     """
 
     var type: EventType
@@ -511,7 +511,7 @@ struct TextEditingCandidatesEvent(ImplicitlyCopyable, Movable):
     """In nanoseconds, populated using SDL_GetTicksNS()."""
     var window_id: WindowID
     """The window with keyboard focus, if any."""
-    var candidates: Ptr[c_char, mut=False]
+    var candidates: Ptr[c_char, AnyOrigin[False]]
     """The list of candidates, or NULL if there are no candidates available."""
     var num_candidates: Int32
     """The number of strings in `candidates`."""
@@ -531,7 +531,7 @@ struct TextInputEvent(ImplicitlyCopyable, Movable):
     This event will never be delivered unless text input is enabled by calling
     SDL_StartTextInput(). Text input is disabled by default!
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_TextInputEvent.
+    Docs: https://wiki.libsdl.org/SDL3/TextInputEvent.
     """
 
     var type: EventType
@@ -541,7 +541,7 @@ struct TextInputEvent(ImplicitlyCopyable, Movable):
     """In nanoseconds, populated using SDL_GetTicksNS()."""
     var window_id: WindowID
     """The window with keyboard focus, if any."""
-    var text: Ptr[c_char, mut=False]
+    var text: Ptr[c_char, AnyOrigin[False]]
     """The input text, UTF-8 encoded."""
 
 
@@ -549,7 +549,7 @@ struct TextInputEvent(ImplicitlyCopyable, Movable):
 struct MouseDeviceEvent(ImplicitlyCopyable, Movable):
     """Mouse device event structure (event.mdevice.*).
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_MouseDeviceEvent.
+    Docs: https://wiki.libsdl.org/SDL3/MouseDeviceEvent.
     """
 
     var type: EventType
@@ -565,7 +565,7 @@ struct MouseDeviceEvent(ImplicitlyCopyable, Movable):
 struct MouseMotionEvent(ImplicitlyCopyable, Movable):
     """Mouse motion event structure (event.motion.*).
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_MouseMotionEvent.
+    Docs: https://wiki.libsdl.org/SDL3/MouseMotionEvent.
     """
 
     var type: EventType
@@ -593,7 +593,7 @@ struct MouseMotionEvent(ImplicitlyCopyable, Movable):
 struct MouseButtonEvent(ImplicitlyCopyable, Movable):
     """Mouse button event structure (event.button.*).
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_MouseButtonEvent.
+    Docs: https://wiki.libsdl.org/SDL3/MouseButtonEvent.
     """
 
     var type: EventType
@@ -622,7 +622,7 @@ struct MouseButtonEvent(ImplicitlyCopyable, Movable):
 struct MouseWheelEvent(ImplicitlyCopyable, Movable):
     """Mouse wheel event structure (event.wheel.*).
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_MouseWheelEvent.
+    Docs: https://wiki.libsdl.org/SDL3/MouseWheelEvent.
     """
 
     var type: EventType
@@ -654,7 +654,7 @@ struct MouseWheelEvent(ImplicitlyCopyable, Movable):
 struct JoyAxisEvent(ImplicitlyCopyable, Movable):
     """Joystick axis motion event structure (event.jaxis.*).
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_JoyAxisEvent.
+    Docs: https://wiki.libsdl.org/SDL3/JoyAxisEvent.
     """
 
     var type: EventType
@@ -678,7 +678,7 @@ struct JoyAxisEvent(ImplicitlyCopyable, Movable):
 struct JoyBallEvent(ImplicitlyCopyable, Movable):
     """Joystick trackball motion event structure (event.jball.*).
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_JoyBallEvent.
+    Docs: https://wiki.libsdl.org/SDL3/JoyBallEvent.
     """
 
     var type: EventType
@@ -703,7 +703,7 @@ struct JoyBallEvent(ImplicitlyCopyable, Movable):
 struct JoyHatEvent(ImplicitlyCopyable, Movable):
     """Joystick hat position change event structure (event.jhat.*).
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_JoyHatEvent.
+    Docs: https://wiki.libsdl.org/SDL3/JoyHatEvent.
     """
 
     var type: EventType
@@ -730,7 +730,7 @@ struct JoyHatEvent(ImplicitlyCopyable, Movable):
 struct JoyButtonEvent(ImplicitlyCopyable, Movable):
     """Joystick button event structure (event.jbutton.*).
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_JoyButtonEvent.
+    Docs: https://wiki.libsdl.org/SDL3/JoyButtonEvent.
     """
 
     var type: EventType
@@ -755,7 +755,7 @@ struct JoyDeviceEvent(ImplicitlyCopyable, Movable):
     SDL will send JOYSTICK_ADDED events for devices that are already plugged in
     during SDL_Init.
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_JoyDeviceEvent.
+    Docs: https://wiki.libsdl.org/SDL3/JoyDeviceEvent.
     """
 
     var type: EventType
@@ -771,7 +771,7 @@ struct JoyDeviceEvent(ImplicitlyCopyable, Movable):
 struct JoyBatteryEvent(ImplicitlyCopyable, Movable):
     """Joystick battery level change event structure (event.jbattery.*).
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_JoyBatteryEvent.
+    Docs: https://wiki.libsdl.org/SDL3/JoyBatteryEvent.
     """
 
     var type: EventType
@@ -791,7 +791,7 @@ struct JoyBatteryEvent(ImplicitlyCopyable, Movable):
 struct GamepadAxisEvent(ImplicitlyCopyable, Movable):
     """Gamepad axis motion event structure (event.gaxis.*).
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_GamepadAxisEvent.
+    Docs: https://wiki.libsdl.org/SDL3/GamepadAxisEvent.
     """
 
     var type: EventType
@@ -815,7 +815,7 @@ struct GamepadAxisEvent(ImplicitlyCopyable, Movable):
 struct GamepadButtonEvent(ImplicitlyCopyable, Movable):
     """Gamepad button event structure (event.gbutton.*).
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_GamepadButtonEvent.
+    Docs: https://wiki.libsdl.org/SDL3/GamepadButtonEvent.
     """
 
     var type: EventType
@@ -844,7 +844,7 @@ struct GamepadDeviceEvent(ImplicitlyCopyable, Movable):
     in during SDL_Init() and are recognized as gamepads. It will also send
     events for joysticks that get gamepad mappings at runtime.
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_GamepadDeviceEvent.
+    Docs: https://wiki.libsdl.org/SDL3/GamepadDeviceEvent.
     """
 
     var type: EventType
@@ -860,7 +860,7 @@ struct GamepadDeviceEvent(ImplicitlyCopyable, Movable):
 struct GamepadTouchpadEvent(ImplicitlyCopyable, Movable):
     """Gamepad touchpad event structure (event.gtouchpad.*).
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_GamepadTouchpadEvent.
+    Docs: https://wiki.libsdl.org/SDL3/GamepadTouchpadEvent.
     """
 
     var type: EventType
@@ -886,7 +886,7 @@ struct GamepadTouchpadEvent(ImplicitlyCopyable, Movable):
 struct GamepadSensorEvent(ImplicitlyCopyable, Movable):
     """Gamepad sensor event structure (event.gsensor.*).
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_GamepadSensorEvent.
+    Docs: https://wiki.libsdl.org/SDL3/GamepadSensorEvent.
     """
 
     var type: EventType
@@ -898,7 +898,7 @@ struct GamepadSensorEvent(ImplicitlyCopyable, Movable):
     """The joystick instance id."""
     var sensor: Int32
     """The type of the sensor, one of the values of SDL_SensorType."""
-    var data: ArrayHelper[c_float, 3, mut=True].result
+    var data: ArrayHelper[c_float, 3, AnyOrigin[True]].result
     """Up to 3 values from the sensor, as defined in SDL_sensor.h."""
     var sensor_timestamp: UInt64
     """The timestamp of the sensor reading in nanoseconds, not necessarily synchronized with the system clock."""
@@ -908,7 +908,7 @@ struct GamepadSensorEvent(ImplicitlyCopyable, Movable):
 struct AudioDeviceEvent(ImplicitlyCopyable, Movable):
     """Audio device event structure (event.adevice.*).
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_AudioDeviceEvent.
+    Docs: https://wiki.libsdl.org/SDL3/AudioDeviceEvent.
     """
 
     var type: EventType
@@ -929,7 +929,7 @@ struct AudioDeviceEvent(ImplicitlyCopyable, Movable):
 struct CameraDeviceEvent(ImplicitlyCopyable, Movable):
     """Camera device event structure (event.cdevice.*).
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_CameraDeviceEvent.
+    Docs: https://wiki.libsdl.org/SDL3/CameraDeviceEvent.
     """
 
     var type: EventType
@@ -945,7 +945,7 @@ struct CameraDeviceEvent(ImplicitlyCopyable, Movable):
 struct RenderEvent(ImplicitlyCopyable, Movable):
     """Renderer event structure (event.render.*).
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_RenderEvent.
+    Docs: https://wiki.libsdl.org/SDL3/RenderEvent.
     """
 
     var type: EventType
@@ -975,7 +975,7 @@ struct TouchFingerEvent(ImplicitlyCopyable, Movable):
     report a touch outside of the window, which will also be outside of the
     range.
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_TouchFingerEvent.
+    Docs: https://wiki.libsdl.org/SDL3/TouchFingerEvent.
     """
 
     var type: EventType
@@ -1014,7 +1014,7 @@ struct PenProximityEvent(ImplicitlyCopyable, Movable):
     is there." The pen touching and lifting off from the tablet while not
     leaving the area are handled by SDL_EVENT_PEN_DOWN and SDL_EVENT_PEN_UP.
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_PenProximityEvent.
+    Docs: https://wiki.libsdl.org/SDL3/PenProximityEvent.
     """
 
     var type: EventType
@@ -1038,7 +1038,7 @@ struct PenMotionEvent(ImplicitlyCopyable, Movable):
     `pen_state & SDL_PEN_INPUT_DOWN` to decide if a pen is "drawing" when
     dealing with pen motion.
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_PenMotionEvent.
+    Docs: https://wiki.libsdl.org/SDL3/PenMotionEvent.
     """
 
     var type: EventType
@@ -1065,7 +1065,7 @@ struct PenTouchEvent(ImplicitlyCopyable, Movable):
     These events come when a pen touches a surface (a tablet, etc), or lifts
     off from one.
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_PenTouchEvent.
+    Docs: https://wiki.libsdl.org/SDL3/PenTouchEvent.
     """
 
     var type: EventType
@@ -1096,7 +1096,7 @@ struct PenButtonEvent(ImplicitlyCopyable, Movable):
     This is for buttons on the pen itself that the user might click. The pen
     itself pressing down to draw triggers a SDL_EVENT_PEN_DOWN event instead.
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_PenButtonEvent.
+    Docs: https://wiki.libsdl.org/SDL3/PenButtonEvent.
     """
 
     var type: EventType
@@ -1127,7 +1127,7 @@ struct PenAxisEvent(ImplicitlyCopyable, Movable):
     You might get some of these events even if the pen isn't touching the
     tablet.
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_PenAxisEvent.
+    Docs: https://wiki.libsdl.org/SDL3/PenAxisEvent.
     """
 
     var type: EventType
@@ -1156,7 +1156,7 @@ struct DropEvent(ImplicitlyCopyable, Movable):
     """An event used to drop text or request a file open by the system
     (event.drop.*).
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_DropEvent.
+    Docs: https://wiki.libsdl.org/SDL3/DropEvent.
     """
 
     var type: EventType
@@ -1170,9 +1170,9 @@ struct DropEvent(ImplicitlyCopyable, Movable):
     """X coordinate, relative to window (not on begin)."""
     var y: c_float
     """Y coordinate, relative to window (not on begin)."""
-    var source: Ptr[c_char, mut=False]
+    var source: Ptr[c_char, AnyOrigin[False]]
     """The source app that sent this drop event, or NULL if that isn't available."""
-    var data: Ptr[c_char, mut=False]
+    var data: Ptr[c_char, AnyOrigin[False]]
     """The text for SDL_EVENT_DROP_TEXT and the file name for SDL_EVENT_DROP_FILE, NULL for other events."""
 
 
@@ -1181,7 +1181,7 @@ struct ClipboardEvent(ImplicitlyCopyable, Movable):
     """An event triggered when the clipboard contents have changed
     (event.clipboard.*).
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_ClipboardEvent.
+    Docs: https://wiki.libsdl.org/SDL3/ClipboardEvent.
     """
 
     var type: EventType
@@ -1193,7 +1193,7 @@ struct ClipboardEvent(ImplicitlyCopyable, Movable):
     """Are we owning the clipboard (internal update)."""
     var num_mime_types: Int32
     """Number of mime types."""
-    var mime_types: Ptr[Ptr[c_char, mut=False], mut=False]
+    var mime_types: Ptr[Ptr[c_char, AnyOrigin[False]], AnyOrigin[False]]
     """Current mime types."""
 
 
@@ -1201,7 +1201,7 @@ struct ClipboardEvent(ImplicitlyCopyable, Movable):
 struct SensorEvent(ImplicitlyCopyable, Movable):
     """Sensor event structure (event.sensor.*).
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_SensorEvent.
+    Docs: https://wiki.libsdl.org/SDL3/SensorEvent.
     """
 
     var type: EventType
@@ -1211,7 +1211,7 @@ struct SensorEvent(ImplicitlyCopyable, Movable):
     """In nanoseconds, populated using SDL_GetTicksNS()."""
     var which: SensorID
     """The instance ID of the sensor."""
-    var data: ArrayHelper[c_float, 6, mut=True].result
+    var data: ArrayHelper[c_float, 6, AnyOrigin[True]].result
     """Up to 6 values from the sensor - additional values can be queried using SDL_GetSensorData()."""
     var sensor_timestamp: UInt64
     """The timestamp of the sensor reading in nanoseconds, not necessarily synchronized with the system clock."""
@@ -1221,7 +1221,7 @@ struct SensorEvent(ImplicitlyCopyable, Movable):
 struct QuitEvent(ImplicitlyCopyable, Movable):
     """The "quit requested" event.
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_QuitEvent.
+    Docs: https://wiki.libsdl.org/SDL3/QuitEvent.
     """
 
     var type: EventType
@@ -1241,7 +1241,7 @@ struct UserEvent(ImplicitlyCopyable, Movable):
     the programmer; the only requirement is that '''type''' is a value obtained
     from SDL_RegisterEvents().
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_UserEvent.
+    Docs: https://wiki.libsdl.org/SDL3/UserEvent.
     """
 
     var type: UInt32
@@ -1253,25 +1253,25 @@ struct UserEvent(ImplicitlyCopyable, Movable):
     """The associated window if any."""
     var code: Int32
     """User defined event code."""
-    var data1: Ptr[NoneType, mut=True]
+    var data1: Ptr[NoneType, AnyOrigin[True]]
     """User defined data pointer."""
-    var data2: Ptr[NoneType, mut=True]
+    var data2: Ptr[NoneType, AnyOrigin[True]]
     """User defined data pointer."""
 
 
 struct Event:
-    alias _mlir_type = __mlir_type[`!pop.union<`, UInt32, `, `, CommonEvent, `, `, DisplayEvent, `, `, WindowEvent, `, `, KeyboardDeviceEvent, `, `, KeyboardEvent, `, `, TextEditingEvent, `, `, TextEditingCandidatesEvent, `, `, TextInputEvent, `, `, MouseDeviceEvent, `, `, MouseMotionEvent, `, `, MouseButtonEvent, `, `, MouseWheelEvent, `, `, JoyDeviceEvent, `, `, JoyAxisEvent, `, `, JoyBallEvent, `, `, JoyHatEvent, `, `, JoyButtonEvent, `, `, JoyBatteryEvent, `, `, GamepadDeviceEvent, `, `, GamepadAxisEvent, `, `, GamepadButtonEvent, `, `, GamepadTouchpadEvent, `, `, GamepadSensorEvent, `, `, AudioDeviceEvent, `, `, CameraDeviceEvent, `, `, SensorEvent, `, `, QuitEvent, `, `, UserEvent, `, `, TouchFingerEvent, `, `, PenProximityEvent, `, `, PenTouchEvent, `, `, PenMotionEvent, `, `, PenButtonEvent, `, `, PenAxisEvent, `, `, RenderEvent, `, `, DropEvent, `, `, ClipboardEvent, `, `, InlineArray[UInt8, 128], `>`]
+    comptime _mlir_type = __mlir_type[`!pop.union<`, UInt32, `, `, CommonEvent, `, `, DisplayEvent, `, `, WindowEvent, `, `, KeyboardDeviceEvent, `, `, KeyboardEvent, `, `, TextEditingEvent, `, `, TextEditingCandidatesEvent, `, `, TextInputEvent, `, `, MouseDeviceEvent, `, `, MouseMotionEvent, `, `, MouseButtonEvent, `, `, MouseWheelEvent, `, `, JoyDeviceEvent, `, `, JoyAxisEvent, `, `, JoyBallEvent, `, `, JoyHatEvent, `, `, JoyButtonEvent, `, `, JoyBatteryEvent, `, `, GamepadDeviceEvent, `, `, GamepadAxisEvent, `, `, GamepadButtonEvent, `, `, GamepadTouchpadEvent, `, `, GamepadSensorEvent, `, `, AudioDeviceEvent, `, `, CameraDeviceEvent, `, `, SensorEvent, `, `, QuitEvent, `, `, UserEvent, `, `, TouchFingerEvent, `, `, PenProximityEvent, `, `, PenTouchEvent, `, `, PenMotionEvent, `, `, PenButtonEvent, `, `, PenAxisEvent, `, `, RenderEvent, `, `, DropEvent, `, `, ClipboardEvent, `, `, InlineArray[UInt8, 128], `>`]
     var _impl: Self._mlir_type
 
     @implicit
     fn __init__[T: AnyType](out self, value: T):
         self._impl = rebind[Self._mlir_type](value)
 
-    fn __getitem__[T: AnyType](ref self) -> ref [self] T:
-        return rebind[Ptr[T]](Ptr(to=self._impl))[]
+    fn __getitem__[T: AnyType](ref self) -> ref [self._impl] T:
+        return rebind[Ptr[T, origin_of(self._impl)]](Ptr(to=self._impl))[]
 
 
-fn pump_events() -> None:
+fn pump_events() raises -> None:
     """Pump the event loop, gathering events from the input devices.
 
     This function updates the event queue and internal input device state.
@@ -1290,7 +1290,7 @@ fn pump_events() -> None:
     Docs: https://wiki.libsdl.org/SDL3/SDL_PumpEvents.
     """
 
-    return _get_sdl_handle()[].get_function[fn () -> None]("SDL_PumpEvents")()
+    return _get_dylib_function[lib, "SDL_PumpEvents", fn () -> None]()()
 
 
 @register_passable("trivial")
@@ -1316,17 +1316,17 @@ struct EventAction(Indexer, Intable):
 
     @always_inline("nodebug")
     fn __mlir_index__(self) -> __mlir_type.index:
-        return Int(self).__mlir_index__()
+        return Int(self)._mlir_value
 
-    alias ADDEVENT = Self(0x0)
+    comptime ADDEVENT = Self(0x0)
     """Add events to the back of the queue."""
-    alias PEEKEVENT = Self(0x1)
+    comptime PEEKEVENT = Self(0x1)
     """Check but don't remove events from the queue front."""
-    alias GETEVENT = Self(0x2)
+    comptime GETEVENT = Self(0x2)
     """Retrieve/remove events from the front of the queue."""
 
 
-fn peep_events(events: Ptr[Event, mut=True], numevents: c_int, action: EventAction, min_type: UInt32, max_type: UInt32) -> c_int:
+fn peep_events(events: Ptr[Event, AnyOrigin[True]], numevents: c_int, action: EventAction, min_type: UInt32, max_type: UInt32) raises -> c_int:
     """Check the event queue for messages and optionally return them.
 
     `action` may be any of the following:
@@ -1369,10 +1369,10 @@ fn peep_events(events: Ptr[Event, mut=True], numevents: c_int, action: EventActi
     Docs: https://wiki.libsdl.org/SDL3/SDL_PeepEvents.
     """
 
-    return _get_sdl_handle()[].get_function[fn (events: Ptr[Event, mut=True], numevents: c_int, action: EventAction, min_type: UInt32, max_type: UInt32) -> c_int]("SDL_PeepEvents")(events, numevents, action, min_type, max_type)
+    return _get_dylib_function[lib, "SDL_PeepEvents", fn (events: Ptr[Event, AnyOrigin[True]], numevents: c_int, action: EventAction, min_type: UInt32, max_type: UInt32) -> c_int]()(events, numevents, action, min_type, max_type)
 
 
-fn has_event(type: UInt32) -> Bool:
+fn has_event(type: UInt32) raises -> Bool:
     """Check for the existence of a certain event type in the event queue.
 
     If you need to check for a range of event types, use SDL_HasEvents()
@@ -1391,10 +1391,10 @@ fn has_event(type: UInt32) -> Bool:
     Docs: https://wiki.libsdl.org/SDL3/SDL_HasEvent.
     """
 
-    return _get_sdl_handle()[].get_function[fn (type: UInt32) -> Bool]("SDL_HasEvent")(type)
+    return _get_dylib_function[lib, "SDL_HasEvent", fn (type: UInt32) -> Bool]()(type)
 
 
-fn has_events(min_type: UInt32, max_type: UInt32) -> Bool:
+fn has_events(min_type: UInt32, max_type: UInt32) raises -> Bool:
     """Check for the existence of certain event types in the event queue.
 
     If you need to check for a single event type, use SDL_HasEvent() instead.
@@ -1415,10 +1415,10 @@ fn has_events(min_type: UInt32, max_type: UInt32) -> Bool:
     Docs: https://wiki.libsdl.org/SDL3/SDL_HasEvents.
     """
 
-    return _get_sdl_handle()[].get_function[fn (min_type: UInt32, max_type: UInt32) -> Bool]("SDL_HasEvents")(min_type, max_type)
+    return _get_dylib_function[lib, "SDL_HasEvents", fn (min_type: UInt32, max_type: UInt32) -> Bool]()(min_type, max_type)
 
 
-fn flush_event(type: UInt32) -> None:
+fn flush_event(type: UInt32) raises -> None:
     """Clear events of a specific type from the event queue.
 
     This will unconditionally remove any events from the queue that match
@@ -1445,10 +1445,10 @@ fn flush_event(type: UInt32) -> None:
     Docs: https://wiki.libsdl.org/SDL3/SDL_FlushEvent.
     """
 
-    return _get_sdl_handle()[].get_function[fn (type: UInt32) -> None]("SDL_FlushEvent")(type)
+    return _get_dylib_function[lib, "SDL_FlushEvent", fn (type: UInt32) -> None]()(type)
 
 
-fn flush_events(min_type: UInt32, max_type: UInt32) -> None:
+fn flush_events(min_type: UInt32, max_type: UInt32) raises -> None:
     """Clear events of a range of types from the event queue.
 
     This will unconditionally remove any events from the queue that are in the
@@ -1474,10 +1474,10 @@ fn flush_events(min_type: UInt32, max_type: UInt32) -> None:
     Docs: https://wiki.libsdl.org/SDL3/SDL_FlushEvents.
     """
 
-    return _get_sdl_handle()[].get_function[fn (min_type: UInt32, max_type: UInt32) -> None]("SDL_FlushEvents")(min_type, max_type)
+    return _get_dylib_function[lib, "SDL_FlushEvents", fn (min_type: UInt32, max_type: UInt32) -> None]()(min_type, max_type)
 
 
-fn poll_event(event: Ptr[Event, mut=True]) -> Bool:
+fn poll_event(event: Ptr[Event, AnyOrigin[True]]) raises -> Bool:
     """Poll for currently pending events.
 
     If `event` is not NULL, the next event is removed from the queue and stored
@@ -1522,10 +1522,10 @@ fn poll_event(event: Ptr[Event, mut=True]) -> Bool:
     Docs: https://wiki.libsdl.org/SDL3/SDL_PollEvent.
     """
 
-    return _get_sdl_handle()[].get_function[fn (event: Ptr[Event, mut=True]) -> Bool]("SDL_PollEvent")(event)
+    return _get_dylib_function[lib, "SDL_PollEvent", fn (event: Ptr[Event, AnyOrigin[True]]) -> Bool]()(event)
 
 
-fn wait_event(event: Ptr[Event, mut=True]) raises:
+fn wait_event(event: Ptr[Event, AnyOrigin[True]]) raises:
     """Wait indefinitely for the next available event.
 
     If `event` is not NULL, the next event is removed from the queue and stored
@@ -1548,12 +1548,12 @@ fn wait_event(event: Ptr[Event, mut=True]) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_WaitEvent.
     """
 
-    ret = _get_sdl_handle()[].get_function[fn (event: Ptr[Event, mut=True]) -> Bool]("SDL_WaitEvent")(event)
+    ret = _get_dylib_function[lib, "SDL_WaitEvent", fn (event: Ptr[Event, AnyOrigin[True]]) -> Bool]()(event)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn wait_event_timeout(event: Ptr[Event, mut=True], timeout_ms: Int32) -> Bool:
+fn wait_event_timeout(event: Ptr[Event, AnyOrigin[True]], timeout_ms: Int32) raises -> Bool:
     """Wait until the specified timeout (in milliseconds) for the next available
     event.
 
@@ -1582,10 +1582,10 @@ fn wait_event_timeout(event: Ptr[Event, mut=True], timeout_ms: Int32) -> Bool:
     Docs: https://wiki.libsdl.org/SDL3/SDL_WaitEventTimeout.
     """
 
-    return _get_sdl_handle()[].get_function[fn (event: Ptr[Event, mut=True], timeout_ms: Int32) -> Bool]("SDL_WaitEventTimeout")(event, timeout_ms)
+    return _get_dylib_function[lib, "SDL_WaitEventTimeout", fn (event: Ptr[Event, AnyOrigin[True]], timeout_ms: Int32) -> Bool]()(event, timeout_ms)
 
 
-fn push_event(event: Ptr[Event, mut=True]) raises:
+fn push_event(event: Ptr[Event, AnyOrigin[True]]) raises:
     """Add an event to the event queue.
 
     The event queue can actually be used as a two way communication channel.
@@ -1618,12 +1618,12 @@ fn push_event(event: Ptr[Event, mut=True]) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_PushEvent.
     """
 
-    ret = _get_sdl_handle()[].get_function[fn (event: Ptr[Event, mut=True]) -> Bool]("SDL_PushEvent")(event)
+    ret = _get_dylib_function[lib, "SDL_PushEvent", fn (event: Ptr[Event, AnyOrigin[True]]) -> Bool]()(event)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-alias EventFilter = fn (userdata: Ptr[NoneType, mut=True], event: Ptr[Event, mut=True]) -> Bool
+comptime EventFilter = fn (userdata: Ptr[NoneType, AnyOrigin[True]], event: Ptr[Event, AnyOrigin[True]]) -> Bool
 """A function pointer used for callbacks that watch the event queue.
     
     Args:
@@ -1645,7 +1645,7 @@ Docs: https://wiki.libsdl.org/SDL3/SDL_EventFilter.
 """
 
 
-fn set_event_filter(filter: EventFilter, userdata: Ptr[NoneType, mut=True]) -> None:
+fn set_event_filter(filter: EventFilter, userdata: Ptr[NoneType, AnyOrigin[True]]) raises -> None:
     """Set up a filter to process all events before they are added to the internal
     event queue.
 
@@ -1681,10 +1681,10 @@ fn set_event_filter(filter: EventFilter, userdata: Ptr[NoneType, mut=True]) -> N
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetEventFilter.
     """
 
-    return _get_sdl_handle()[].get_function[fn (filter: EventFilter, userdata: Ptr[NoneType, mut=True]) -> None]("SDL_SetEventFilter")(filter, userdata)
+    return _get_dylib_function[lib, "SDL_SetEventFilter", fn (filter: EventFilter, userdata: Ptr[NoneType, AnyOrigin[True]]) -> None]()(filter, userdata)
 
 
-fn get_event_filter(filter: Ptr[EventFilter, mut=True], userdata: Ptr[Ptr[NoneType, mut=True], mut=True]) raises:
+fn get_event_filter(filter: Ptr[EventFilter, AnyOrigin[True]], userdata: Ptr[Ptr[NoneType, AnyOrigin[True]], AnyOrigin[True]]) raises:
     """Query the current event filter.
 
     This function can be used to "chain" filters, by saving the existing filter
@@ -1704,12 +1704,12 @@ fn get_event_filter(filter: Ptr[EventFilter, mut=True], userdata: Ptr[Ptr[NoneTy
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetEventFilter.
     """
 
-    ret = _get_sdl_handle()[].get_function[fn (filter: Ptr[EventFilter, mut=True], userdata: Ptr[Ptr[NoneType, mut=True], mut=True]) -> Bool]("SDL_GetEventFilter")(filter, userdata)
+    ret = _get_dylib_function[lib, "SDL_GetEventFilter", fn (filter: Ptr[EventFilter, AnyOrigin[True]], userdata: Ptr[Ptr[NoneType, AnyOrigin[True]], AnyOrigin[True]]) -> Bool]()(filter, userdata)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn add_event_watch(filter: EventFilter, userdata: Ptr[NoneType, mut=True]) raises:
+fn add_event_watch(filter: EventFilter, userdata: Ptr[NoneType, AnyOrigin[True]]) raises:
     """Add a callback to be triggered when an event is added to the event queue.
 
     `filter` will be called when an event happens, and its return value is
@@ -1741,12 +1741,12 @@ fn add_event_watch(filter: EventFilter, userdata: Ptr[NoneType, mut=True]) raise
     Docs: https://wiki.libsdl.org/SDL3/SDL_AddEventWatch.
     """
 
-    ret = _get_sdl_handle()[].get_function[fn (filter: EventFilter, userdata: Ptr[NoneType, mut=True]) -> Bool]("SDL_AddEventWatch")(filter, userdata)
+    ret = _get_dylib_function[lib, "SDL_AddEventWatch", fn (filter: EventFilter, userdata: Ptr[NoneType, AnyOrigin[True]]) -> Bool]()(filter, userdata)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn remove_event_watch(filter: EventFilter, userdata: Ptr[NoneType, mut=True]) -> None:
+fn remove_event_watch(filter: EventFilter, userdata: Ptr[NoneType, AnyOrigin[True]]) raises -> None:
     """Remove an event watch callback added with SDL_AddEventWatch().
 
     This function takes the same input as SDL_AddEventWatch() to identify and
@@ -1762,10 +1762,10 @@ fn remove_event_watch(filter: EventFilter, userdata: Ptr[NoneType, mut=True]) ->
     Docs: https://wiki.libsdl.org/SDL3/SDL_RemoveEventWatch.
     """
 
-    return _get_sdl_handle()[].get_function[fn (filter: EventFilter, userdata: Ptr[NoneType, mut=True]) -> None]("SDL_RemoveEventWatch")(filter, userdata)
+    return _get_dylib_function[lib, "SDL_RemoveEventWatch", fn (filter: EventFilter, userdata: Ptr[NoneType, AnyOrigin[True]]) -> None]()(filter, userdata)
 
 
-fn filter_events(filter: EventFilter, userdata: Ptr[NoneType, mut=True]) -> None:
+fn filter_events(filter: EventFilter, userdata: Ptr[NoneType, AnyOrigin[True]]) raises -> None:
     """Run a specific filter function on the current event queue, removing any
     events for which the filter returns false.
 
@@ -1783,10 +1783,10 @@ fn filter_events(filter: EventFilter, userdata: Ptr[NoneType, mut=True]) -> None
     Docs: https://wiki.libsdl.org/SDL3/SDL_FilterEvents.
     """
 
-    return _get_sdl_handle()[].get_function[fn (filter: EventFilter, userdata: Ptr[NoneType, mut=True]) -> None]("SDL_FilterEvents")(filter, userdata)
+    return _get_dylib_function[lib, "SDL_FilterEvents", fn (filter: EventFilter, userdata: Ptr[NoneType, AnyOrigin[True]]) -> None]()(filter, userdata)
 
 
-fn set_event_enabled(type: UInt32, enabled: Bool) -> None:
+fn set_event_enabled(type: UInt32, enabled: Bool) raises -> None:
     """Set the state of processing events by type.
 
     Args:
@@ -1799,10 +1799,10 @@ fn set_event_enabled(type: UInt32, enabled: Bool) -> None:
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetEventEnabled.
     """
 
-    return _get_sdl_handle()[].get_function[fn (type: UInt32, enabled: Bool) -> None]("SDL_SetEventEnabled")(type, enabled)
+    return _get_dylib_function[lib, "SDL_SetEventEnabled", fn (type: UInt32, enabled: Bool) -> None]()(type, enabled)
 
 
-fn event_enabled(type: UInt32) -> Bool:
+fn event_enabled(type: UInt32) raises -> Bool:
     """Query the state of processing events by type.
 
     Args:
@@ -1817,10 +1817,10 @@ fn event_enabled(type: UInt32) -> Bool:
     Docs: https://wiki.libsdl.org/SDL3/SDL_EventEnabled.
     """
 
-    return _get_sdl_handle()[].get_function[fn (type: UInt32) -> Bool]("SDL_EventEnabled")(type)
+    return _get_dylib_function[lib, "SDL_EventEnabled", fn (type: UInt32) -> Bool]()(type)
 
 
-fn register_events(numevents: c_int) -> UInt32:
+fn register_events(numevents: c_int) raises -> UInt32:
     """Allocate a set of user-defined events, and return the beginning event
     number for that set of events.
 
@@ -1837,10 +1837,10 @@ fn register_events(numevents: c_int) -> UInt32:
     Docs: https://wiki.libsdl.org/SDL3/SDL_RegisterEvents.
     """
 
-    return _get_sdl_handle()[].get_function[fn (numevents: c_int) -> UInt32]("SDL_RegisterEvents")(numevents)
+    return _get_dylib_function[lib, "SDL_RegisterEvents", fn (numevents: c_int) -> UInt32]()(numevents)
 
 
-fn get_window_from_event(event: Ptr[Event, mut=False]) -> Ptr[Window, mut=True]:
+fn get_window_from_event(event: Ptr[Event, AnyOrigin[False]]) raises -> Ptr[Window, AnyOrigin[True]]:
     """Get window associated with an event.
 
     Args:
@@ -1855,4 +1855,4 @@ fn get_window_from_event(event: Ptr[Event, mut=False]) -> Ptr[Window, mut=True]:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetWindowFromEvent.
     """
 
-    return _get_sdl_handle()[].get_function[fn (event: Ptr[Event, mut=False]) -> Ptr[Window, mut=True]]("SDL_GetWindowFromEvent")(event)
+    return _get_dylib_function[lib, "SDL_GetWindowFromEvent", fn (event: Ptr[Event, AnyOrigin[False]]) -> Ptr[Window, AnyOrigin[True]]]()(event)

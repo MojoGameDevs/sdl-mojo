@@ -64,63 +64,63 @@ struct Scancode(Indexer, Intable):
 
     @always_inline("nodebug")
     fn __mlir_index__(self) -> __mlir_type.index:
-        return Int(self).__mlir_index__()
+        return Int(self)._mlir_value
 
-    alias SCANCODE_UNKNOWN = Self(0)
+    comptime SCANCODE_UNKNOWN = Self(0)
 
     # *  \name Usage page 0x07
     #      *
     #      *  These values are from usage page 0x07 (USB keyboard page).
 
-    alias SCANCODE_A = Self(4)
-    alias SCANCODE_B = Self(5)
-    alias SCANCODE_C = Self(6)
-    alias SCANCODE_D = Self(7)
-    alias SCANCODE_E = Self(8)
-    alias SCANCODE_F = Self(9)
-    alias SCANCODE_G = Self(10)
-    alias SCANCODE_H = Self(11)
-    alias SCANCODE_I = Self(12)
-    alias SCANCODE_J = Self(13)
-    alias SCANCODE_K = Self(14)
-    alias SCANCODE_L = Self(15)
-    alias SCANCODE_M = Self(16)
-    alias SCANCODE_N = Self(17)
-    alias SCANCODE_O = Self(18)
-    alias SCANCODE_P = Self(19)
-    alias SCANCODE_Q = Self(20)
-    alias SCANCODE_R = Self(21)
-    alias SCANCODE_S = Self(22)
-    alias SCANCODE_T = Self(23)
-    alias SCANCODE_U = Self(24)
-    alias SCANCODE_V = Self(25)
-    alias SCANCODE_W = Self(26)
-    alias SCANCODE_X = Self(27)
-    alias SCANCODE_Y = Self(28)
-    alias SCANCODE_Z = Self(29)
+    comptime SCANCODE_A = Self(4)
+    comptime SCANCODE_B = Self(5)
+    comptime SCANCODE_C = Self(6)
+    comptime SCANCODE_D = Self(7)
+    comptime SCANCODE_E = Self(8)
+    comptime SCANCODE_F = Self(9)
+    comptime SCANCODE_G = Self(10)
+    comptime SCANCODE_H = Self(11)
+    comptime SCANCODE_I = Self(12)
+    comptime SCANCODE_J = Self(13)
+    comptime SCANCODE_K = Self(14)
+    comptime SCANCODE_L = Self(15)
+    comptime SCANCODE_M = Self(16)
+    comptime SCANCODE_N = Self(17)
+    comptime SCANCODE_O = Self(18)
+    comptime SCANCODE_P = Self(19)
+    comptime SCANCODE_Q = Self(20)
+    comptime SCANCODE_R = Self(21)
+    comptime SCANCODE_S = Self(22)
+    comptime SCANCODE_T = Self(23)
+    comptime SCANCODE_U = Self(24)
+    comptime SCANCODE_V = Self(25)
+    comptime SCANCODE_W = Self(26)
+    comptime SCANCODE_X = Self(27)
+    comptime SCANCODE_Y = Self(28)
+    comptime SCANCODE_Z = Self(29)
 
-    alias SCANCODE_1 = Self(30)
-    alias SCANCODE_2 = Self(31)
-    alias SCANCODE_3 = Self(32)
-    alias SCANCODE_4 = Self(33)
-    alias SCANCODE_5 = Self(34)
-    alias SCANCODE_6 = Self(35)
-    alias SCANCODE_7 = Self(36)
-    alias SCANCODE_8 = Self(37)
-    alias SCANCODE_9 = Self(38)
-    alias SCANCODE_0 = Self(39)
+    comptime SCANCODE_1 = Self(30)
+    comptime SCANCODE_2 = Self(31)
+    comptime SCANCODE_3 = Self(32)
+    comptime SCANCODE_4 = Self(33)
+    comptime SCANCODE_5 = Self(34)
+    comptime SCANCODE_6 = Self(35)
+    comptime SCANCODE_7 = Self(36)
+    comptime SCANCODE_8 = Self(37)
+    comptime SCANCODE_9 = Self(38)
+    comptime SCANCODE_0 = Self(39)
 
-    alias SCANCODE_RETURN = Self(40)
-    alias SCANCODE_ESCAPE = Self(41)
-    alias SCANCODE_BACKSPACE = Self(42)
-    alias SCANCODE_TAB = Self(43)
-    alias SCANCODE_SPACE = Self(44)
+    comptime SCANCODE_RETURN = Self(40)
+    comptime SCANCODE_ESCAPE = Self(41)
+    comptime SCANCODE_BACKSPACE = Self(42)
+    comptime SCANCODE_TAB = Self(43)
+    comptime SCANCODE_SPACE = Self(44)
 
-    alias SCANCODE_MINUS = Self(45)
-    alias SCANCODE_EQUALS = Self(46)
-    alias SCANCODE_LEFTBRACKET = Self(47)
-    alias SCANCODE_RIGHTBRACKET = Self(48)
-    alias SCANCODE_BACKSLASH = Self(49)
+    comptime SCANCODE_MINUS = Self(45)
+    comptime SCANCODE_EQUALS = Self(46)
+    comptime SCANCODE_LEFTBRACKET = Self(47)
+    comptime SCANCODE_RIGHTBRACKET = Self(48)
+    comptime SCANCODE_BACKSLASH = Self(49)
     """Located at the lower left of the return
       key on ISO keyboards and at the right end
       of the QWERTY row on ANSI keyboards.
@@ -134,7 +134,7 @@ struct Scancode(Indexer, Intable):
       ACCENT and POUND SIGN in a French Mac
       layout, and ASTERISK and MICRO SIGN in a
       French Windows layout."""
-    alias SCANCODE_NONUSHASH = Self(50)
+    comptime SCANCODE_NONUSHASH = Self(50)
     """ISO USB keyboards actually use this code
       instead of 49 for the same key, but all
       OSes I've seen treat the two codes
@@ -146,9 +146,9 @@ struct Scancode(Indexer, Intable):
       should not rely on this code because SDL
       will never generate it with most (all?)
       keyboards."""
-    alias SCANCODE_SEMICOLON = Self(51)
-    alias SCANCODE_APOSTROPHE = Self(52)
-    alias SCANCODE_GRAVE = Self(53)
+    comptime SCANCODE_SEMICOLON = Self(51)
+    comptime SCANCODE_APOSTROPHE = Self(52)
+    comptime SCANCODE_GRAVE = Self(53)
     """Located in the top left corner (on both ANSI
       and ISO keyboards). Produces GRAVE ACCENT and
       TILDE in a US Windows layout and in US and UK
@@ -165,61 +165,61 @@ struct Scancode(Indexer, Intable):
       keyboards, and LESS-THAN SIGN and GREATER-THAN
       SIGN in a Swiss German, German, or French Mac
       layout on ANSI keyboards."""
-    alias SCANCODE_COMMA = Self(54)
-    alias SCANCODE_PERIOD = Self(55)
-    alias SCANCODE_SLASH = Self(56)
+    comptime SCANCODE_COMMA = Self(54)
+    comptime SCANCODE_PERIOD = Self(55)
+    comptime SCANCODE_SLASH = Self(56)
 
-    alias SCANCODE_CAPSLOCK = Self(57)
+    comptime SCANCODE_CAPSLOCK = Self(57)
 
-    alias SCANCODE_F1 = Self(58)
-    alias SCANCODE_F2 = Self(59)
-    alias SCANCODE_F3 = Self(60)
-    alias SCANCODE_F4 = Self(61)
-    alias SCANCODE_F5 = Self(62)
-    alias SCANCODE_F6 = Self(63)
-    alias SCANCODE_F7 = Self(64)
-    alias SCANCODE_F8 = Self(65)
-    alias SCANCODE_F9 = Self(66)
-    alias SCANCODE_F10 = Self(67)
-    alias SCANCODE_F11 = Self(68)
-    alias SCANCODE_F12 = Self(69)
+    comptime SCANCODE_F1 = Self(58)
+    comptime SCANCODE_F2 = Self(59)
+    comptime SCANCODE_F3 = Self(60)
+    comptime SCANCODE_F4 = Self(61)
+    comptime SCANCODE_F5 = Self(62)
+    comptime SCANCODE_F6 = Self(63)
+    comptime SCANCODE_F7 = Self(64)
+    comptime SCANCODE_F8 = Self(65)
+    comptime SCANCODE_F9 = Self(66)
+    comptime SCANCODE_F10 = Self(67)
+    comptime SCANCODE_F11 = Self(68)
+    comptime SCANCODE_F12 = Self(69)
 
-    alias SCANCODE_PRINTSCREEN = Self(70)
-    alias SCANCODE_SCROLLLOCK = Self(71)
-    alias SCANCODE_PAUSE = Self(72)
-    alias SCANCODE_INSERT = Self(73)
+    comptime SCANCODE_PRINTSCREEN = Self(70)
+    comptime SCANCODE_SCROLLLOCK = Self(71)
+    comptime SCANCODE_PAUSE = Self(72)
+    comptime SCANCODE_INSERT = Self(73)
     """Insert on PC, help on some Mac keyboards (but
                                        does send code 73, not 117)."""
-    alias SCANCODE_HOME = Self(74)
-    alias SCANCODE_PAGEUP = Self(75)
-    alias SCANCODE_DELETE = Self(76)
-    alias SCANCODE_END = Self(77)
-    alias SCANCODE_PAGEDOWN = Self(78)
-    alias SCANCODE_RIGHT = Self(79)
-    alias SCANCODE_LEFT = Self(80)
-    alias SCANCODE_DOWN = Self(81)
-    alias SCANCODE_UP = Self(82)
+    comptime SCANCODE_HOME = Self(74)
+    comptime SCANCODE_PAGEUP = Self(75)
+    comptime SCANCODE_DELETE = Self(76)
+    comptime SCANCODE_END = Self(77)
+    comptime SCANCODE_PAGEDOWN = Self(78)
+    comptime SCANCODE_RIGHT = Self(79)
+    comptime SCANCODE_LEFT = Self(80)
+    comptime SCANCODE_DOWN = Self(81)
+    comptime SCANCODE_UP = Self(82)
 
-    alias SCANCODE_NUMLOCKCLEAR = Self(83)
+    comptime SCANCODE_NUMLOCKCLEAR = Self(83)
     """Num lock on PC, clear on Mac keyboards."""
-    alias SCANCODE_KP_DIVIDE = Self(84)
-    alias SCANCODE_KP_MULTIPLY = Self(85)
-    alias SCANCODE_KP_MINUS = Self(86)
-    alias SCANCODE_KP_PLUS = Self(87)
-    alias SCANCODE_KP_ENTER = Self(88)
-    alias SCANCODE_KP_1 = Self(89)
-    alias SCANCODE_KP_2 = Self(90)
-    alias SCANCODE_KP_3 = Self(91)
-    alias SCANCODE_KP_4 = Self(92)
-    alias SCANCODE_KP_5 = Self(93)
-    alias SCANCODE_KP_6 = Self(94)
-    alias SCANCODE_KP_7 = Self(95)
-    alias SCANCODE_KP_8 = Self(96)
-    alias SCANCODE_KP_9 = Self(97)
-    alias SCANCODE_KP_0 = Self(98)
-    alias SCANCODE_KP_PERIOD = Self(99)
+    comptime SCANCODE_KP_DIVIDE = Self(84)
+    comptime SCANCODE_KP_MULTIPLY = Self(85)
+    comptime SCANCODE_KP_MINUS = Self(86)
+    comptime SCANCODE_KP_PLUS = Self(87)
+    comptime SCANCODE_KP_ENTER = Self(88)
+    comptime SCANCODE_KP_1 = Self(89)
+    comptime SCANCODE_KP_2 = Self(90)
+    comptime SCANCODE_KP_3 = Self(91)
+    comptime SCANCODE_KP_4 = Self(92)
+    comptime SCANCODE_KP_5 = Self(93)
+    comptime SCANCODE_KP_6 = Self(94)
+    comptime SCANCODE_KP_7 = Self(95)
+    comptime SCANCODE_KP_8 = Self(96)
+    comptime SCANCODE_KP_9 = Self(97)
+    comptime SCANCODE_KP_0 = Self(98)
+    comptime SCANCODE_KP_PERIOD = Self(99)
 
-    alias SCANCODE_NONUSBACKSLASH = Self(100)
+    comptime SCANCODE_NONUSBACKSLASH = Self(100)
     """This is the additional key that ISO
       keyboards have over ANSI ones,
       located between left shift and Z.
@@ -230,162 +230,162 @@ struct Scancode(Indexer, Intable):
       LESS-THAN SIGN and GREATER-THAN SIGN
       in a Swiss German, German, or French
       layout."""
-    alias SCANCODE_APPLICATION = Self(101)
+    comptime SCANCODE_APPLICATION = Self(101)
     """Windows contextual menu, compose."""
-    alias SCANCODE_POWER = Self(102)
+    comptime SCANCODE_POWER = Self(102)
     """The USB document says this is a status flag,
       not a physical key - but some Mac keyboards
       do have a power key."""
-    alias SCANCODE_KP_EQUALS = Self(103)
-    alias SCANCODE_F13 = Self(104)
-    alias SCANCODE_F14 = Self(105)
-    alias SCANCODE_F15 = Self(106)
-    alias SCANCODE_F16 = Self(107)
-    alias SCANCODE_F17 = Self(108)
-    alias SCANCODE_F18 = Self(109)
-    alias SCANCODE_F19 = Self(110)
-    alias SCANCODE_F20 = Self(111)
-    alias SCANCODE_F21 = Self(112)
-    alias SCANCODE_F22 = Self(113)
-    alias SCANCODE_F23 = Self(114)
-    alias SCANCODE_F24 = Self(115)
-    alias SCANCODE_EXECUTE = Self(116)
-    alias SCANCODE_HELP = Self(117)
+    comptime SCANCODE_KP_EQUALS = Self(103)
+    comptime SCANCODE_F13 = Self(104)
+    comptime SCANCODE_F14 = Self(105)
+    comptime SCANCODE_F15 = Self(106)
+    comptime SCANCODE_F16 = Self(107)
+    comptime SCANCODE_F17 = Self(108)
+    comptime SCANCODE_F18 = Self(109)
+    comptime SCANCODE_F19 = Self(110)
+    comptime SCANCODE_F20 = Self(111)
+    comptime SCANCODE_F21 = Self(112)
+    comptime SCANCODE_F22 = Self(113)
+    comptime SCANCODE_F23 = Self(114)
+    comptime SCANCODE_F24 = Self(115)
+    comptime SCANCODE_EXECUTE = Self(116)
+    comptime SCANCODE_HELP = Self(117)
     """AL Integrated Help Center."""
-    alias SCANCODE_MENU = Self(118)
+    comptime SCANCODE_MENU = Self(118)
     """Menu (show menu)."""
-    alias SCANCODE_SELECT = Self(119)
-    alias SCANCODE_STOP = Self(120)
+    comptime SCANCODE_SELECT = Self(119)
+    comptime SCANCODE_STOP = Self(120)
     """AC Stop."""
-    alias SCANCODE_AGAIN = Self(121)
+    comptime SCANCODE_AGAIN = Self(121)
     """AC Redo/Repeat."""
-    alias SCANCODE_UNDO = Self(122)
+    comptime SCANCODE_UNDO = Self(122)
     """AC Undo."""
-    alias SCANCODE_CUT = Self(123)
+    comptime SCANCODE_CUT = Self(123)
     """AC Cut."""
-    alias SCANCODE_COPY = Self(124)
+    comptime SCANCODE_COPY = Self(124)
     """AC Copy."""
-    alias SCANCODE_PASTE = Self(125)
+    comptime SCANCODE_PASTE = Self(125)
     """AC Paste."""
-    alias SCANCODE_FIND = Self(126)
+    comptime SCANCODE_FIND = Self(126)
     """AC Find."""
-    alias SCANCODE_MUTE = Self(127)
-    alias SCANCODE_VOLUMEUP = Self(128)
-    alias SCANCODE_VOLUMEDOWN = Self(129)
+    comptime SCANCODE_MUTE = Self(127)
+    comptime SCANCODE_VOLUMEUP = Self(128)
+    comptime SCANCODE_VOLUMEDOWN = Self(129)
     # not sure whether there's a reason to enable these
     # SDL_SCANCODE_LOCKINGCAPSLOCK = 130,
     # SDL_SCANCODE_LOCKINGNUMLOCK = 131,
     # SDL_SCANCODE_LOCKINGSCROLLLOCK = 132,
-    alias SCANCODE_KP_COMMA = Self(133)
-    alias SCANCODE_KP_EQUALSAS400 = Self(134)
+    comptime SCANCODE_KP_COMMA = Self(133)
+    comptime SCANCODE_KP_EQUALSAS400 = Self(134)
 
-    alias SCANCODE_INTERNATIONAL1 = Self(135)
+    comptime SCANCODE_INTERNATIONAL1 = Self(135)
     """Used on Asian keyboards, see
                                                 footnotes in USB doc."""
-    alias SCANCODE_INTERNATIONAL2 = Self(136)
-    alias SCANCODE_INTERNATIONAL3 = Self(137)
+    comptime SCANCODE_INTERNATIONAL2 = Self(136)
+    comptime SCANCODE_INTERNATIONAL3 = Self(137)
     """Yen."""
-    alias SCANCODE_INTERNATIONAL4 = Self(138)
-    alias SCANCODE_INTERNATIONAL5 = Self(139)
-    alias SCANCODE_INTERNATIONAL6 = Self(140)
-    alias SCANCODE_INTERNATIONAL7 = Self(141)
-    alias SCANCODE_INTERNATIONAL8 = Self(142)
-    alias SCANCODE_INTERNATIONAL9 = Self(143)
-    alias SCANCODE_LANG1 = Self(144)
+    comptime SCANCODE_INTERNATIONAL4 = Self(138)
+    comptime SCANCODE_INTERNATIONAL5 = Self(139)
+    comptime SCANCODE_INTERNATIONAL6 = Self(140)
+    comptime SCANCODE_INTERNATIONAL7 = Self(141)
+    comptime SCANCODE_INTERNATIONAL8 = Self(142)
+    comptime SCANCODE_INTERNATIONAL9 = Self(143)
+    comptime SCANCODE_LANG1 = Self(144)
     """Hangul/English toggle."""
-    alias SCANCODE_LANG2 = Self(145)
+    comptime SCANCODE_LANG2 = Self(145)
     """Hanja conversion."""
-    alias SCANCODE_LANG3 = Self(146)
+    comptime SCANCODE_LANG3 = Self(146)
     """Katakana."""
-    alias SCANCODE_LANG4 = Self(147)
+    comptime SCANCODE_LANG4 = Self(147)
     """Hiragana."""
-    alias SCANCODE_LANG5 = Self(148)
+    comptime SCANCODE_LANG5 = Self(148)
     """Zenkaku/Hankaku."""
-    alias SCANCODE_LANG6 = Self(149)
+    comptime SCANCODE_LANG6 = Self(149)
     """Reserved."""
-    alias SCANCODE_LANG7 = Self(150)
+    comptime SCANCODE_LANG7 = Self(150)
     """Reserved."""
-    alias SCANCODE_LANG8 = Self(151)
+    comptime SCANCODE_LANG8 = Self(151)
     """Reserved."""
-    alias SCANCODE_LANG9 = Self(152)
+    comptime SCANCODE_LANG9 = Self(152)
     """Reserved."""
 
-    alias SCANCODE_ALTERASE = Self(153)
+    comptime SCANCODE_ALTERASE = Self(153)
     """Erase-Eaze."""
-    alias SCANCODE_SYSREQ = Self(154)
-    alias SCANCODE_CANCEL = Self(155)
+    comptime SCANCODE_SYSREQ = Self(154)
+    comptime SCANCODE_CANCEL = Self(155)
     """AC Cancel."""
-    alias SCANCODE_CLEAR = Self(156)
-    alias SCANCODE_PRIOR = Self(157)
-    alias SCANCODE_RETURN2 = Self(158)
-    alias SCANCODE_SEPARATOR = Self(159)
-    alias SCANCODE_OUT = Self(160)
-    alias SCANCODE_OPER = Self(161)
-    alias SCANCODE_CLEARAGAIN = Self(162)
-    alias SCANCODE_CRSEL = Self(163)
-    alias SCANCODE_EXSEL = Self(164)
+    comptime SCANCODE_CLEAR = Self(156)
+    comptime SCANCODE_PRIOR = Self(157)
+    comptime SCANCODE_RETURN2 = Self(158)
+    comptime SCANCODE_SEPARATOR = Self(159)
+    comptime SCANCODE_OUT = Self(160)
+    comptime SCANCODE_OPER = Self(161)
+    comptime SCANCODE_CLEARAGAIN = Self(162)
+    comptime SCANCODE_CRSEL = Self(163)
+    comptime SCANCODE_EXSEL = Self(164)
 
-    alias SCANCODE_KP_00 = Self(176)
-    alias SCANCODE_KP_000 = Self(177)
-    alias SCANCODE_THOUSANDSSEPARATOR = Self(178)
-    alias SCANCODE_DECIMALSEPARATOR = Self(179)
-    alias SCANCODE_CURRENCYUNIT = Self(180)
-    alias SCANCODE_CURRENCYSUBUNIT = Self(181)
-    alias SCANCODE_KP_LEFTPAREN = Self(182)
-    alias SCANCODE_KP_RIGHTPAREN = Self(183)
-    alias SCANCODE_KP_LEFTBRACE = Self(184)
-    alias SCANCODE_KP_RIGHTBRACE = Self(185)
-    alias SCANCODE_KP_TAB = Self(186)
-    alias SCANCODE_KP_BACKSPACE = Self(187)
-    alias SCANCODE_KP_A = Self(188)
-    alias SCANCODE_KP_B = Self(189)
-    alias SCANCODE_KP_C = Self(190)
-    alias SCANCODE_KP_D = Self(191)
-    alias SCANCODE_KP_E = Self(192)
-    alias SCANCODE_KP_F = Self(193)
-    alias SCANCODE_KP_XOR = Self(194)
-    alias SCANCODE_KP_POWER = Self(195)
-    alias SCANCODE_KP_PERCENT = Self(196)
-    alias SCANCODE_KP_LESS = Self(197)
-    alias SCANCODE_KP_GREATER = Self(198)
-    alias SCANCODE_KP_AMPERSAND = Self(199)
-    alias SCANCODE_KP_DBLAMPERSAND = Self(200)
-    alias SCANCODE_KP_VERTICALBAR = Self(201)
-    alias SCANCODE_KP_DBLVERTICALBAR = Self(202)
-    alias SCANCODE_KP_COLON = Self(203)
-    alias SCANCODE_KP_HASH = Self(204)
-    alias SCANCODE_KP_SPACE = Self(205)
-    alias SCANCODE_KP_AT = Self(206)
-    alias SCANCODE_KP_EXCLAM = Self(207)
-    alias SCANCODE_KP_MEMSTORE = Self(208)
-    alias SCANCODE_KP_MEMRECALL = Self(209)
-    alias SCANCODE_KP_MEMCLEAR = Self(210)
-    alias SCANCODE_KP_MEMADD = Self(211)
-    alias SCANCODE_KP_MEMSUBTRACT = Self(212)
-    alias SCANCODE_KP_MEMMULTIPLY = Self(213)
-    alias SCANCODE_KP_MEMDIVIDE = Self(214)
-    alias SCANCODE_KP_PLUSMINUS = Self(215)
-    alias SCANCODE_KP_CLEAR = Self(216)
-    alias SCANCODE_KP_CLEARENTRY = Self(217)
-    alias SCANCODE_KP_BINARY = Self(218)
-    alias SCANCODE_KP_OCTAL = Self(219)
-    alias SCANCODE_KP_DECIMAL = Self(220)
-    alias SCANCODE_KP_HEXADECIMAL = Self(221)
+    comptime SCANCODE_KP_00 = Self(176)
+    comptime SCANCODE_KP_000 = Self(177)
+    comptime SCANCODE_THOUSANDSSEPARATOR = Self(178)
+    comptime SCANCODE_DECIMALSEPARATOR = Self(179)
+    comptime SCANCODE_CURRENCYUNIT = Self(180)
+    comptime SCANCODE_CURRENCYSUBUNIT = Self(181)
+    comptime SCANCODE_KP_LEFTPAREN = Self(182)
+    comptime SCANCODE_KP_RIGHTPAREN = Self(183)
+    comptime SCANCODE_KP_LEFTBRACE = Self(184)
+    comptime SCANCODE_KP_RIGHTBRACE = Self(185)
+    comptime SCANCODE_KP_TAB = Self(186)
+    comptime SCANCODE_KP_BACKSPACE = Self(187)
+    comptime SCANCODE_KP_A = Self(188)
+    comptime SCANCODE_KP_B = Self(189)
+    comptime SCANCODE_KP_C = Self(190)
+    comptime SCANCODE_KP_D = Self(191)
+    comptime SCANCODE_KP_E = Self(192)
+    comptime SCANCODE_KP_F = Self(193)
+    comptime SCANCODE_KP_XOR = Self(194)
+    comptime SCANCODE_KP_POWER = Self(195)
+    comptime SCANCODE_KP_PERCENT = Self(196)
+    comptime SCANCODE_KP_LESS = Self(197)
+    comptime SCANCODE_KP_GREATER = Self(198)
+    comptime SCANCODE_KP_AMPERSAND = Self(199)
+    comptime SCANCODE_KP_DBLAMPERSAND = Self(200)
+    comptime SCANCODE_KP_VERTICALBAR = Self(201)
+    comptime SCANCODE_KP_DBLVERTICALBAR = Self(202)
+    comptime SCANCODE_KP_COLON = Self(203)
+    comptime SCANCODE_KP_HASH = Self(204)
+    comptime SCANCODE_KP_SPACE = Self(205)
+    comptime SCANCODE_KP_AT = Self(206)
+    comptime SCANCODE_KP_EXCLAM = Self(207)
+    comptime SCANCODE_KP_MEMSTORE = Self(208)
+    comptime SCANCODE_KP_MEMRECALL = Self(209)
+    comptime SCANCODE_KP_MEMCLEAR = Self(210)
+    comptime SCANCODE_KP_MEMADD = Self(211)
+    comptime SCANCODE_KP_MEMSUBTRACT = Self(212)
+    comptime SCANCODE_KP_MEMMULTIPLY = Self(213)
+    comptime SCANCODE_KP_MEMDIVIDE = Self(214)
+    comptime SCANCODE_KP_PLUSMINUS = Self(215)
+    comptime SCANCODE_KP_CLEAR = Self(216)
+    comptime SCANCODE_KP_CLEARENTRY = Self(217)
+    comptime SCANCODE_KP_BINARY = Self(218)
+    comptime SCANCODE_KP_OCTAL = Self(219)
+    comptime SCANCODE_KP_DECIMAL = Self(220)
+    comptime SCANCODE_KP_HEXADECIMAL = Self(221)
 
-    alias SCANCODE_LCTRL = Self(224)
-    alias SCANCODE_LSHIFT = Self(225)
-    alias SCANCODE_LALT = Self(226)
+    comptime SCANCODE_LCTRL = Self(224)
+    comptime SCANCODE_LSHIFT = Self(225)
+    comptime SCANCODE_LALT = Self(226)
     """Alt, option."""
-    alias SCANCODE_LGUI = Self(227)
+    comptime SCANCODE_LGUI = Self(227)
     """Windows, command (apple), meta."""
-    alias SCANCODE_RCTRL = Self(228)
-    alias SCANCODE_RSHIFT = Self(229)
-    alias SCANCODE_RALT = Self(230)
+    comptime SCANCODE_RCTRL = Self(228)
+    comptime SCANCODE_RSHIFT = Self(229)
+    comptime SCANCODE_RALT = Self(230)
     """Alt gr, option."""
-    alias SCANCODE_RGUI = Self(231)
+    comptime SCANCODE_RGUI = Self(231)
     """Windows, command (apple), meta."""
 
-    alias SCANCODE_MODE = Self(257)
+    comptime SCANCODE_MODE = Self(257)
     """I'm not sure if this is really not covered
       by any of the above, but since there's a
       special SDL_KMOD_MODE for it I'm adding it here."""
@@ -398,92 +398,92 @@ struct Scancode(Indexer, Intable):
     #      *  current scancode range, so pick the ones that commonly come up in
     #      *  real world usage.
 
-    alias SCANCODE_SLEEP = Self(258)
+    comptime SCANCODE_SLEEP = Self(258)
     """Sleep."""
-    alias SCANCODE_WAKE = Self(259)
+    comptime SCANCODE_WAKE = Self(259)
     """Wake."""
 
-    alias SCANCODE_CHANNEL_INCREMENT = Self(260)
+    comptime SCANCODE_CHANNEL_INCREMENT = Self(260)
     """Channel Increment."""
-    alias SCANCODE_CHANNEL_DECREMENT = Self(261)
+    comptime SCANCODE_CHANNEL_DECREMENT = Self(261)
     """Channel Decrement."""
 
-    alias SCANCODE_MEDIA_PLAY = Self(262)
+    comptime SCANCODE_MEDIA_PLAY = Self(262)
     """Play."""
-    alias SCANCODE_MEDIA_PAUSE = Self(263)
+    comptime SCANCODE_MEDIA_PAUSE = Self(263)
     """Pause."""
-    alias SCANCODE_MEDIA_RECORD = Self(264)
+    comptime SCANCODE_MEDIA_RECORD = Self(264)
     """Record."""
-    alias SCANCODE_MEDIA_FAST_FORWARD = Self(265)
+    comptime SCANCODE_MEDIA_FAST_FORWARD = Self(265)
     """Fast Forward."""
-    alias SCANCODE_MEDIA_REWIND = Self(266)
+    comptime SCANCODE_MEDIA_REWIND = Self(266)
     """Rewind."""
-    alias SCANCODE_MEDIA_NEXT_TRACK = Self(267)
+    comptime SCANCODE_MEDIA_NEXT_TRACK = Self(267)
     """Next Track."""
-    alias SCANCODE_MEDIA_PREVIOUS_TRACK = Self(268)
+    comptime SCANCODE_MEDIA_PREVIOUS_TRACK = Self(268)
     """Previous Track."""
-    alias SCANCODE_MEDIA_STOP = Self(269)
+    comptime SCANCODE_MEDIA_STOP = Self(269)
     """Stop."""
-    alias SCANCODE_MEDIA_EJECT = Self(270)
+    comptime SCANCODE_MEDIA_EJECT = Self(270)
     """Eject."""
-    alias SCANCODE_MEDIA_PLAY_PAUSE = Self(271)
+    comptime SCANCODE_MEDIA_PLAY_PAUSE = Self(271)
     """Play / Pause."""
-    alias SCANCODE_MEDIA_SELECT = Self(272)
+    comptime SCANCODE_MEDIA_SELECT = Self(272)
     """Media Select."""
 
-    alias SCANCODE_AC_NEW = Self(273)
+    comptime SCANCODE_AC_NEW = Self(273)
     """AC New."""
-    alias SCANCODE_AC_OPEN = Self(274)
+    comptime SCANCODE_AC_OPEN = Self(274)
     """AC Open."""
-    alias SCANCODE_AC_CLOSE = Self(275)
+    comptime SCANCODE_AC_CLOSE = Self(275)
     """AC Close."""
-    alias SCANCODE_AC_EXIT = Self(276)
+    comptime SCANCODE_AC_EXIT = Self(276)
     """AC Exit."""
-    alias SCANCODE_AC_SAVE = Self(277)
+    comptime SCANCODE_AC_SAVE = Self(277)
     """AC Save."""
-    alias SCANCODE_AC_PRINT = Self(278)
+    comptime SCANCODE_AC_PRINT = Self(278)
     """AC Print."""
-    alias SCANCODE_AC_PROPERTIES = Self(279)
+    comptime SCANCODE_AC_PROPERTIES = Self(279)
     """AC Properties."""
 
-    alias SCANCODE_AC_SEARCH = Self(280)
+    comptime SCANCODE_AC_SEARCH = Self(280)
     """AC Search."""
-    alias SCANCODE_AC_HOME = Self(281)
+    comptime SCANCODE_AC_HOME = Self(281)
     """AC Home."""
-    alias SCANCODE_AC_BACK = Self(282)
+    comptime SCANCODE_AC_BACK = Self(282)
     """AC Back."""
-    alias SCANCODE_AC_FORWARD = Self(283)
+    comptime SCANCODE_AC_FORWARD = Self(283)
     """AC Forward."""
-    alias SCANCODE_AC_STOP = Self(284)
+    comptime SCANCODE_AC_STOP = Self(284)
     """AC Stop."""
-    alias SCANCODE_AC_REFRESH = Self(285)
+    comptime SCANCODE_AC_REFRESH = Self(285)
     """AC Refresh."""
-    alias SCANCODE_AC_BOOKMARKS = Self(286)
+    comptime SCANCODE_AC_BOOKMARKS = Self(286)
     """AC Bookmarks."""
 
     # *  \name Mobile keys
     #      *
     #      *  These are values that are often used on mobile phones.
 
-    alias SCANCODE_SOFTLEFT = Self(287)
+    comptime SCANCODE_SOFTLEFT = Self(287)
     """Usually situated below the display on phones and
                                           used as a multi-function feature key for selecting
                                           a software defined function shown on the bottom left
                                           of the display."""
-    alias SCANCODE_SOFTRIGHT = Self(288)
+    comptime SCANCODE_SOFTRIGHT = Self(288)
     """Usually situated below the display on phones and
                                            used as a multi-function feature key for selecting
                                            a software defined function shown on the bottom right
                                            of the display."""
-    alias SCANCODE_CALL = Self(289)
+    comptime SCANCODE_CALL = Self(289)
     """Used for accepting phone calls."""
-    alias SCANCODE_ENDCALL = Self(290)
+    comptime SCANCODE_ENDCALL = Self(290)
     """Used for rejecting phone calls."""
 
     # Add any other keys here.
 
-    alias SCANCODE_RESERVED = Self(400)
+    comptime SCANCODE_RESERVED = Self(400)
     """400-500 reserved for dynamic keycodes."""
 
-    alias SCANCODE_COUNT = Self(512)
+    comptime SCANCODE_COUNT = Self(512)
     """Not a key, just marks the number of scancodes for array bounds."""

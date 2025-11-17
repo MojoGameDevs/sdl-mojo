@@ -87,25 +87,32 @@ def snake_case(string: str) -> str:
         "9Grid": "_9grid",
     }
     for k, v in special_cases.items():
-        if k not in string: continue
+        if k not in string:
+            continue
         string = string.replace(k, v)
-    return re.sub(r"(?<=[a-z0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])", "_", string).lower()
+    return re.sub(
+        r"(?<=[a-z0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])", "_", string
+    ).lower()
 
 
 def capitalize(string: str) -> str:
-    return string.capitalize() if len(string) < 2 else (string[0].capitalize() + string[1:])
+    return (
+        string.capitalize()
+        if len(string) < 2
+        else (string[0].capitalize() + string[1:])
+    )
+
 
 def drop_prefix(string: str) -> str:
-    return string.replace('SDL_', '')
+    return string.replace("SDL_", "")
 
 
 # +------( heading )------+ #
 #
 def translate_heading(m: re.Match) -> str:
-    license = re.sub(r'^(?:  )?', r'# | ', m['license'], flags = re.MULTILINE)
-    filedoc = re.sub(r'^ \* ?', r'', m['filedoc'], flags = re.MULTILINE)
-    return (
-f'''# x--------------------------------------------------------------------------x #
+    license = re.sub(r"^(?:  )?", r"# | ", m["license"], flags=re.MULTILINE)
+    filedoc = re.sub(r"^ \* ?", r"", m["filedoc"], flags=re.MULTILINE)
+    return f'''# x--------------------------------------------------------------------------x #
 # | SDL3 Bindings in Mojo
 # x--------------------------------------------------------------------------x #
 {license}
@@ -113,61 +120,62 @@ f'''# x-------------------------------------------------------------------------
 
 """{filedoc}
 """
-''')
+'''
 
 
 # +------( type )------+ #
 #
 type_map = {
-    'void': 'NoneType',
-    'SDL_FunctionPointer': 'fn () -> None',
-    'SDL_Time': 'Int64',
-    'intptr_t': 'Int',
-    'char': 'c_char',
-    'unsigned char': 'c_uint',
-    'int': 'c_int',
-    'unsigned int': 'c_uint',
-    'short': 'c_short',
-    'unsigned short': 'c_ushort',
-    'long': 'c_long',
-    'long long': 'c_long_long',
-    'size_t': 'c_size_t',
-    'ssize_t': 'c_ssize_t',
-    'float': 'c_float',
-    'double': 'c_double',
-    'uint8_t': 'UInt8',
-    'Uint8': 'UInt8', 
-    'uint16_t': 'UInt16',
-    'Uint16': 'UInt16', 
-    'uint32_t': 'UInt32',
-    'Uint32': 'UInt32', 
-    'uint64_t': 'UInt64',
-    'Uint64': 'UInt64', 
-    'int8_t': 'Int8',
-    'Sint8': 'Int8', 
-    'int16_t': 'Int16',
-    'Sint16': 'Int16', 
-    'int32_t': 'Int32',
-    'Sint32': 'Int32', 
-    'int64_t': 'Int64',
-    'Sint64': 'Int64', 
-    'bool': 'Bool',
-    }
+    "void": "NoneType",
+    "SDL_FunctionPointer": "fn () -> None",
+    "SDL_Time": "Int64",
+    "intptr_t": "Int",
+    "char": "c_char",
+    "unsigned char": "c_uint",
+    "int": "c_int",
+    "unsigned int": "c_uint",
+    "short": "c_short",
+    "unsigned short": "c_ushort",
+    "long": "c_long",
+    "long long": "c_long_long",
+    "size_t": "c_size_t",
+    "ssize_t": "c_ssize_t",
+    "float": "c_float",
+    "double": "c_double",
+    "uint8_t": "UInt8",
+    "Uint8": "UInt8",
+    "uint16_t": "UInt16",
+    "Uint16": "UInt16",
+    "uint32_t": "UInt32",
+    "Uint32": "UInt32",
+    "uint64_t": "UInt64",
+    "Uint64": "UInt64",
+    "int8_t": "Int8",
+    "Sint8": "Int8",
+    "int16_t": "Int16",
+    "Sint16": "Int16",
+    "int32_t": "Int32",
+    "Sint32": "Int32",
+    "int64_t": "Int64",
+    "Sint64": "Int64",
+    "bool": "Bool",
+}
+
 
 def translate_type(m: re.Match) -> str:
-    result = m['type']
-    result = result.replace(' *const', '').replace(' * const', '')
+    result = m["type"]
+    result = result.replace(" *const", "").replace(" * const", "")
     result = type_map.get(result) or result
 
-    if m.groupdict().get('ptrs'):
-        for _ in range(len(m['ptrs'])):
-            result = f'Ptr[{result}, mut = {not bool(m['mut'])}]'
+    if m.groupdict().get("ptrs"):
+        for _ in range(len(m["ptrs"])):
+            result = f"Ptr[{result}, AnyOrigin[{not bool(m['mut'])}]]"
 
-    if m.groupdict().get('vecs'):
-        result = f'ArrayHelper[{result}, {m['vecs']}, mut = {not bool(m['mut'])}].result'
+    if m.groupdict().get("vecs"):
+        result = f"ArrayHelper[{result}, {m['vecs']}, AnyOrigin[{not bool(m['mut'])}]].result"
 
-    if m.groupdict().get('amnt'):
-        result = f'InlineArray[{result}, {m['amnt']}]'
+    if m.groupdict().get("amnt"):
+        result = f"InlineArray[{result}, {m['amnt']}]"
 
     return drop_prefix(result)
 
@@ -180,122 +188,145 @@ def translate_return_type(m: re.Match) -> str:
 
 # +------( variable )------+ #
 #
-match_return = re.compile(r'^(?P<mut>const )?(?P<type>.+?) ?(?P<ptrs>\**)(?:\[(?P<vecs>.*?)\])?$')
-match_variable = re.compile(r'^(?P<mut>const )?(?P<type>.+) (?P<ptrs>\**)(?P<name>\w+?)(?:\[(?P<vecs>.*?)\])?$')
-match_function_pointer = re.compile(r'^(?P<ret>.*?) \(SDLCALL \*(?P<name>\w*)\)\((?P<args>.*?)\)')
+match_return = re.compile(
+    r"^(?P<mut>const )?(?P<type>.+?) ?(?P<ptrs>\**)(?:\[(?P<vecs>.*?)\])?$"
+)
+match_variable = re.compile(
+    r"^(?P<mut>const )?(?P<type>.+) (?P<ptrs>\**)(?P<name>\w+?)(?:\[(?P<vecs>.*?)\])?$"
+)
+match_function_pointer = re.compile(
+    r"^(?P<ret>.*?) \(SDLCALL \*(?P<name>\w*)\)\((?P<args>.*?)\)"
+)
+
 
 def translate_variable(m: re.Match) -> str:
-    return f'{snake_case(drop_prefix(m['name']))}: {translate_type(m)}'
+    return f"{snake_case(drop_prefix(m['name']))}: {translate_type(m)}"
+
 
 def translate_function_pointer(m: re.Match) -> str:
     if m:
-        ret = translate_return_type(re.match(match_return, m['ret']))
-        args = re.sub(match_argument, translate_argument, m['args'])
-        return f'{snake_case(drop_prefix(m['name']))}: fn ({args}) -> {ret}'
+        ret = translate_return_type(re.match(match_return, m["ret"]))
+        args = re.sub(match_argument, translate_argument, m["args"])
+        return f"{snake_case(drop_prefix(m['name']))}: fn ({args}) -> {ret}"
 
 
 # +------( docstring )------+ #
 #
-match_docblock_indent = re.compile(r'^ *\* ?', flags = re.MULTILINE)
-match_docblock_category = re.compile(r'^\\(?P<cat>\w+) (?P<body>[^\n]*\n?(?: [^\n]*\n)*)', flags = re.MULTILINE)
+match_docblock_indent = re.compile(r"^ *\* ?", flags=re.MULTILINE)
+match_docblock_category = re.compile(
+    r"^\\(?P<cat>\w+) (?P<body>[^\n]*\n?(?: [^\n]*\n)*)", flags=re.MULTILINE
+)
 
-def doc_template(doc: str, name: str, ind: str = '') -> str:
-    return (
-f'''"""{doc}
+
+def doc_template(doc: str, name: str, ind: str = "") -> str:
+    return f'''"""{doc}
 
 {ind}Docs: https://wiki.libsdl.org/SDL3/{name}.
 {ind}"""
-''')
+'''
+
 
 def format_docstring(string: str) -> str:
     if string:
-        string = re.sub(match_docblock_indent, '', string)
+        string = re.sub(match_docblock_indent, "", string)
         first_param = True
 
         def translate_category(category: re.Match) -> str:
             nonlocal first_param
             result: str
-            match category.group('cat'):
-                case 'param':  
-                    first_space = category.group('body').find(' ')
-                    name = snake_case(category.group('body')[:first_space])
-                    body = capitalize(category.group('body')[first_space:].strip(' '))
-                    body = re.sub(r'\n +', '\n' + (' '*(len(name) + 6)), body, flags = re.MULTILINE)
-                    result = ('Args:\n' if first_param else '') + '    ' + name + ': ' + body
+            match category.group("cat"):
+                case "param":
+                    first_space = category.group("body").find(" ")
+                    name = snake_case(category.group("body")[:first_space])
+                    body = capitalize(category.group("body")[first_space:].strip(" "))
+                    body = re.sub(
+                        r"\n +",
+                        "\n" + (" " * (len(name) + 6)),
+                        body,
+                        flags=re.MULTILINE,
+                    )
+                    result = (
+                        ("Args:\n" if first_param else "") + "    " + name + ": " + body
+                    )
                     first_param = False
-                case 'returns':
-                    result = f'\nReturns:\n    {re.sub(r'\n +', '\n    ', capitalize(category.group('body')), flags = re.MULTILINE)}'
-                case 'threadsafety':
-                    result = f'Safety:\n    {re.sub(r'\n +', '\n    ', capitalize(category.group('body')), flags = re.MULTILINE)}'
+                case "returns":
+                    result = f"\nReturns:\n    {re.sub(r'\n +', '\n    ', capitalize(category.group('body')), flags=re.MULTILINE)}"
+                case "threadsafety":
+                    result = f"Safety:\n    {re.sub(r'\n +', '\n    ', capitalize(category.group('body')), flags=re.MULTILINE)}"
                 case _:
-                    result = ''
+                    result = ""
             return result
-            
+
         string = re.sub(match_docblock_category, translate_category, string)
-        string = re.sub(r'\\', r'\\\\', string)
-        string = re.sub(r'\n *\n *\n', r'\n\n', string.strip(), flags = re.MULTILINE)
+        string = re.sub(r"\\", r"\\\\", string)
+        string = re.sub(r"\n *\n *\n", r"\n\n", string.strip(), flags=re.MULTILINE)
 
         # Capitalize first character and add a period to the first sentence
         end = string.find("\n\n")
         end = len(string) if end == -1 else end
-        if string[end - 1] != '.':
-            string = string[:end] + '.' + string[end:]
+        if string[end - 1] != ".":
+            string = string[:end] + "." + string[end:]
         return string[0].upper() + string[1:]
 
 
 def format_docblock(string: str) -> str:
     if string:
-        doc = re.sub(match_docblock_category, '', string).strip()
+        doc = re.sub(match_docblock_category, "", string).strip()
         doc = format_docstring(doc)
-        return re.sub('\n', r'\n    ', doc, flags = re.MULTILINE)
+        return re.sub("\n", r"\n    ", doc, flags=re.MULTILINE)
 
 
 def format_comblock(string: str) -> str:
     if string:
-        doc = re.sub(match_docblock_category, '', string).strip()
-        return re.sub('^', r'    # ', doc, flags = re.MULTILINE)
+        doc = re.sub(match_docblock_category, "", string).strip()
+        return re.sub("^", r"    # ", doc, flags=re.MULTILINE)
 
 
 # +------( typedef )------+ #
 #
-match_typedef_defines = re.compile(r'#define (?P<name>\w+)(?:\((?P<params>[^\n]+?)\))??  *(?P<expr>.+?) *(?:/\*\*< (?P<doc>.*?) \*/)?\n')
+match_typedef_defines = re.compile(
+    r"#define (?P<name>\w+)(?:\((?P<params>[^\n]+?)\))??  *(?P<expr>.+?) *(?:/\*\*< (?P<doc>.*?) \*/)?\n"
+)
+
 
 def translate_typedef(m: re.Match) -> str:
-    doc = format_docblock(m['doc'])
-    type = type_map.get(m['td_type']) or m['td_type']
-    name = m['td_name']
+    doc = format_docblock(m["doc"])
+    type = type_map.get(m["td_type"]) or m["td_type"]
+    name = m["td_name"]
     mojo_name = drop_prefix(name)
-    ptr = m['td_ptr']
-    
+    ptr = m["td_ptr"]
+
     if ptr:
-        return f'alias {mojo_name} = Ptr[NoneType]\n{doc_template(doc, name)}'
+        return f"comptime {mojo_name} = Ptr[NoneType, AnyOrigin[True]]\n{doc_template(doc, name)}"
 
     def translate_def(m: re.Match) -> str:
-        def_name = drop_prefix(m['name'])
-        def_params = m['params']
-        def_expr = re.sub(r'SDL_UINT64_C\((\w*)\)', r'\1', m['expr'])
-        def_expr = def_expr.replace('u', '').lstrip('(').rstrip(')')
-        def_expr = re.sub(r'\bSDL(\w*)\b', r'Self.SDL\1.value', def_expr)
+        def_name = drop_prefix(m["name"])
+        def_params = m["params"]
+        def_expr = re.sub(r"SDL_UINT64_C\((\w*)\)", r"\1", m["expr"])
+        def_expr = def_expr.replace("u", "").lstrip("(").rstrip(")")
+        def_expr = re.sub(r"\bSDL(\w*)\b", r"Self.SDL\1.value", def_expr)
         def_expr = drop_prefix(def_expr)
-        def_doc = format_docblock(m['doc'])
+        def_doc = format_docblock(m["doc"])
         if def_params:
-            return (
-f'''
+            return f"""
     @always_inline
     @staticmethod
     fn {def_name}({def_params}: {type}) -> {type}:
         return {def_expr}
 
-''')
+"""
         else:
-            return (f'    alias {def_name} = Self({def_expr})' + (f'\n    """{def_doc}"""' if def_doc else '') + '\n')
+            return (
+                f"    comptime {def_name} = Self({def_expr})"
+                + (f'\n    """{def_doc}"""' if def_doc else "")
+                + "\n"
+            )
 
-    defs = re.sub(match_typedef_defines, translate_def, m['td_defs'])
-    return (
-f'''
+    defs = re.sub(match_typedef_defines, translate_def, m["td_defs"])
+    return f"""
 @register_passable("trivial")
 struct {mojo_name}(Intable):
-    {doc_template(doc, name, '    ')}
+    {doc_template(doc, name, "    ")}
     var value: {type}
 
     @always_inline
@@ -311,7 +342,8 @@ struct {mojo_name}(Intable):
         return Self(lhs.value | rhs.value)
 
 {defs}
-''')
+"""
+
 
 # +------( macros )------+ #
 #
@@ -319,30 +351,40 @@ struct {mojo_name}(Intable):
 
 # +------( enums )------+ #
 #
-match_enum_types = re.compile(r'^    ([\w]+?)(?: *= (-?[\w]+?))?,?(?:\n|$| */\*(?:\*<)?(.*?)\*/)', flags = re.MULTILINE | re.DOTALL)
-match_enum_comment = re.compile(r' */\*(?:([^\n]*)\*/\n|\*?(.*?)\*/)', flags = re.MULTILINE | re.DOTALL)
+match_enum_types = re.compile(
+    r"^    ([\w]+?)(?: *= (-?[\w]+?))?,?(?:\n|$| */\*(?:\*<)?(.*?)\*/)",
+    flags=re.MULTILINE | re.DOTALL,
+)
+match_enum_comment = re.compile(
+    r" */\*(?:([^\n]*)\*/\n|\*?(.*?)\*/)", flags=re.MULTILINE | re.DOTALL
+)
 running_enum_value = 0
 running_enum_base = 0
+
 
 def translate_enum_type(m: re.Match) -> str:
     global running_enum_value, running_enum_base
     name = m[1]
-    name = re.sub('(^[0-9]+$)', r'N\1', name)
+    name = re.sub("(^[0-9]+$)", r"N\1", name)
     value = m[2]
     if value:
         try:
-            value = value.replace('u', '')
+            value = value.replace("u", "")
             running_enum_value = int(value, 0) + 1
-            running_enum_base = 16 if value.startswith('0x') else 10
+            running_enum_base = 16 if value.startswith("0x") else 10
         except:
-            value = 'Self.' + value
+            value = "Self." + value
     else:
-        value = hex(running_enum_value) if running_enum_base == 16 else str(running_enum_value)
+        value = (
+            hex(running_enum_value)
+            if running_enum_base == 16
+            else str(running_enum_value)
+        )
         running_enum_value += 1
     doc = format_docblock(m[3])
-    if 'Self.' not in value:
-        value = f'Self({value})'
-    res =  drop_prefix(f'    alias {name} = {value}\n')
+    if "Self." not in value:
+        value = f"Self({value})"
+    res = drop_prefix(f"    comptime {name} = {value}\n")
     if doc:
         return res + f'    """{doc}"""'
     return res
@@ -351,46 +393,50 @@ def translate_enum_type(m: re.Match) -> str:
 def translate_enum_comment(m: re.Match) -> str:
     if m[1]:
         # single-line comment
-        if not re.search(r'@[\{\}]', m[1]):
-            return format_comblock(m[1]) + '\n'
+        if not re.search(r"@[\{\}]", m[1]):
+            return format_comblock(m[1]) + "\n"
     elif m[2]:
         # multi-line comment
         return format_comblock(m[2])
-    return ''
+    return ""
 
 
-match_enum_if = re.compile(r'^    #if (?P<cond>[^\n]+)\n(?P<true>(?:[^\n]+\n)+?)    #else\n(?P<false>(?:[^\n]+\n)+?)    #endif', re.MULTILINE)
-match_enum_if_type = re.compile(r'(?P<name>\w+) = (?P<val>\w+)')
+match_enum_if = re.compile(
+    r"^    #if (?P<cond>[^\n]+)\n(?P<true>(?:[^\n]+\n)+?)    #else\n(?P<false>(?:[^\n]+\n)+?)    #endif",
+    re.MULTILINE,
+)
+match_enum_if_type = re.compile(r"(?P<name>\w+) = (?P<val>\w+)")
+
 
 def translate_enum_if(m: re.Match) -> str:
-    cond = m['cond']
-    if cond == 'SDL_BYTEORDER == SDL_BIG_ENDIAN':
-        cond = 'is_big_endian()'
-    elif cond == 'SDL_BYTEORDER == SDL_LIL_ENDIAN':
-        cond = 'is_little_endian()'
-    
-    true_iter = re.finditer(match_enum_if_type, m['true'])
-    false_iter = re.finditer(match_enum_if_type, m['false'])
-    result = ''
+    cond = m["cond"]
+    if cond == "SDL_BYTEORDER == SDL_BIG_ENDIAN":
+        cond = "is_big_endian()"
+    elif cond == "SDL_BYTEORDER == SDL_LIL_ENDIAN":
+        cond = "is_little_endian()"
+
+    true_iter = re.finditer(match_enum_if_type, m["true"])
+    false_iter = re.finditer(match_enum_if_type, m["false"])
+    result = ""
     for false, true in zip(true_iter, false_iter):
-        result += f'    alias {false.group('name')} = Self.{false.group('val')} if {cond} else Self.{true.group('val')}\n'
+        result += f"    comptime {false.group('name')} = Self.{false.group('val')} if {cond} else Self.{true.group('val')}\n"
     return drop_prefix(result)
+
 
 def translate_enum(m: re.Match) -> str:
     global running_enum_value
     running_enum_value = 0
-    doc = format_docblock(m['doc'])
-    name = m['te_name']
-    body = m['te_body']
+    doc = format_docblock(m["doc"])
+    name = m["te_name"]
+    body = m["te_body"]
     # types = re.sub(f'(?:{name.upper()}|EVENT|CAPITALIZE)_', '', match.group('enum_body'))
     body = re.sub(match_enum_if, translate_enum_if, body)
     body = re.sub(match_enum_types, translate_enum_type, body)
     body = re.sub(match_enum_comment, translate_enum_comment, body)
-    return (
-f'''
+    return f"""
 @register_passable("trivial")
 struct {drop_prefix(name)}(Indexer, Intable):
-    {doc_template(doc, name, '    ')}
+    {doc_template(doc, name, "    ")}
     var value: UInt32
 
     @always_inline
@@ -400,110 +446,116 @@ struct {drop_prefix(name)}(Indexer, Intable):
     @always_inline
     fn __int__(self) -> Int:
         return Int(self.value)
-    
+
     @always_inline
     fn __eq__(lhs, rhs: Self) -> Bool:
         return lhs.value == rhs.value
-    
+
     @always_inline("nodebug")
     fn __mlir_index__(self) -> __mlir_type.index:
-        return Int(self).__mlir_index__()
+        return Int(self)._mlir_value
 {body}
-''')
+"""
 
 
 # +------( field )------+ #
 #
-match_field = re.compile(r'(?:^ */\*\*?\s*(?P<pre_doc>[\S\s]*?)\s*\*/\n)?    (?P<field>.+?); *(?:/\*\*< (?P<post_doc>[\S\s]*?) \*/)?', re.MULTILINE)
-match_multi_field = re.compile(r'    (.+?)((?: \*?\w+?,)+ \w+;)')
+match_field = re.compile(
+    r"(?:^ */\*\*?\s*(?P<pre_doc>[\S\s]*?)\s*\*/\n)?    (?P<field>.+?); *(?:/\*\*< (?P<post_doc>[\S\s]*?) \*/)?",
+    re.MULTILINE,
+)
+match_multi_field = re.compile(r"    (.+?)((?: \*?\w+?,)+ \w+;)")
+
 
 def translate_field(field: re.Match) -> str:
-    var = translate_function_pointer(re.match(match_function_pointer, field.group('field'))) or translate_variable(re.match(match_variable, field.group('field')))
-    doc = format_docblock(field.group('pre_doc') or field.group('post_doc'))
-    return f'    var {var}' + (f'\n    """{doc}"""' if doc else '')
+    var = translate_function_pointer(
+        re.match(match_function_pointer, field.group("field"))
+    ) or translate_variable(re.match(match_variable, field.group("field")))
+    doc = format_docblock(field.group("pre_doc") or field.group("post_doc"))
+    return f"    var {var}" + (f'\n    """{doc}"""' if doc else "")
+
 
 def split_multifield(multifield: re.Match) -> str:
-    result = ''
-    for field in re.finditer(r' (\w+?)[,;]', multifield.group(2)):
-        result += f'    {multifield.group(1)} {field.group(1)};\n'
+    result = ""
+    for field in re.finditer(r" (\w+?)[,;]", multifield.group(2)):
+        result += f"    {multifield.group(1)} {field.group(1)};\n"
     return result
+
 
 # +------( struct )------+ #
 #
 def translate_struct(m: re.Match) -> str:
-    doc = format_docblock(m['doc'])
-    name = m['s_name']
-    body = re.sub(match_field, translate_field, m['s_body'])
-    return (
-f'''
+    doc = format_docblock(m["doc"])
+    name = m["s_name"]
+    body = re.sub(match_field, translate_field, m["s_body"])
+    return f"""
 @fieldwise_init
 struct {drop_prefix(name)}(ImplicitlyCopyable, Movable):
-    {doc_template(doc, name, '    ')}
-    
+    {doc_template(doc, name, "    ")}
+
 {body}
-''')
+"""
 
 
 # +------( opaque struct )------+ #
 #
 def translate_opaque_struct(m: re.Match) -> str:
-    return (
-f'''
+    return f"""
 @fieldwise_init
-struct {drop_prefix(m['os_name'])}(ImplicitlyCopyable, Movable):
-    {doc_template(format_docblock(m['doc']), m['os_name'], '    ')}
+struct {drop_prefix(m["os_name"])}(ImplicitlyCopyable, Movable):
+    {doc_template(format_docblock(m["doc"]), drop_prefix(m["os_name"]), "    ")}
     pass
-''')
+"""
 
 
 # +------( ptr struct )------+ #
 #
 def translate_ptr_struct(m: re.Match) -> str:
-    return (
-f'''
-alias {drop_prefix(m['ps_name'])} = Ptr[NoneType]
-{doc_template(format_docblock(m['doc']), m['ps_name'])}
-''')
+    return f"""
+comptime {drop_prefix(m["ps_name"])} = Ptr[NoneType, AnyOrigin[True]]
+{doc_template(format_docblock(m["doc"]), drop_prefix(m["ps_name"]))}
+"""
 
 
 # +------( typedef struct )------+ #
 #
 def translate_typedef_struct(m: re.Match) -> str:
-    doc = format_docblock(m['doc'])
-    name = m['ts_name']
+    doc = format_docblock(m["doc"])
+    name = drop_prefix(m["ts_name"])
 
-    if name == "SDL_GamepadBinding":
+    if name == "GamepadBinding":
         return translate_gamepadbinding(doc)
-    
-    body = m['ts_body']
+
+    body = m["ts_body"]
     body = re.sub(match_multi_field, split_multifield, body)
     body = re.sub(match_field, translate_field, body)
-    if name == 'SDL_StorageInterface':
-        body = body.replace('var copy: fn', 'var copy_file: fn')
-    return (
-f'''
+    if name == "StorageInterface":
+        body = body.replace("var copy: fn", "var copy_file: fn")
+    return f"""
 @fieldwise_init
-struct {drop_prefix(m['ts_name'])}(ImplicitlyCopyable, Movable):
-    {doc_template(doc, name, '    ')}
-    
+struct {name}(ImplicitlyCopyable, Movable):
+    {doc_template(doc, name, "    ")}
+
 {body}
-''')
+"""
 
 
 # +------( union )------+ #
 #
-match_union_member = re.compile(r'^    (?P<type>\w+) (?P<name>\w+)(?:\[(?P<amnt>\d+)\])?.*?$', re.MULTILINE)
+match_union_member = re.compile(
+    r"^    (?P<type>\w+) (?P<name>\w+)(?:\[(?P<amnt>\d+)\])?.*?$", re.MULTILINE
+)
+
 
 def translate_union(m: re.Match) -> str:
-    name = m['tu_name']
-    body = ''
-    for member in re.finditer(match_union_member, m['tu_body']):
-        body += '    ' + translate_type(member) + ', `, `,\n'
-    body = body.removesuffix(' `, `,\n')
-    return (
-f'''  
+    name = m["tu_name"]
+    body = ""
+    for member in re.finditer(match_union_member, m["tu_body"]):
+        body += "    " + translate_type(member) + ", `, `,\n"
+    body = body.removesuffix(" `, `,\n")
+    return f"""
 struct {drop_prefix(name)}:
-    alias _mlir_type = __mlir_type[`!pop.union<`, 
+    comptime _mlir_type = __mlir_type[`!pop.union<`,
 {body}
     `>`]
     var _impl: Self._mlir_type
@@ -512,66 +564,81 @@ struct {drop_prefix(name)}:
     fn __init__[T: AnyType](out self, value: T):
         self._impl = rebind[Self._mlir_type](value)
 
-    fn __getitem__[T: AnyType](ref self) -> ref [self] T:
-        return rebind[Ptr[T]](Ptr(to=self._impl))[]
-''')
+    fn __getitem__[T: AnyType](ref self) -> ref [self._impl] T:
+        return rebind[Ptr[T, origin_of(self._impl)]](Ptr(to=self._impl))[]
+"""
 
 
 # +------( argument )------+ #
 #
-match_argument = re.compile(r'(?:(?<=,)|^)\s*(.+?)(?:(?=,)|$)')
-match_string_argument = re.compile(r'(\w+): Ptr\[c_char, mut = False\]')
-match_argument_names = re.compile(r'(, ?)?(\w+):.*?(?:(?=, \w*?:)|$)')
+match_argument = re.compile(r"(?:(?<=,)|^)\s*(.+?)(?:(?=,)|$)")
+match_string_argument = re.compile(r"(\w+): Ptr\[c_char, AnyOrigin\[False\]\]")
+match_argument_names = re.compile(r"(, ?)?(\w+):.*?(?:(?=, \w*?:)|$)")
+
 
 def translate_argument(arg: re.Match) -> str:
-    return "" if arg.group() == 'void' else (' ' + translate_variable(re.match(match_variable, arg.group(1))))
+    return (
+        ""
+        if arg.group() == "void"
+        else (" " + translate_variable(re.match(match_variable, arg.group(1))))
+    )
 
 
 # +------( function )------+ #
 #
-def fn_raises_template(doc: str, sdl_name: str, mojo_name: str, args: str, ret: str, call: str) -> str:
-    return (
-f'''
-fn {mojo_name}({args}{', ' * bool(args) * (ret != 'None')}{f'out ret: {ret}' * (ret != 'None')}) raises: 
-    {doc_template(doc, sdl_name, '    ')}
+def fn_raises_template(
+    doc: str, sdl_name: str, mojo_name: str, args: str, ret: str, call: str
+) -> str:
+    return f"""
+fn {mojo_name}({args}{", " * bool(args) * (ret != "None")}{f"out ret: {ret}" * (ret != "None")}) raises:
+    {doc_template(doc, sdl_name, "    ")}
     ret = {call}
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
-''')
+"""
 
-def fn_template(doc: str, sdl_name: str, mojo_name: str, args: str, ret: str, call: str) -> str:
-    return (
-f'''
-fn {mojo_name}({args}) -> {ret}: 
-    {doc_template(doc, sdl_name, '    ')}
+
+def fn_template(
+    doc: str, sdl_name: str, mojo_name: str, args: str, ret: str, call: str
+) -> str:
+    return f"""
+fn {mojo_name}({args}) raises -> {ret}:
+    {doc_template(doc, sdl_name, "    ")}
     return {call}
 
-''')
+"""
+
 
 def translate_function(m: re.Match):
-    if m.group('f_attr') and ('VARARG' in m.group('f_attr')):
+    if m.group("f_attr") and ("VARARG" in m.group("f_attr")):
         # handle variadic functions
-        return ''
-    doc = format_docblock(m['doc'])
-    sdl_name = m.group('f_name')
+        return ""
+    doc = format_docblock(m["doc"])
+    sdl_name = m.group("f_name")
     mojo_name = snake_case(drop_prefix(sdl_name))
-    sdl_ret = translate_return_type(re.match(match_return, m.group('f_ret')))
-    mojo_ret = re.sub(match_string_argument, r'String', sdl_ret)
-    sdl_args = re.sub(match_argument, translate_argument, m.group('f_args')).removeprefix(' ')
-    mojo_args = re.sub(match_string_argument, r'var \1: String', sdl_args)
-    pass_args = re.sub(match_argument_names, r'\1\2', sdl_args)
-    for arg_name in re.finditer(r'\w+(?=: String)', mojo_args):
-        pass_args = re.sub(r'\b' + arg_name[0] + r'\b', arg_name[0] + '.unsafe_cstr_ptr()', pass_args)
-    call = f'_get_sdl_handle()[].get_function[fn ({sdl_args}) -> {sdl_ret}]("{sdl_name}")({pass_args})'
-    if mojo_ret == 'String':
-        call = 'String(unsafe_from_utf8_ptr=' + call + ')'
-    if re.search('Returns:\n        True on success', doc) and (mojo_ret == 'Bool'):
-        doc = doc.replace('Returns', 'Raises')
-        doc = re.sub(r'True on success.*?false (.*)', r'Raises \1', doc)
+    sdl_ret = translate_return_type(re.match(match_return, m.group("f_ret")))
+    mojo_ret = re.sub(match_string_argument, r"String", sdl_ret)
+    sdl_args = re.sub(
+        match_argument, translate_argument, m.group("f_args")
+    ).removeprefix(" ")
+    mojo_args = re.sub(match_string_argument, r"var \1: String", sdl_args)
+    pass_args = re.sub(match_argument_names, r"\1\2", sdl_args)
+    for arg_name in re.finditer(r"\w+(?=: String)", mojo_args):
+        pass_args = re.sub(
+            r"\b" + arg_name[0] + r"\b", arg_name[0] + ".unsafe_cstr_ptr()", pass_args
+        )
+    call = f'_get_dylib_function[lib, "{m["f_name"]}", fn ({sdl_args}) -> {sdl_ret}]()({pass_args})'
+    if mojo_ret == "String":
+        call = "String(unsafe_from_utf8_ptr=" + call + ")"
+    if re.search("Returns:\n        True on success", doc) and (mojo_ret == "Bool"):
+        doc = doc.replace("Returns", "Raises")
+        doc = re.sub(r"True on success.*?false (.*)", r"Raises \1", doc)
         mojo_ret = "None"
         return fn_raises_template(doc, sdl_name, mojo_name, mojo_args, mojo_ret, call)
-    elif re.search(r'on failure;', doc, re.MULTILINE) and (mojo_ret.startswith('Ptr') or mojo_ret.startswith('String')):
+    elif re.search(r"on failure;", doc, re.MULTILINE) and (
+        mojo_ret.startswith("Ptr") or mojo_ret.startswith("String")
+    ):
         return fn_raises_template(doc, sdl_name, mojo_name, mojo_args, mojo_ret, call)
     else:
         return fn_template(doc, sdl_name, mojo_name, mojo_args, mojo_ret, call)
@@ -580,19 +647,18 @@ def translate_function(m: re.Match):
 # +------( typedef function )------+ #
 #
 def translate_typedef_function(m: re.Match):
-    doc = format_docblock(m['doc'])
-    name = m['tf_name']
-    ret = translate_return_type(re.match(match_return, m['tf_ret']))
-    args = re.sub(match_argument, translate_argument, m['tf_args']).removeprefix(' ')
-    f_type = f'fn ({args}) -> {ret}'
-    if m['tf_ptr']:
-        f_type = f'Ptr[{f_type}]'
-    return (
-f'''
-alias {drop_prefix(name)} = {f_type}
+    doc = format_docblock(m["doc"])
+    name = m["tf_name"]
+    ret = translate_return_type(re.match(match_return, m["tf_ret"]))
+    args = re.sub(match_argument, translate_argument, m["tf_args"]).removeprefix(" ")
+    f_type = f"fn ({args}) -> {ret}"
+    if m["tf_ptr"]:
+        f_type = f"Ptr[{f_type}, AnyOrigin[True]]"
+    return f"""
+comptime {drop_prefix(name)} = {f_type}
 {doc_template(doc, name)}
 
-''')
+"""
 
 
 # +------( special cases )------+ #
@@ -600,8 +666,7 @@ alias {drop_prefix(name)} = {f_type}
 # These are things this doesn't currently handle
 def translate_gamepadbinding(doc: str) -> str:
     # nested structs
-    return (
-f'''
+    return f'''
 @fieldwise_init
 @register_passable("trivial")
 struct GamepadBindingInputAxis(ImplicitlyCopyable, Movable):
@@ -620,15 +685,15 @@ struct GamepadBindingInputHat(ImplicitlyCopyable, Movable):
 @fieldwise_init
 @register_passable("trivial")
 struct GamepadBindingInput(ImplicitlyCopyable, Movable):
-    alias _mlir_type = __mlir_type[`!pop.union<`, GamepadBindingInputAxis, `, `, GamepadBindingInputHat, `>`]
+    comptime _mlir_type = __mlir_type[`!pop.union<`, GamepadBindingInputAxis, `, `, GamepadBindingInputHat, `>`]
     var _impl: Self._mlir_type
 
     @implicit
     fn __init__[T: AnyType](out self, value: T):
         self._impl = rebind[Self._mlir_type](value)
 
-    fn __getitem__[T: AnyType](ref self) -> ref [self] T:
-        return rebind[Ptr[T]](Ptr(to=self._impl))[]
+    fn __getitem__[T: AnyType](ref self) -> ref [self._impl] T:
+        return rebind[Ptr[T, origin_of(self._impl)]](Ptr(to=self._impl))[]
 
 
 @fieldwise_init
@@ -642,15 +707,15 @@ struct GamepadBindingOutputAxis(ImplicitlyCopyable, Movable):
 @fieldwise_init
 @register_passable("trivial")
 struct GamepadBindingOutput(ImplicitlyCopyable, Movable):
-    alias _mlir_type = __mlir_type[`!pop.union<`, GamepadButton, `, `, GamepadBindingOutputAxis, `>`]
+    comptime _mlir_type = __mlir_type[`!pop.union<`, GamepadButton, `, `, GamepadBindingOutputAxis, `>`]
     var _impl: Self._mlir_type
 
     @implicit
     fn __init__[T: AnyType](out self, value: T):
         self._impl = rebind[Self._mlir_type](value)
 
-    fn __getitem__[T: AnyType](ref self) -> ref [self] T:
-        return rebind[Ptr[T]](Ptr(to=self._impl))[]
+    fn __getitem__[T: AnyType](ref self) -> ref [self._impl] T:
+        return rebind[Ptr[T, origin_of(self._impl)]](Ptr(to=self._impl))[]
 
 
 @fieldwise_init
@@ -666,68 +731,97 @@ struct GamepadBinding(ImplicitlyCopyable, Movable):
     var output_type: GamepadBindingType
     var output: GamepadBindingOutput
 '''
-)
 
 
 # +------( translate )------+ #
 #
 patterns = {
-    "heading": (r'\A/\*\n(?P<license>.*?)\n\*/\n.*?\n/\*\*\n \* # Category(?P<filedoc>.*?)\n \*/', translate_heading),
-    "typedef": (r'^typedef (?P<td_type>\w+) (?P<td_ptr>\*)?(?P<td_name>\w+);\n*(?P<td_defs>(#define.*?\n)*)', translate_typedef),
-    "typedef_enum": (r'^typedef enum (?P<te_name>\w+?)\n\{\n(?P<te_body>.*?)\n\} (?P=te_name);', translate_enum),
-    "struct": (r'^struct (?P<s_name>\w+?)[\n| ]\{\n(?P<s_body>.*?)\n\};(?:\n#endif /\* !SDL_INTERNAL \*/\n\ntypedef struct (?P=s_name) (?P=s_name);)?', translate_struct),
-    "opaque_struct": (r'^typedef struct (?P<os_name>\w+?) (?P=os_name);', translate_opaque_struct),
-    "ptr_struct": (r'^typedef struct (?P<ps_type>\w+) \*(?P<ps_name>\w+);', translate_ptr_struct),
-    "typedef_struct": (r'^typedef struct (?P<ts_name>\w+?)[\n| ]\{\n(?P<ts_body>.+?)\n\} (?P=ts_name);', translate_typedef_struct),
-    "typedef_union": (r'^typedef union (?P<tu_name>\w+?)\n\{\n(?P<tu_body>.+?)\n\} (?P=tu_name);', translate_union),
-    "function": (r'^extern SDL_DECLSPEC (?P<f_ret>.+?) SDLCALL (?P<f_name>\w+?)\((?P<f_args>.+?)\)(?P<f_attr> [^\n]*)?;', translate_function),
-    "typedef_function": (r'^typedef (?:const )?(?P<tf_ret>.+?) ?(?P<tf_ptr>\*)?\(SDLCALL \*(?P<tf_name>\w+)\)\((?P<tf_args>.+?)\);', translate_typedef_function),
-    }
+    "heading": (
+        r"\A/\*\n(?P<license>.*?)\n\*/\n.*?\n/\*\*\n \* # Category(?P<filedoc>.*?)\n \*/",
+        translate_heading,
+    ),
+    "typedef": (
+        r"^typedef (?P<td_type>\w+) (?P<td_ptr>\*)?(?P<td_name>\w+);\n*(?P<td_defs>(#define.*?\n)*)",
+        translate_typedef,
+    ),
+    "typedef_enum": (
+        r"^typedef enum (?P<te_name>\w+?)\n\{\n(?P<te_body>.*?)\n\} (?P=te_name);",
+        translate_enum,
+    ),
+    "struct": (
+        r"^struct (?P<s_name>\w+?)[\n| ]\{\n(?P<s_body>.*?)\n\};(?:\n#endif /\* !SDL_INTERNAL \*/\n\ntypedef struct (?P=s_name) (?P=s_name);)?",
+        translate_struct,
+    ),
+    "opaque_struct": (
+        r"^typedef struct (?P<os_name>\w+?) (?P=os_name);",
+        translate_opaque_struct,
+    ),
+    "ptr_struct": (
+        r"^typedef struct (?P<ps_type>\w+) \*(?P<ps_name>\w+);",
+        translate_ptr_struct,
+    ),
+    "typedef_struct": (
+        r"^typedef struct (?P<ts_name>\w+?)[\n| ]\{\n(?P<ts_body>.+?)\n\} (?P=ts_name);",
+        translate_typedef_struct,
+    ),
+    "typedef_union": (
+        r"^typedef union (?P<tu_name>\w+?)\n\{\n(?P<tu_body>.+?)\n\} (?P=tu_name);",
+        translate_union,
+    ),
+    "function": (
+        r"^extern SDL_DECLSPEC (?P<f_ret>.+?) SDLCALL (?P<f_name>\w+?)\((?P<f_args>.+?)\)(?P<f_attr> [^\n]*)?;",
+        translate_function,
+    ),
+    "typedef_function": (
+        r"^typedef (?:const )?(?P<tf_ret>.+?) ?(?P<tf_ptr>\*)?\(SDLCALL \*(?P<tf_name>\w+)\)\((?P<tf_args>.+?)\);",
+        translate_typedef_function,
+    ),
+}
 
-regex = re.compile(r'(?:^/\*\*\n(?>(?P<doc>.*?)\n \*/\n))?(?:' + '|'.join('(?P<%s>%s)' % (key, val[0]) for (key, val) in patterns.items()) + ')', flags = re.MULTILINE | re.DOTALL)
+regex = re.compile(
+    r"(?:^/\*\*\n(?>(?P<doc>.*?)\n \*/\n))?(?:"
+    + "|".join("(?P<%s>%s)" % (key, val[0]) for (key, val) in patterns.items())
+    + ")",
+    flags=re.MULTILINE | re.DOTALL,
+)
 
 
-def get_src(url: str, out: Path):
-    with urlopen(repo + include) as src:
-        out.unlink(missing_ok = True)
-        with open(out, 'a') as out:
-            for match in re.finditer(regex, src.read().decode('utf-8')):
-                out.write(patterns[match.lastgroup][1](match))
+def translate_src(src_url: str, out_path: Path):
+    with urlopen(src_url) as src:
+        with open(out_path, "w") as out:
+            for match in re.finditer(regex, src.read().decode("utf-8")):
+                _ = out.write(patterns[str(match.lastgroup)][1](match))
+
 
 out_dir = Path('src/')
 rmtree(out_dir, ignore_errors=True)
 out_dir.mkdir(exist_ok=True)
 
-with open(out_dir / '__init__.mojo', 'w') as imp:
-    imp.write('''
-# x--------------------------------------------------------------------------x #
+imports = ""
+for include in includes:
+    out_path = out_dir / (include.lower().removesuffix(".h") + ".mojo")
+    print("translating " + str(out_path))
+    translate_src(repo + include, out_path)
+    imports += f"from .{out_path.stem} import *\n"
+
+with open(out_dir / "__init__.mojo", "w") as imp:
+    _ = imp.write(f'''
+# +--------------------------------------------------------------------------+ #
 # | SDL3 Bindings in Mojo
-# x--------------------------------------------------------------------------x #
+# +--------------------------------------------------------------------------+ #
 
 """SDL3 Bindings in Mojo"""
 
-''')
-    for include in includes:
-        out = out_dir / (include.lower().removesuffix('.h') + '.mojo')
-        get_src(include, out)
-        print('translating ' + str(out))
-        imp.write(f'from .{out.stem} import *\n')
-    imp.write(
-f'''
+{imports}
 
-alias Ptr = stdlib.memory.LegacyUnsafePointer
+comptime AnyOrigin[mut: Bool] = __mlir_attr[`#lit.any.origin<`, mut._mlir_value, `>: !lit.origin<`, mut._mlir_value, `>`]
+comptime Ptr = stdlib.memory.UnsafePointer
 
-from os import abort
-from sys import CompilationTarget, is_big_endian, is_little_endian
-from sys.ffi import _Global, OwnedDLHandle, c_char, c_uchar, c_int, c_uint, c_short, c_ushort, c_long, c_long_long, c_size_t, c_ssize_t, c_float, c_double
 
-alias lib = _Global["SDL", _init_sdl_handle]()
+from sys import CompilationTarget, is_little_endian, is_big_endian
+from sys.ffi import _Global, OwnedDLHandle, _get_dylib_function, c_char, c_uchar, c_int, c_uint, c_short, c_ushort, c_long, c_long_long, c_size_t, c_ssize_t, c_float, c_double
 
-fn _get_sdl_handle() -> Ptr[OwnedDLHandle]:
-    try:
-        return lib.get_or_create_ptr()
-    except:
-        return abort[Ptr[OwnedDLHandle]]("Cannot get handle to libSDL3")
+comptime lib = _Global["SDL", _init_sdl_handle]()
 
 fn _init_sdl_handle() -> OwnedDLHandle:
     try:
@@ -750,6 +844,6 @@ fn _uninit[T: AnyType](out value: T):
     __mlir_op.`lit.ownership.mark_initialized`(__get_mvalue_as_litref(value))
 
 
-struct ArrayHelper[type: Copyable & Movable, size: Int, *, mut: Bool = True]:
-    alias result = Ptr[InlineArray[type, size], mut = mut]
+struct ArrayHelper[type: ImplicitlyCopyable & Movable, size: Int, origin: Origin]:
+    comptime result = Ptr[InlineArray[type, size], origin]
 ''')

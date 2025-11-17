@@ -61,23 +61,23 @@ struct PowerState(Indexer, Intable):
 
     @always_inline("nodebug")
     fn __mlir_index__(self) -> __mlir_type.index:
-        return Int(self).__mlir_index__()
+        return Int(self)._mlir_value
 
-    alias POWERSTATE_ERROR = Self(-1)
+    comptime POWERSTATE_ERROR = Self(-1)
     """Error determining power status."""
-    alias POWERSTATE_UNKNOWN = Self(0)
+    comptime POWERSTATE_UNKNOWN = Self(0)
     """Cannot determine power status."""
-    alias POWERSTATE_ON_BATTERY = Self(1)
+    comptime POWERSTATE_ON_BATTERY = Self(1)
     """Not plugged in, running on the battery."""
-    alias POWERSTATE_NO_BATTERY = Self(2)
+    comptime POWERSTATE_NO_BATTERY = Self(2)
     """Plugged in, no battery available."""
-    alias POWERSTATE_CHARGING = Self(3)
+    comptime POWERSTATE_CHARGING = Self(3)
     """Plugged in, charging battery."""
-    alias POWERSTATE_CHARGED = Self(4)
+    comptime POWERSTATE_CHARGED = Self(4)
     """Plugged in, battery charged."""
 
 
-fn get_power_info(seconds: Ptr[c_int, mut=True], percent: Ptr[c_int, mut=True]) -> PowerState:
+fn get_power_info(seconds: Ptr[c_int, AnyOrigin[True]], percent: Ptr[c_int, AnyOrigin[True]]) raises -> PowerState:
     """Get the current power supply details.
 
     You should never take a battery status as absolute truth. Batteries
@@ -113,4 +113,4 @@ fn get_power_info(seconds: Ptr[c_int, mut=True], percent: Ptr[c_int, mut=True]) 
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetPowerInfo.
     """
 
-    return _get_sdl_handle()[].get_function[fn (seconds: Ptr[c_int, mut=True], percent: Ptr[c_int, mut=True]) -> PowerState]("SDL_GetPowerInfo")(seconds, percent)
+    return _get_dylib_function[lib, "SDL_GetPowerInfo", fn (seconds: Ptr[c_int, AnyOrigin[True]], percent: Ptr[c_int, AnyOrigin[True]]) -> PowerState]()(seconds, percent)

@@ -98,7 +98,7 @@ struct CameraID(Intable):
 struct Camera(ImplicitlyCopyable, Movable):
     """The opaque structure used to identify an opened SDL camera.
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_Camera.
+    Docs: https://wiki.libsdl.org/SDL3/Camera.
     """
 
     pass
@@ -111,7 +111,7 @@ struct CameraSpec(ImplicitlyCopyable, Movable):
     Cameras often support multiple formats; each one will be encapsulated in
     this struct.
 
-    Docs: https://wiki.libsdl.org/SDL3/SDL_CameraSpec.
+    Docs: https://wiki.libsdl.org/SDL3/CameraSpec.
     """
 
     var format: PixelFormat
@@ -151,14 +151,14 @@ struct CameraPosition(Indexer, Intable):
 
     @always_inline("nodebug")
     fn __mlir_index__(self) -> __mlir_type.index:
-        return Int(self).__mlir_index__()
+        return Int(self)._mlir_value
 
-    alias CAMERA_POSITION_UNKNOWN = Self(0x0)
-    alias CAMERA_POSITION_FRONT_FACING = Self(0x1)
-    alias CAMERA_POSITION_BACK_FACING = Self(0x2)
+    comptime CAMERA_POSITION_UNKNOWN = Self(0x0)
+    comptime CAMERA_POSITION_FRONT_FACING = Self(0x1)
+    comptime CAMERA_POSITION_BACK_FACING = Self(0x2)
 
 
-fn get_num_camera_drivers() -> c_int:
+fn get_num_camera_drivers() raises -> c_int:
     """Use this function to get the number of built-in camera drivers.
 
     This function returns a hardcoded number. This never returns a negative
@@ -180,10 +180,10 @@ fn get_num_camera_drivers() -> c_int:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetNumCameraDrivers.
     """
 
-    return _get_sdl_handle()[].get_function[fn () -> c_int]("SDL_GetNumCameraDrivers")()
+    return _get_dylib_function[lib, "SDL_GetNumCameraDrivers", fn () -> c_int]()()
 
 
-fn get_camera_driver(index: c_int) -> Ptr[c_char, mut=False]:
+fn get_camera_driver(index: c_int) raises -> Ptr[c_char, AnyOrigin[False]]:
     """Use this function to get the name of a built in camera driver.
 
     The list of camera drivers is given in the order that they are normally
@@ -208,10 +208,10 @@ fn get_camera_driver(index: c_int) -> Ptr[c_char, mut=False]:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetCameraDriver.
     """
 
-    return _get_sdl_handle()[].get_function[fn (index: c_int) -> Ptr[c_char, mut=False]]("SDL_GetCameraDriver")(index)
+    return _get_dylib_function[lib, "SDL_GetCameraDriver", fn (index: c_int) -> Ptr[c_char, AnyOrigin[False]]]()(index)
 
 
-fn get_current_camera_driver() -> Ptr[c_char, mut=False]:
+fn get_current_camera_driver() raises -> Ptr[c_char, AnyOrigin[False]]:
     """Get the name of the current camera driver.
 
     The names of drivers are all simple, low-ASCII identifiers, like "v4l2",
@@ -228,10 +228,10 @@ fn get_current_camera_driver() -> Ptr[c_char, mut=False]:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetCurrentCameraDriver.
     """
 
-    return _get_sdl_handle()[].get_function[fn () -> Ptr[c_char, mut=False]]("SDL_GetCurrentCameraDriver")()
+    return _get_dylib_function[lib, "SDL_GetCurrentCameraDriver", fn () -> Ptr[c_char, AnyOrigin[False]]]()()
 
 
-fn get_cameras(count: Ptr[c_int, mut=True], out ret: Ptr[CameraID, mut=True]) raises:
+fn get_cameras(count: Ptr[c_int, AnyOrigin[True]], out ret: Ptr[CameraID, AnyOrigin[True]]) raises:
     """Get a list of currently connected camera devices.
 
     Args:
@@ -249,12 +249,12 @@ fn get_cameras(count: Ptr[c_int, mut=True], out ret: Ptr[CameraID, mut=True]) ra
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetCameras.
     """
 
-    ret = _get_sdl_handle()[].get_function[fn (count: Ptr[c_int, mut=True]) -> Ptr[CameraID, mut=True]]("SDL_GetCameras")(count)
+    ret = _get_dylib_function[lib, "SDL_GetCameras", fn (count: Ptr[c_int, AnyOrigin[True]]) -> Ptr[CameraID, AnyOrigin[True]]]()(count)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn get_camera_supported_formats(instance_id: CameraID, count: Ptr[c_int, mut=True]) -> Ptr[Ptr[CameraSpec, mut=True], mut=True]:
+fn get_camera_supported_formats(instance_id: CameraID, count: Ptr[c_int, AnyOrigin[True]]) raises -> Ptr[Ptr[CameraSpec, AnyOrigin[True]], AnyOrigin[True]]:
     """Get the list of native formats/sizes a camera supports.
 
     This returns a list of all formats and frame sizes that a specific camera
@@ -293,10 +293,10 @@ fn get_camera_supported_formats(instance_id: CameraID, count: Ptr[c_int, mut=Tru
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetCameraSupportedFormats.
     """
 
-    return _get_sdl_handle()[].get_function[fn (instance_id: CameraID, count: Ptr[c_int, mut=True]) -> Ptr[Ptr[CameraSpec, mut=True], mut=True]]("SDL_GetCameraSupportedFormats")(instance_id, count)
+    return _get_dylib_function[lib, "SDL_GetCameraSupportedFormats", fn (instance_id: CameraID, count: Ptr[c_int, AnyOrigin[True]]) -> Ptr[Ptr[CameraSpec, AnyOrigin[True]], AnyOrigin[True]]]()(instance_id, count)
 
 
-fn get_camera_name(instance_id: CameraID, out ret: Ptr[c_char, mut=False]) raises:
+fn get_camera_name(instance_id: CameraID, out ret: Ptr[c_char, AnyOrigin[False]]) raises:
     """Get the human-readable device name for a camera.
 
     Args:
@@ -312,12 +312,12 @@ fn get_camera_name(instance_id: CameraID, out ret: Ptr[c_char, mut=False]) raise
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetCameraName.
     """
 
-    ret = _get_sdl_handle()[].get_function[fn (instance_id: CameraID) -> Ptr[c_char, mut=False]]("SDL_GetCameraName")(instance_id)
+    ret = _get_dylib_function[lib, "SDL_GetCameraName", fn (instance_id: CameraID) -> Ptr[c_char, AnyOrigin[False]]]()(instance_id)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn get_camera_position(instance_id: CameraID) -> CameraPosition:
+fn get_camera_position(instance_id: CameraID) raises -> CameraPosition:
     """Get the position of the camera in relation to the system.
 
     Most platforms will report UNKNOWN, but mobile devices, like phones, can
@@ -337,10 +337,10 @@ fn get_camera_position(instance_id: CameraID) -> CameraPosition:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetCameraPosition.
     """
 
-    return _get_sdl_handle()[].get_function[fn (instance_id: CameraID) -> CameraPosition]("SDL_GetCameraPosition")(instance_id)
+    return _get_dylib_function[lib, "SDL_GetCameraPosition", fn (instance_id: CameraID) -> CameraPosition]()(instance_id)
 
 
-fn open_camera(instance_id: CameraID, spec: Ptr[CameraSpec, mut=False], out ret: Ptr[Camera, mut=True]) raises:
+fn open_camera(instance_id: CameraID, spec: Ptr[CameraSpec, AnyOrigin[False]], out ret: Ptr[Camera, AnyOrigin[True]]) raises:
     """Open a video recording device (a "camera").
 
     You can open the device with any reasonable spec, and if the hardware can't
@@ -387,12 +387,12 @@ fn open_camera(instance_id: CameraID, spec: Ptr[CameraSpec, mut=False], out ret:
     Docs: https://wiki.libsdl.org/SDL3/SDL_OpenCamera.
     """
 
-    ret = _get_sdl_handle()[].get_function[fn (instance_id: CameraID, spec: Ptr[CameraSpec, mut=False]) -> Ptr[Camera, mut=True]]("SDL_OpenCamera")(instance_id, spec)
+    ret = _get_dylib_function[lib, "SDL_OpenCamera", fn (instance_id: CameraID, spec: Ptr[CameraSpec, AnyOrigin[False]]) -> Ptr[Camera, AnyOrigin[True]]]()(instance_id, spec)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn get_camera_permission_state(camera: Ptr[Camera, mut=True]) -> c_int:
+fn get_camera_permission_state(camera: Ptr[Camera, AnyOrigin[True]]) raises -> c_int:
     """Query if camera access has been approved by the user.
 
     Cameras will not function between when the device is opened by the app and
@@ -425,10 +425,10 @@ fn get_camera_permission_state(camera: Ptr[Camera, mut=True]) -> c_int:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetCameraPermissionState.
     """
 
-    return _get_sdl_handle()[].get_function[fn (camera: Ptr[Camera, mut=True]) -> c_int]("SDL_GetCameraPermissionState")(camera)
+    return _get_dylib_function[lib, "SDL_GetCameraPermissionState", fn (camera: Ptr[Camera, AnyOrigin[True]]) -> c_int]()(camera)
 
 
-fn get_camera_id(camera: Ptr[Camera, mut=True]) -> CameraID:
+fn get_camera_id(camera: Ptr[Camera, AnyOrigin[True]]) raises -> CameraID:
     """Get the instance ID of an opened camera.
 
     Args:
@@ -444,10 +444,10 @@ fn get_camera_id(camera: Ptr[Camera, mut=True]) -> CameraID:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetCameraID.
     """
 
-    return _get_sdl_handle()[].get_function[fn (camera: Ptr[Camera, mut=True]) -> CameraID]("SDL_GetCameraID")(camera)
+    return _get_dylib_function[lib, "SDL_GetCameraID", fn (camera: Ptr[Camera, AnyOrigin[True]]) -> CameraID]()(camera)
 
 
-fn get_camera_properties(camera: Ptr[Camera, mut=True]) -> PropertiesID:
+fn get_camera_properties(camera: Ptr[Camera, AnyOrigin[True]]) raises -> PropertiesID:
     """Get the properties associated with an opened camera.
 
     Args:
@@ -463,10 +463,10 @@ fn get_camera_properties(camera: Ptr[Camera, mut=True]) -> PropertiesID:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetCameraProperties.
     """
 
-    return _get_sdl_handle()[].get_function[fn (camera: Ptr[Camera, mut=True]) -> PropertiesID]("SDL_GetCameraProperties")(camera)
+    return _get_dylib_function[lib, "SDL_GetCameraProperties", fn (camera: Ptr[Camera, AnyOrigin[True]]) -> PropertiesID]()(camera)
 
 
-fn get_camera_format(camera: Ptr[Camera, mut=True], spec: Ptr[CameraSpec, mut=True]) raises:
+fn get_camera_format(camera: Ptr[Camera, AnyOrigin[True]], spec: Ptr[CameraSpec, AnyOrigin[True]]) raises:
     """Get the spec that a camera is using when generating images.
 
     Note that this might not be the native format of the hardware, as SDL might
@@ -493,12 +493,12 @@ fn get_camera_format(camera: Ptr[Camera, mut=True], spec: Ptr[CameraSpec, mut=Tr
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetCameraFormat.
     """
 
-    ret = _get_sdl_handle()[].get_function[fn (camera: Ptr[Camera, mut=True], spec: Ptr[CameraSpec, mut=True]) -> Bool]("SDL_GetCameraFormat")(camera, spec)
+    ret = _get_dylib_function[lib, "SDL_GetCameraFormat", fn (camera: Ptr[Camera, AnyOrigin[True]], spec: Ptr[CameraSpec, AnyOrigin[True]]) -> Bool]()(camera, spec)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn acquire_camera_frame(camera: Ptr[Camera, mut=True], timestamp_ns: Ptr[UInt64, mut=True]) -> Ptr[Surface, mut=True]:
+fn acquire_camera_frame(camera: Ptr[Camera, AnyOrigin[True]], timestamp_ns: Ptr[UInt64, AnyOrigin[True]]) raises -> Ptr[Surface, AnyOrigin[True]]:
     """Acquire a frame.
 
     The frame is a memory pointer to the image data, whose size and format are
@@ -542,10 +542,10 @@ fn acquire_camera_frame(camera: Ptr[Camera, mut=True], timestamp_ns: Ptr[UInt64,
     Docs: https://wiki.libsdl.org/SDL3/SDL_AcquireCameraFrame.
     """
 
-    return _get_sdl_handle()[].get_function[fn (camera: Ptr[Camera, mut=True], timestamp_ns: Ptr[UInt64, mut=True]) -> Ptr[Surface, mut=True]]("SDL_AcquireCameraFrame")(camera, timestamp_ns)
+    return _get_dylib_function[lib, "SDL_AcquireCameraFrame", fn (camera: Ptr[Camera, AnyOrigin[True]], timestamp_ns: Ptr[UInt64, AnyOrigin[True]]) -> Ptr[Surface, AnyOrigin[True]]]()(camera, timestamp_ns)
 
 
-fn release_camera_frame(camera: Ptr[Camera, mut=True], frame: Ptr[Surface, mut=True]) -> None:
+fn release_camera_frame(camera: Ptr[Camera, AnyOrigin[True]], frame: Ptr[Surface, AnyOrigin[True]]) raises -> None:
     """Release a frame of video acquired from a camera.
 
     Let the back-end re-use the internal buffer for camera.
@@ -572,10 +572,10 @@ fn release_camera_frame(camera: Ptr[Camera, mut=True], frame: Ptr[Surface, mut=T
     Docs: https://wiki.libsdl.org/SDL3/SDL_ReleaseCameraFrame.
     """
 
-    return _get_sdl_handle()[].get_function[fn (camera: Ptr[Camera, mut=True], frame: Ptr[Surface, mut=True]) -> None]("SDL_ReleaseCameraFrame")(camera, frame)
+    return _get_dylib_function[lib, "SDL_ReleaseCameraFrame", fn (camera: Ptr[Camera, AnyOrigin[True]], frame: Ptr[Surface, AnyOrigin[True]]) -> None]()(camera, frame)
 
 
-fn close_camera(camera: Ptr[Camera, mut=True]) -> None:
+fn close_camera(camera: Ptr[Camera, AnyOrigin[True]]) raises -> None:
     """Use this function to shut down camera processing and close the camera
     device.
 
@@ -589,4 +589,4 @@ fn close_camera(camera: Ptr[Camera, mut=True]) -> None:
     Docs: https://wiki.libsdl.org/SDL3/SDL_CloseCamera.
     """
 
-    return _get_sdl_handle()[].get_function[fn (camera: Ptr[Camera, mut=True]) -> None]("SDL_CloseCamera")(camera)
+    return _get_dylib_function[lib, "SDL_CloseCamera", fn (camera: Ptr[Camera, AnyOrigin[True]]) -> None]()(camera)

@@ -1,6 +1,6 @@
-# x--------------------------------------------------------------------------x #
+# +--------------------------------------------------------------------------+ #
 # | SDL3 Bindings in Mojo
-# x--------------------------------------------------------------------------x #
+# +--------------------------------------------------------------------------+ #
 
 """SDL3 Bindings in Mojo"""
 
@@ -40,20 +40,14 @@ from .sdl_version import *
 from .sdl_video import *
 
 
-alias Ptr = stdlib.memory.LegacyUnsafePointer
-
-from os import abort
-from sys import CompilationTarget, is_big_endian, is_little_endian
-from sys.ffi import _Global, OwnedDLHandle, c_char, c_uchar, c_int, c_uint, c_short, c_ushort, c_long, c_long_long, c_size_t, c_ssize_t, c_float, c_double
-
-alias lib = _Global["SDL", _init_sdl_handle]()
+comptime AnyOrigin[mut: Bool] = __mlir_attr[`#lit.any.origin<`, mut._mlir_value, `>: !lit.origin<`, mut._mlir_value, `>`]
+comptime Ptr = stdlib.memory.UnsafePointer
 
 
-fn _get_sdl_handle() -> Ptr[OwnedDLHandle]:
-    try:
-        return lib.get_or_create_ptr()
-    except:
-        return abort[Ptr[OwnedDLHandle]]("Cannot get handle to libSDL3")
+from sys import CompilationTarget, is_little_endian, is_big_endian
+from sys.ffi import _Global, OwnedDLHandle, _get_dylib_function, c_char, c_uchar, c_int, c_uint, c_short, c_ushort, c_long, c_long_long, c_size_t, c_ssize_t, c_float, c_double
+
+comptime lib = _Global["SDL", _init_sdl_handle]()
 
 
 fn _init_sdl_handle() -> OwnedDLHandle:
@@ -78,5 +72,5 @@ fn _uninit[T: AnyType](out value: T):
     __mlir_op.`lit.ownership.mark_initialized`(__get_mvalue_as_litref(value))
 
 
-struct ArrayHelper[type: Copyable & Movable, size: Int, *, mut: Bool = True]:
-    alias result = Ptr[InlineArray[type, size], mut=mut]
+struct ArrayHelper[type: ImplicitlyCopyable & Movable, size: Int, origin: Origin]:
+    comptime result = Ptr[InlineArray[type, size], origin]

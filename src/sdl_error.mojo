@@ -47,7 +47,7 @@ is known to call SDL_SetError(), so errors simply propagate through.
 """
 
 
-fn out_of_memory() -> Bool:
+fn out_of_memory() raises -> Bool:
     """Set an error indicating that memory allocation failed.
 
     This function does not do any memory allocation.
@@ -61,10 +61,10 @@ fn out_of_memory() -> Bool:
     Docs: https://wiki.libsdl.org/SDL3/SDL_OutOfMemory.
     """
 
-    return _get_sdl_handle()[].get_function[fn () -> Bool]("SDL_OutOfMemory")()
+    return _get_dylib_function[lib, "SDL_OutOfMemory", fn () -> Bool]()()
 
 
-fn get_error() -> Ptr[c_char, mut=False]:
+fn get_error() raises -> Ptr[c_char, AnyOrigin[False]]:
     """Retrieve a message about the last error that occurred on the current
     thread.
 
@@ -99,10 +99,10 @@ fn get_error() -> Ptr[c_char, mut=False]:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetError.
     """
 
-    return _get_sdl_handle()[].get_function[fn () -> Ptr[c_char, mut=False]]("SDL_GetError")()
+    return _get_dylib_function[lib, "SDL_GetError", fn () -> Ptr[c_char, AnyOrigin[False]]]()()
 
 
-fn clear_error() -> Bool:
+fn clear_error() raises -> Bool:
     """Clear any previous error message for this thread.
 
     Returns:
@@ -114,4 +114,4 @@ fn clear_error() -> Bool:
     Docs: https://wiki.libsdl.org/SDL3/SDL_ClearError.
     """
 
-    return _get_sdl_handle()[].get_function[fn () -> Bool]("SDL_ClearError")()
+    return _get_dylib_function[lib, "SDL_ClearError", fn () -> Bool]()()

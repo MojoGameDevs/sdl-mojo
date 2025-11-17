@@ -92,17 +92,17 @@ struct PropertyType(Indexer, Intable):
 
     @always_inline("nodebug")
     fn __mlir_index__(self) -> __mlir_type.index:
-        return Int(self).__mlir_index__()
+        return Int(self)._mlir_value
 
-    alias PROPERTY_TYPE_INVALID = Self(0)
-    alias PROPERTY_TYPE_POINTER = Self(1)
-    alias PROPERTY_TYPE_STRING = Self(2)
-    alias PROPERTY_TYPE_NUMBER = Self(3)
-    alias PROPERTY_TYPE_FLOAT = Self(4)
-    alias PROPERTY_TYPE_BOOLEAN = Self(5)
+    comptime PROPERTY_TYPE_INVALID = Self(0)
+    comptime PROPERTY_TYPE_POINTER = Self(1)
+    comptime PROPERTY_TYPE_STRING = Self(2)
+    comptime PROPERTY_TYPE_NUMBER = Self(3)
+    comptime PROPERTY_TYPE_FLOAT = Self(4)
+    comptime PROPERTY_TYPE_BOOLEAN = Self(5)
 
 
-fn get_global_properties() -> PropertiesID:
+fn get_global_properties() raises -> PropertiesID:
     """Get the global SDL properties.
 
     Returns:
@@ -112,10 +112,10 @@ fn get_global_properties() -> PropertiesID:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetGlobalProperties.
     """
 
-    return _get_sdl_handle()[].get_function[fn () -> PropertiesID]("SDL_GetGlobalProperties")()
+    return _get_dylib_function[lib, "SDL_GetGlobalProperties", fn () -> PropertiesID]()()
 
 
-fn create_properties() -> PropertiesID:
+fn create_properties() raises -> PropertiesID:
     """Create a group of properties.
 
     All properties are automatically destroyed when SDL_Quit() is called.
@@ -130,7 +130,7 @@ fn create_properties() -> PropertiesID:
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateProperties.
     """
 
-    return _get_sdl_handle()[].get_function[fn () -> PropertiesID]("SDL_CreateProperties")()
+    return _get_dylib_function[lib, "SDL_CreateProperties", fn () -> PropertiesID]()()
 
 
 fn copy_properties(src: PropertiesID, dst: PropertiesID) raises:
@@ -155,7 +155,7 @@ fn copy_properties(src: PropertiesID, dst: PropertiesID) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_CopyProperties.
     """
 
-    ret = _get_sdl_handle()[].get_function[fn (src: PropertiesID, dst: PropertiesID) -> Bool]("SDL_CopyProperties")(src, dst)
+    ret = _get_dylib_function[lib, "SDL_CopyProperties", fn (src: PropertiesID, dst: PropertiesID) -> Bool]()(src, dst)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -185,12 +185,12 @@ fn lock_properties(props: PropertiesID) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_LockProperties.
     """
 
-    ret = _get_sdl_handle()[].get_function[fn (props: PropertiesID) -> Bool]("SDL_LockProperties")(props)
+    ret = _get_dylib_function[lib, "SDL_LockProperties", fn (props: PropertiesID) -> Bool]()(props)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn unlock_properties(props: PropertiesID) -> None:
+fn unlock_properties(props: PropertiesID) raises -> None:
     """Unlock a group of properties.
 
     Args:
@@ -202,10 +202,10 @@ fn unlock_properties(props: PropertiesID) -> None:
     Docs: https://wiki.libsdl.org/SDL3/SDL_UnlockProperties.
     """
 
-    return _get_sdl_handle()[].get_function[fn (props: PropertiesID) -> None]("SDL_UnlockProperties")(props)
+    return _get_dylib_function[lib, "SDL_UnlockProperties", fn (props: PropertiesID) -> None]()(props)
 
 
-alias CleanupPropertyCallback = fn (userdata: Ptr[NoneType, mut=True], value: Ptr[NoneType, mut=True]) -> None
+comptime CleanupPropertyCallback = fn (userdata: Ptr[NoneType, AnyOrigin[True]], value: Ptr[NoneType, AnyOrigin[True]]) -> None
 """A callback used to free resources when a property is deleted.
     
     This should release any resources associated with `value` that are no
@@ -229,7 +229,7 @@ Docs: https://wiki.libsdl.org/SDL3/SDL_CleanupPropertyCallback.
 """
 
 
-fn set_pointer_property_with_cleanup(props: PropertiesID, var name: String, value: Ptr[NoneType, mut=True], cleanup: CleanupPropertyCallback, userdata: Ptr[NoneType, mut=True]) raises:
+fn set_pointer_property_with_cleanup(props: PropertiesID, var name: String, value: Ptr[NoneType, AnyOrigin[True]], cleanup: CleanupPropertyCallback, userdata: Ptr[NoneType, AnyOrigin[True]]) raises:
     """Set a pointer property in a group of properties with a cleanup function
     that is called when the property is deleted.
 
@@ -259,12 +259,12 @@ fn set_pointer_property_with_cleanup(props: PropertiesID, var name: String, valu
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetPointerPropertyWithCleanup.
     """
 
-    ret = _get_sdl_handle()[].get_function[fn (props: PropertiesID, name: Ptr[c_char, mut=False], value: Ptr[NoneType, mut=True], cleanup: CleanupPropertyCallback, userdata: Ptr[NoneType, mut=True]) -> Bool]("SDL_SetPointerPropertyWithCleanup")(props, name.unsafe_cstr_ptr(), value, cleanup, userdata)
+    ret = _get_dylib_function[lib, "SDL_SetPointerPropertyWithCleanup", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]], value: Ptr[NoneType, AnyOrigin[True]], cleanup: CleanupPropertyCallback, userdata: Ptr[NoneType, AnyOrigin[True]]) -> Bool]()(props, name.unsafe_cstr_ptr(), value, cleanup, userdata)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn set_pointer_property(props: PropertiesID, var name: String, value: Ptr[NoneType, mut=True]) raises:
+fn set_pointer_property(props: PropertiesID, var name: String, value: Ptr[NoneType, AnyOrigin[True]]) raises:
     """Set a pointer property in a group of properties.
 
     Args:
@@ -282,7 +282,7 @@ fn set_pointer_property(props: PropertiesID, var name: String, value: Ptr[NoneTy
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetPointerProperty.
     """
 
-    ret = _get_sdl_handle()[].get_function[fn (props: PropertiesID, name: Ptr[c_char, mut=False], value: Ptr[NoneType, mut=True]) -> Bool]("SDL_SetPointerProperty")(props, name.unsafe_cstr_ptr(), value)
+    ret = _get_dylib_function[lib, "SDL_SetPointerProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]], value: Ptr[NoneType, AnyOrigin[True]]) -> Bool]()(props, name.unsafe_cstr_ptr(), value)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -308,7 +308,7 @@ fn set_string_property(props: PropertiesID, var name: String, var value: String)
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetStringProperty.
     """
 
-    ret = _get_sdl_handle()[].get_function[fn (props: PropertiesID, name: Ptr[c_char, mut=False], value: Ptr[c_char, mut=False]) -> Bool]("SDL_SetStringProperty")(props, name.unsafe_cstr_ptr(), value.unsafe_cstr_ptr())
+    ret = _get_dylib_function[lib, "SDL_SetStringProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]], value: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(props, name.unsafe_cstr_ptr(), value.unsafe_cstr_ptr())
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -331,7 +331,7 @@ fn set_number_property(props: PropertiesID, var name: String, value: Int64) rais
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetNumberProperty.
     """
 
-    ret = _get_sdl_handle()[].get_function[fn (props: PropertiesID, name: Ptr[c_char, mut=False], value: Int64) -> Bool]("SDL_SetNumberProperty")(props, name.unsafe_cstr_ptr(), value)
+    ret = _get_dylib_function[lib, "SDL_SetNumberProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]], value: Int64) -> Bool]()(props, name.unsafe_cstr_ptr(), value)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -354,7 +354,7 @@ fn set_float_property(props: PropertiesID, var name: String, value: c_float) rai
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetFloatProperty.
     """
 
-    ret = _get_sdl_handle()[].get_function[fn (props: PropertiesID, name: Ptr[c_char, mut=False], value: c_float) -> Bool]("SDL_SetFloatProperty")(props, name.unsafe_cstr_ptr(), value)
+    ret = _get_dylib_function[lib, "SDL_SetFloatProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]], value: c_float) -> Bool]()(props, name.unsafe_cstr_ptr(), value)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -377,12 +377,12 @@ fn set_boolean_property(props: PropertiesID, var name: String, value: Bool) rais
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetBooleanProperty.
     """
 
-    ret = _get_sdl_handle()[].get_function[fn (props: PropertiesID, name: Ptr[c_char, mut=False], value: Bool) -> Bool]("SDL_SetBooleanProperty")(props, name.unsafe_cstr_ptr(), value)
+    ret = _get_dylib_function[lib, "SDL_SetBooleanProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]], value: Bool) -> Bool]()(props, name.unsafe_cstr_ptr(), value)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn has_property(props: PropertiesID, var name: String) -> Bool:
+fn has_property(props: PropertiesID, var name: String) raises -> Bool:
     """Return whether a property exists in a group of properties.
 
     Args:
@@ -398,10 +398,10 @@ fn has_property(props: PropertiesID, var name: String) -> Bool:
     Docs: https://wiki.libsdl.org/SDL3/SDL_HasProperty.
     """
 
-    return _get_sdl_handle()[].get_function[fn (props: PropertiesID, name: Ptr[c_char, mut=False]) -> Bool]("SDL_HasProperty")(props, name.unsafe_cstr_ptr())
+    return _get_dylib_function[lib, "SDL_HasProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(props, name.unsafe_cstr_ptr())
 
 
-fn get_property_type(props: PropertiesID, var name: String) -> PropertyType:
+fn get_property_type(props: PropertiesID, var name: String) raises -> PropertyType:
     """Get the type of a property in a group of properties.
 
     Args:
@@ -418,10 +418,10 @@ fn get_property_type(props: PropertiesID, var name: String) -> PropertyType:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetPropertyType.
     """
 
-    return _get_sdl_handle()[].get_function[fn (props: PropertiesID, name: Ptr[c_char, mut=False]) -> PropertyType]("SDL_GetPropertyType")(props, name.unsafe_cstr_ptr())
+    return _get_dylib_function[lib, "SDL_GetPropertyType", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]]) -> PropertyType]()(props, name.unsafe_cstr_ptr())
 
 
-fn get_pointer_property(props: PropertiesID, var name: String, default_value: Ptr[NoneType, mut=True]) -> Ptr[NoneType, mut=True]:
+fn get_pointer_property(props: PropertiesID, var name: String, default_value: Ptr[NoneType, AnyOrigin[True]]) raises -> Ptr[NoneType, AnyOrigin[True]]:
     """Get a pointer property from a group of properties.
 
     By convention, the names of properties that SDL exposes on objects will
@@ -449,10 +449,10 @@ fn get_pointer_property(props: PropertiesID, var name: String, default_value: Pt
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetPointerProperty.
     """
 
-    return _get_sdl_handle()[].get_function[fn (props: PropertiesID, name: Ptr[c_char, mut=False], default_value: Ptr[NoneType, mut=True]) -> Ptr[NoneType, mut=True]]("SDL_GetPointerProperty")(props, name.unsafe_cstr_ptr(), default_value)
+    return _get_dylib_function[lib, "SDL_GetPointerProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]], default_value: Ptr[NoneType, AnyOrigin[True]]) -> Ptr[NoneType, AnyOrigin[True]]]()(props, name.unsafe_cstr_ptr(), default_value)
 
 
-fn get_string_property(props: PropertiesID, var name: String, var default_value: String) -> Ptr[c_char, mut=False]:
+fn get_string_property(props: PropertiesID, var name: String, var default_value: String) raises -> Ptr[c_char, AnyOrigin[False]]:
     """Get a string property from a group of properties.
 
     Args:
@@ -475,10 +475,10 @@ fn get_string_property(props: PropertiesID, var name: String, var default_value:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetStringProperty.
     """
 
-    return _get_sdl_handle()[].get_function[fn (props: PropertiesID, name: Ptr[c_char, mut=False], default_value: Ptr[c_char, mut=False]) -> Ptr[c_char, mut=False]]("SDL_GetStringProperty")(props, name.unsafe_cstr_ptr(), default_value.unsafe_cstr_ptr())
+    return _get_dylib_function[lib, "SDL_GetStringProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]], default_value: Ptr[c_char, AnyOrigin[False]]) -> Ptr[c_char, AnyOrigin[False]]]()(props, name.unsafe_cstr_ptr(), default_value.unsafe_cstr_ptr())
 
 
-fn get_number_property(props: PropertiesID, var name: String, default_value: Int64) -> Int64:
+fn get_number_property(props: PropertiesID, var name: String, default_value: Int64) raises -> Int64:
     """Get a number property from a group of properties.
 
     You can use SDL_GetPropertyType() to query whether the property exists and
@@ -499,10 +499,10 @@ fn get_number_property(props: PropertiesID, var name: String, default_value: Int
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetNumberProperty.
     """
 
-    return _get_sdl_handle()[].get_function[fn (props: PropertiesID, name: Ptr[c_char, mut=False], default_value: Int64) -> Int64]("SDL_GetNumberProperty")(props, name.unsafe_cstr_ptr(), default_value)
+    return _get_dylib_function[lib, "SDL_GetNumberProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]], default_value: Int64) -> Int64]()(props, name.unsafe_cstr_ptr(), default_value)
 
 
-fn get_float_property(props: PropertiesID, var name: String, default_value: c_float) -> c_float:
+fn get_float_property(props: PropertiesID, var name: String, default_value: c_float) raises -> c_float:
     """Get a floating point property from a group of properties.
 
     You can use SDL_GetPropertyType() to query whether the property exists and
@@ -523,10 +523,10 @@ fn get_float_property(props: PropertiesID, var name: String, default_value: c_fl
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetFloatProperty.
     """
 
-    return _get_sdl_handle()[].get_function[fn (props: PropertiesID, name: Ptr[c_char, mut=False], default_value: c_float) -> c_float]("SDL_GetFloatProperty")(props, name.unsafe_cstr_ptr(), default_value)
+    return _get_dylib_function[lib, "SDL_GetFloatProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]], default_value: c_float) -> c_float]()(props, name.unsafe_cstr_ptr(), default_value)
 
 
-fn get_boolean_property(props: PropertiesID, var name: String, default_value: Bool) -> Bool:
+fn get_boolean_property(props: PropertiesID, var name: String, default_value: Bool) raises -> Bool:
     """Get a boolean property from a group of properties.
 
     You can use SDL_GetPropertyType() to query whether the property exists and
@@ -547,7 +547,7 @@ fn get_boolean_property(props: PropertiesID, var name: String, default_value: Bo
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetBooleanProperty.
     """
 
-    return _get_sdl_handle()[].get_function[fn (props: PropertiesID, name: Ptr[c_char, mut=False], default_value: Bool) -> Bool]("SDL_GetBooleanProperty")(props, name.unsafe_cstr_ptr(), default_value)
+    return _get_dylib_function[lib, "SDL_GetBooleanProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]], default_value: Bool) -> Bool]()(props, name.unsafe_cstr_ptr(), default_value)
 
 
 fn clear_property(props: PropertiesID, var name: String) raises:
@@ -567,12 +567,12 @@ fn clear_property(props: PropertiesID, var name: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_ClearProperty.
     """
 
-    ret = _get_sdl_handle()[].get_function[fn (props: PropertiesID, name: Ptr[c_char, mut=False]) -> Bool]("SDL_ClearProperty")(props, name.unsafe_cstr_ptr())
+    ret = _get_dylib_function[lib, "SDL_ClearProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(props, name.unsafe_cstr_ptr())
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-alias EnumeratePropertiesCallback = fn (userdata: Ptr[NoneType, mut=True], props: PropertiesID, name: Ptr[c_char, mut=False]) -> None
+comptime EnumeratePropertiesCallback = fn (userdata: Ptr[NoneType, AnyOrigin[True]], props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]]) -> None
 """A callback used to enumerate all the properties in a group of properties.
     
     This callback is called from SDL_EnumerateProperties(), and is called once
@@ -591,7 +591,7 @@ Docs: https://wiki.libsdl.org/SDL3/SDL_EnumeratePropertiesCallback.
 """
 
 
-fn enumerate_properties(props: PropertiesID, callback: EnumeratePropertiesCallback, userdata: Ptr[NoneType, mut=True]) raises:
+fn enumerate_properties(props: PropertiesID, callback: EnumeratePropertiesCallback, userdata: Ptr[NoneType, AnyOrigin[True]]) raises:
     """Enumerate the properties contained in a group of properties.
 
     The callback function is called for each property in the group of
@@ -612,12 +612,12 @@ fn enumerate_properties(props: PropertiesID, callback: EnumeratePropertiesCallba
     Docs: https://wiki.libsdl.org/SDL3/SDL_EnumerateProperties.
     """
 
-    ret = _get_sdl_handle()[].get_function[fn (props: PropertiesID, callback: EnumeratePropertiesCallback, userdata: Ptr[NoneType, mut=True]) -> Bool]("SDL_EnumerateProperties")(props, callback, userdata)
+    ret = _get_dylib_function[lib, "SDL_EnumerateProperties", fn (props: PropertiesID, callback: EnumeratePropertiesCallback, userdata: Ptr[NoneType, AnyOrigin[True]]) -> Bool]()(props, callback, userdata)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn destroy_properties(props: PropertiesID) -> None:
+fn destroy_properties(props: PropertiesID) raises -> None:
     """Destroy a group of properties.
 
     All properties are deleted and their cleanup functions will be called, if
@@ -634,4 +634,4 @@ fn destroy_properties(props: PropertiesID) -> None:
     Docs: https://wiki.libsdl.org/SDL3/SDL_DestroyProperties.
     """
 
-    return _get_sdl_handle()[].get_function[fn (props: PropertiesID) -> None]("SDL_DestroyProperties")(props)
+    return _get_dylib_function[lib, "SDL_DestroyProperties", fn (props: PropertiesID) -> None]()(props)
