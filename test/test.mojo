@@ -17,8 +17,8 @@ def main():
     alias screen_height = 480
     sdl.init(InitFlags.INIT_VIDEO | InitFlags.INIT_AUDIO | InitFlags.INIT_EVENTS | InitFlags.INIT_JOYSTICK | InitFlags.INIT_GAMEPAD)
 
-    var window = Ptr[sdl.Window]()
-    var renderer = Ptr[sdl.Renderer]()
+    var window = Ptr[sdl.Window, MutAnyOrigin]()
+    var renderer = Ptr[sdl.Renderer, MutAnyOrigin]()
     sdl.create_window_and_renderer("sdl3 test", screen_width, screen_height, sdl.WindowFlags(0), Ptr(to=window), Ptr(to=renderer))
 
     var running = True

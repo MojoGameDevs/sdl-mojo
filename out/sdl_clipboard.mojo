@@ -75,7 +75,7 @@ it doesn't support a primary selection.
 """
 
 
-fn set_clipboard_text(owned text: String) raises:
+fn set_clipboard_text(var text: String) raises:
     """Put UTF-8 text into the clipboard.
 
     Args:
@@ -91,15 +91,15 @@ fn set_clipboard_text(owned text: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetClipboardText.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetClipboardText", fn (text: Ptr[c_char, mut=False]) -> Bool]()(text.unsafe_cstr_ptr())
+    ret = _get_dylib_function[lib, "SDL_SetClipboardText", fn (text: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(text.unsafe_cstr_ptr())
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn get_clipboard_text(out ret: Ptr[c_char, mut=True]) raises:
+fn get_clipboard_text(out ret: Ptr[c_char, AnyOrigin[True]]) raises:
     """Get UTF-8 text from the clipboard.
 
-    This functions returns an empty string if there was not enough memory left
+    This function returns an empty string if there is not enough memory left
     for a copy of the clipboard's content.
 
     Returns:
@@ -113,12 +113,12 @@ fn get_clipboard_text(out ret: Ptr[c_char, mut=True]) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetClipboardText.
     """
 
-    ret = _get_dylib_function[lib, "SDL_GetClipboardText", fn () -> Ptr[c_char, mut=True]]()()
+    ret = _get_dylib_function[lib, "SDL_GetClipboardText", fn () -> Ptr[c_char, AnyOrigin[True]]]()()
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn has_clipboard_text() -> Bool:
+fn has_clipboard_text() raises -> Bool:
     """Query whether the clipboard exists and contains a non-empty text string.
 
     Returns:
@@ -133,7 +133,7 @@ fn has_clipboard_text() -> Bool:
     return _get_dylib_function[lib, "SDL_HasClipboardText", fn () -> Bool]()()
 
 
-fn set_primary_selection_text(owned text: String) raises:
+fn set_primary_selection_text(var text: String) raises:
     """Put UTF-8 text into the primary selection.
 
     Args:
@@ -149,15 +149,15 @@ fn set_primary_selection_text(owned text: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetPrimarySelectionText.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetPrimarySelectionText", fn (text: Ptr[c_char, mut=False]) -> Bool]()(text.unsafe_cstr_ptr())
+    ret = _get_dylib_function[lib, "SDL_SetPrimarySelectionText", fn (text: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(text.unsafe_cstr_ptr())
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn get_primary_selection_text() -> Ptr[c_char, mut=True]:
+fn get_primary_selection_text() raises -> Ptr[c_char, AnyOrigin[True]]:
     """Get UTF-8 text from the primary selection.
 
-    This functions returns an empty string if there was not enough memory left
+    This function returns an empty string if there is not enough memory left
     for a copy of the primary selection's content.
 
     Returns:
@@ -171,10 +171,10 @@ fn get_primary_selection_text() -> Ptr[c_char, mut=True]:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetPrimarySelectionText.
     """
 
-    return _get_dylib_function[lib, "SDL_GetPrimarySelectionText", fn () -> Ptr[c_char, mut=True]]()()
+    return _get_dylib_function[lib, "SDL_GetPrimarySelectionText", fn () -> Ptr[c_char, AnyOrigin[True]]]()()
 
 
-fn has_primary_selection_text() -> Bool:
+fn has_primary_selection_text() raises -> Bool:
     """Query whether the primary selection exists and contains a non-empty text
     string.
 
@@ -190,7 +190,7 @@ fn has_primary_selection_text() -> Bool:
     return _get_dylib_function[lib, "SDL_HasPrimarySelectionText", fn () -> Bool]()()
 
 
-alias ClipboardDataCallback = Ptr[fn (userdata: Ptr[NoneType, mut=True], mime_type: Ptr[c_char, mut=False], size: Ptr[c_size_t, mut=True]) -> None]
+comptime ClipboardDataCallback = Ptr[fn (userdata: Ptr[NoneType, AnyOrigin[True]], mime_type: Ptr[c_char, AnyOrigin[False]], size: Ptr[c_size_t, AnyOrigin[True]]) -> None, AnyOrigin[True]]
 """Callback function that will be called when data for the specified mime-type
     is requested by the OS.
     
@@ -199,34 +199,33 @@ alias ClipboardDataCallback = Ptr[fn (userdata: Ptr[NoneType, mut=True], mime_ty
     cleared in SDL_Quit().
     
     Args:
-        userdata: A pointer to provided user data.
+        userdata: A pointer to the provided user data.
         mime_type: The requested mime-type.
         size: A pointer filled in with the length of the returned data.
     
     Returns:
         A pointer to the data for the provided mime-type. Returning NULL
-        or setting length to 0 will cause no data to be sent to the
-        "receiver". It is up to the receiver to handle this. Essentially
-        returning no data is more or less undefined behavior and may cause
-        breakage in receiving applications. The returned data will not be
-        freed so it needs to be retained and dealt with internally.
+        or setting the length to 0 will cause zero length data to be sent
+        to the "receiver", which should be able to handle this. The
+        returned data will not be freed, so it needs to be retained and
+        dealt with internally.
 
 Docs: https://wiki.libsdl.org/SDL3/SDL_ClipboardDataCallback.
 """
 
 
-alias ClipboardCleanupCallback = fn (userdata: Ptr[NoneType, mut=True]) -> None
-"""Callback function that will be called when the clipboard is cleared, or new
+comptime ClipboardCleanupCallback = fn (userdata: Ptr[NoneType, AnyOrigin[True]]) -> None
+"""Callback function that will be called when the clipboard is cleared, or when new
     data is set.
     
     Args:
-        userdata: A pointer to provided user data.
+        userdata: A pointer to the provided user data.
 
 Docs: https://wiki.libsdl.org/SDL3/SDL_ClipboardCleanupCallback.
 """
 
 
-fn set_clipboard_data(callback: ClipboardDataCallback, cleanup: ClipboardCleanupCallback, userdata: Ptr[NoneType, mut=True], mime_types: Ptr[Ptr[c_char, mut=False], mut=False], num_mime_types: c_size_t) raises:
+fn set_clipboard_data(callback: ClipboardDataCallback, cleanup: ClipboardCleanupCallback, userdata: Ptr[NoneType, AnyOrigin[True]], mime_types: Ptr[Ptr[c_char, AnyOrigin[False]], AnyOrigin[False]], num_mime_types: c_size_t) raises:
     """Offer clipboard data to the OS.
 
     Tell the operating system that the application is offering clipboard data
@@ -235,7 +234,7 @@ fn set_clipboard_data(callback: ClipboardDataCallback, cleanup: ClipboardCleanup
     respond with the data for the requested mime-type.
 
     The size of text data does not include any terminator, and the text does
-    not need to be null terminated (e.g. you can directly copy a portion of a
+    not need to be null-terminated (e.g., you can directly copy a portion of a
     document).
 
     Args:
@@ -244,7 +243,7 @@ fn set_clipboard_data(callback: ClipboardDataCallback, cleanup: ClipboardCleanup
         cleanup: A function pointer to the function that cleans up the
                  clipboard data.
         userdata: An opaque pointer that will be forwarded to the callbacks.
-        mime_types: A list of mime-types that are being offered.
+        mime_types: A list of mime-types that are being offered. SDL copies the given list.
         num_mime_types: The number of mime-types in the mime_types list.
 
     Raises:
@@ -257,9 +256,9 @@ fn set_clipboard_data(callback: ClipboardDataCallback, cleanup: ClipboardCleanup
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetClipboardData.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetClipboardData", fn (callback: ClipboardDataCallback, cleanup: ClipboardCleanupCallback, userdata: Ptr[NoneType, mut=True], mime_types: Ptr[Ptr[c_char, mut=False], mut=False], num_mime_types: c_size_t) -> Bool]()(callback, cleanup, userdata, mime_types, num_mime_types)
+    ret = _get_dylib_function[lib, "SDL_SetClipboardData", fn (callback: ClipboardDataCallback, cleanup: ClipboardCleanupCallback, userdata: Ptr[NoneType, AnyOrigin[True]], mime_types: Ptr[Ptr[c_char, AnyOrigin[False]], AnyOrigin[False]], num_mime_types: c_size_t) -> Bool]()(callback, cleanup, userdata, mime_types, num_mime_types)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
 fn clear_clipboard_data() raises:
@@ -277,14 +276,14 @@ fn clear_clipboard_data() raises:
 
     ret = _get_dylib_function[lib, "SDL_ClearClipboardData", fn () -> Bool]()()
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn get_clipboard_data(owned mime_type: String, size: Ptr[c_size_t, mut=True], out ret: Ptr[NoneType, mut=True]) raises:
-    """Get the data from clipboard for a given mime type.
+fn get_clipboard_data(var mime_type: String, size: Ptr[c_size_t, AnyOrigin[True]], out ret: Ptr[NoneType, AnyOrigin[True]]) raises:
+    """Get the data from the clipboard for a given mime type.
 
     The size of text data does not include the terminator, but the text is
-    guaranteed to be null terminated.
+    guaranteed to be null-terminated.
 
     Args:
         mime_type: The mime type to read from the clipboard.
@@ -301,19 +300,19 @@ fn get_clipboard_data(owned mime_type: String, size: Ptr[c_size_t, mut=True], ou
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetClipboardData.
     """
 
-    ret = _get_dylib_function[lib, "SDL_GetClipboardData", fn (mime_type: Ptr[c_char, mut=False], size: Ptr[c_size_t, mut=True]) -> Ptr[NoneType, mut=True]]()(mime_type.unsafe_cstr_ptr(), size)
+    ret = _get_dylib_function[lib, "SDL_GetClipboardData", fn (mime_type: Ptr[c_char, AnyOrigin[False]], size: Ptr[c_size_t, AnyOrigin[True]]) -> Ptr[NoneType, AnyOrigin[True]]]()(mime_type.unsafe_cstr_ptr(), size)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn has_clipboard_data(owned mime_type: String) -> Bool:
+fn has_clipboard_data(var mime_type: String) raises -> Bool:
     """Query whether there is data in the clipboard for the provided mime type.
 
     Args:
-        mime_type: The mime type to check for data for.
+        mime_type: The mime type to check for data.
 
     Returns:
-        True if there exists data in clipboard for the provided mime type,
+        True if data exists in the clipboard for the provided mime type,
         false if it does not.
 
     Safety:
@@ -322,10 +321,10 @@ fn has_clipboard_data(owned mime_type: String) -> Bool:
     Docs: https://wiki.libsdl.org/SDL3/SDL_HasClipboardData.
     """
 
-    return _get_dylib_function[lib, "SDL_HasClipboardData", fn (mime_type: Ptr[c_char, mut=False]) -> Bool]()(mime_type.unsafe_cstr_ptr())
+    return _get_dylib_function[lib, "SDL_HasClipboardData", fn (mime_type: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(mime_type.unsafe_cstr_ptr())
 
 
-fn get_clipboard_mime_types(num_mime_types: Ptr[c_size_t, mut=True]) -> Ptr[Ptr[c_char, mut=True], mut=True]:
+fn get_clipboard_mime_types(num_mime_types: Ptr[c_size_t, AnyOrigin[True]]) raises -> Ptr[Ptr[c_char, AnyOrigin[True]], AnyOrigin[True]]:
     """Retrieve the list of mime types available in the clipboard.
 
     Args:
@@ -333,7 +332,7 @@ fn get_clipboard_mime_types(num_mime_types: Ptr[c_size_t, mut=True]) -> Ptr[Ptr[
                         be NULL.
 
     Returns:
-        A null terminated array of strings with mime types, or NULL on
+        A null-terminated array of strings with mime types, or NULL on
         failure; call SDL_GetError() for more information. This should be
         freed with SDL_free() when it is no longer needed.
 
@@ -343,4 +342,4 @@ fn get_clipboard_mime_types(num_mime_types: Ptr[c_size_t, mut=True]) -> Ptr[Ptr[
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetClipboardMimeTypes.
     """
 
-    return _get_dylib_function[lib, "SDL_GetClipboardMimeTypes", fn (num_mime_types: Ptr[c_size_t, mut=True]) -> Ptr[Ptr[c_char, mut=True], mut=True]]()(num_mime_types)
+    return _get_dylib_function[lib, "SDL_GetClipboardMimeTypes", fn (num_mime_types: Ptr[c_size_t, AnyOrigin[True]]) -> Ptr[Ptr[c_char, AnyOrigin[True]], AnyOrigin[True]]]()(num_mime_types)

@@ -149,40 +149,40 @@ struct AudioFormat(Indexer, Intable):
         return lhs.value == rhs.value
 
     @always_inline("nodebug")
-    fn __index__(self) -> __mlir_type.index:
-        return Int(self).value
+    fn __mlir_index__(self) -> __mlir_type.index:
+        return Int(self)._mlir_value
 
-    alias AUDIO_UNKNOWN = Self(0x0000)
+    comptime AUDIO_UNKNOWN = Self(0x0000)
     """Unspecified audio format."""
-    alias AUDIO_U8 = Self(0x0008)
+    comptime AUDIO_U8 = Self(0x0008)
     """Unsigned 8-bit samples."""
     # SDL_DEFINE_AUDIO_FORMAT(0, 0, 0, 8),
-    alias AUDIO_S8 = Self(0x8008)
+    comptime AUDIO_S8 = Self(0x8008)
     """Signed 8-bit samples."""
     # SDL_DEFINE_AUDIO_FORMAT(1, 0, 0, 8),
-    alias AUDIO_S16LE = Self(0x8010)
+    comptime AUDIO_S16LE = Self(0x8010)
     """Signed 16-bit samples."""
     # SDL_DEFINE_AUDIO_FORMAT(1, 0, 0, 16),
-    alias AUDIO_S16BE = Self(0x9010)
+    comptime AUDIO_S16BE = Self(0x9010)
     """As above, but big-endian byte order."""
     # SDL_DEFINE_AUDIO_FORMAT(1, 1, 0, 16),
-    alias AUDIO_S32LE = Self(0x8020)
+    comptime AUDIO_S32LE = Self(0x8020)
     """32-bit integer samples."""
     # SDL_DEFINE_AUDIO_FORMAT(1, 0, 0, 32),
-    alias AUDIO_S32BE = Self(0x9020)
+    comptime AUDIO_S32BE = Self(0x9020)
     """As above, but big-endian byte order."""
     # SDL_DEFINE_AUDIO_FORMAT(1, 1, 0, 32),
-    alias AUDIO_F32LE = Self(0x8120)
+    comptime AUDIO_F32LE = Self(0x8120)
     """32-bit floating point samples."""
     # SDL_DEFINE_AUDIO_FORMAT(1, 0, 1, 32),
-    alias AUDIO_F32BE = Self(0x9120)
+    comptime AUDIO_F32BE = Self(0x9120)
     """As above, but big-endian byte order."""
     # SDL_DEFINE_AUDIO_FORMAT(1, 1, 1, 32),
 
     # These represent the current system's byteorder.
-    alias AUDIO_S16 = Self.AUDIO_S16LE if is_little_endian() else Self.AUDIO_S16BE
-    alias AUDIO_S32 = Self.AUDIO_S32LE if is_little_endian() else Self.AUDIO_S32BE
-    alias AUDIO_F32 = Self.AUDIO_F32LE if is_little_endian() else Self.AUDIO_F32BE
+    comptime AUDIO_S16 = Self.AUDIO_S16LE if is_little_endian() else Self.AUDIO_S16BE
+    comptime AUDIO_S32 = Self.AUDIO_S32LE if is_little_endian() else Self.AUDIO_S32BE
+    comptime AUDIO_F32 = Self.AUDIO_F32LE if is_little_endian() else Self.AUDIO_F32BE
 
 
 @register_passable("trivial")
@@ -210,7 +210,7 @@ struct AudioDeviceID(Intable):
 
 
 @fieldwise_init
-struct AudioSpec(Copyable, Movable):
+struct AudioSpec(ImplicitlyCopyable, Movable):
     """Format specifier for audio data.
 
     Docs: https://wiki.libsdl.org/SDL3/AudioSpec.
@@ -225,7 +225,7 @@ struct AudioSpec(Copyable, Movable):
 
 
 @fieldwise_init
-struct AudioStream(Copyable, Movable):
+struct AudioStream(ImplicitlyCopyable, Movable):
     """The opaque handle that represents an audio stream.
 
     SDL_AudioStream is an audio conversion interface.
@@ -251,7 +251,7 @@ struct AudioStream(Copyable, Movable):
     pass
 
 
-fn get_num_audio_drivers() -> c_int:
+fn get_num_audio_drivers() raises -> c_int:
     """Use this function to get the number of built-in audio drivers.
 
     This function returns a hardcoded number. This never returns a negative
@@ -276,7 +276,7 @@ fn get_num_audio_drivers() -> c_int:
     return _get_dylib_function[lib, "SDL_GetNumAudioDrivers", fn () -> c_int]()()
 
 
-fn get_audio_driver(index: c_int) -> Ptr[c_char, mut=False]:
+fn get_audio_driver(index: c_int) raises -> Ptr[c_char, AnyOrigin[False]]:
     """Use this function to get the name of a built in audio driver.
 
     The list of audio drivers is given in the order that they are normally
@@ -301,10 +301,10 @@ fn get_audio_driver(index: c_int) -> Ptr[c_char, mut=False]:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetAudioDriver.
     """
 
-    return _get_dylib_function[lib, "SDL_GetAudioDriver", fn (index: c_int) -> Ptr[c_char, mut=False]]()(index)
+    return _get_dylib_function[lib, "SDL_GetAudioDriver", fn (index: c_int) -> Ptr[c_char, AnyOrigin[False]]]()(index)
 
 
-fn get_current_audio_driver() -> Ptr[c_char, mut=False]:
+fn get_current_audio_driver() raises -> Ptr[c_char, AnyOrigin[False]]:
     """Get the name of the current audio driver.
 
     The names of drivers are all simple, low-ASCII identifiers, like "alsa",
@@ -321,10 +321,10 @@ fn get_current_audio_driver() -> Ptr[c_char, mut=False]:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetCurrentAudioDriver.
     """
 
-    return _get_dylib_function[lib, "SDL_GetCurrentAudioDriver", fn () -> Ptr[c_char, mut=False]]()()
+    return _get_dylib_function[lib, "SDL_GetCurrentAudioDriver", fn () -> Ptr[c_char, AnyOrigin[False]]]()()
 
 
-fn get_audio_playback_devices(count: Ptr[c_int, mut=True]) -> Ptr[AudioDeviceID, mut=True]:
+fn get_audio_playback_devices(count: Ptr[c_int, AnyOrigin[True]]) raises -> Ptr[AudioDeviceID, AnyOrigin[True]]:
     """Get a list of currently-connected audio playback devices.
 
     This returns of list of available devices that play sound, perhaps to
@@ -353,10 +353,10 @@ fn get_audio_playback_devices(count: Ptr[c_int, mut=True]) -> Ptr[AudioDeviceID,
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetAudioPlaybackDevices.
     """
 
-    return _get_dylib_function[lib, "SDL_GetAudioPlaybackDevices", fn (count: Ptr[c_int, mut=True]) -> Ptr[AudioDeviceID, mut=True]]()(count)
+    return _get_dylib_function[lib, "SDL_GetAudioPlaybackDevices", fn (count: Ptr[c_int, AnyOrigin[True]]) -> Ptr[AudioDeviceID, AnyOrigin[True]]]()(count)
 
 
-fn get_audio_recording_devices(count: Ptr[c_int, mut=True], out ret: Ptr[AudioDeviceID, mut=True]) raises:
+fn get_audio_recording_devices(count: Ptr[c_int, AnyOrigin[True]], out ret: Ptr[AudioDeviceID, AnyOrigin[True]]) raises:
     """Get a list of currently-connected audio recording devices.
 
     This returns of list of available devices that record audio, like a
@@ -385,12 +385,12 @@ fn get_audio_recording_devices(count: Ptr[c_int, mut=True], out ret: Ptr[AudioDe
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetAudioRecordingDevices.
     """
 
-    ret = _get_dylib_function[lib, "SDL_GetAudioRecordingDevices", fn (count: Ptr[c_int, mut=True]) -> Ptr[AudioDeviceID, mut=True]]()(count)
+    ret = _get_dylib_function[lib, "SDL_GetAudioRecordingDevices", fn (count: Ptr[c_int, AnyOrigin[True]]) -> Ptr[AudioDeviceID, AnyOrigin[True]]]()(count)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn get_audio_device_name(devid: AudioDeviceID, out ret: Ptr[c_char, mut=False]) raises:
+fn get_audio_device_name(devid: AudioDeviceID, out ret: Ptr[c_char, AnyOrigin[False]]) raises:
     """Get the human-readable name of a specific audio device.
 
     Args:
@@ -406,12 +406,12 @@ fn get_audio_device_name(devid: AudioDeviceID, out ret: Ptr[c_char, mut=False]) 
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetAudioDeviceName.
     """
 
-    ret = _get_dylib_function[lib, "SDL_GetAudioDeviceName", fn (devid: AudioDeviceID) -> Ptr[c_char, mut=False]]()(devid)
+    ret = _get_dylib_function[lib, "SDL_GetAudioDeviceName", fn (devid: AudioDeviceID) -> Ptr[c_char, AnyOrigin[False]]]()(devid)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn get_audio_device_format(devid: AudioDeviceID, spec: Ptr[AudioSpec, mut=True], sample_frames: Ptr[c_int, mut=True]) raises:
+fn get_audio_device_format(devid: AudioDeviceID, spec: Ptr[AudioSpec, AnyOrigin[True]], sample_frames: Ptr[c_int, AnyOrigin[True]]) raises:
     """Get the current audio format of a specific audio device.
 
     For an opened device, this will report the format the device is currently
@@ -449,12 +449,12 @@ fn get_audio_device_format(devid: AudioDeviceID, spec: Ptr[AudioSpec, mut=True],
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetAudioDeviceFormat.
     """
 
-    ret = _get_dylib_function[lib, "SDL_GetAudioDeviceFormat", fn (devid: AudioDeviceID, spec: Ptr[AudioSpec, mut=True], sample_frames: Ptr[c_int, mut=True]) -> Bool]()(devid, spec, sample_frames)
+    ret = _get_dylib_function[lib, "SDL_GetAudioDeviceFormat", fn (devid: AudioDeviceID, spec: Ptr[AudioSpec, AnyOrigin[True]], sample_frames: Ptr[c_int, AnyOrigin[True]]) -> Bool]()(devid, spec, sample_frames)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn get_audio_device_channel_map(devid: AudioDeviceID, count: Ptr[c_int, mut=True]) -> Ptr[c_int, mut=True]:
+fn get_audio_device_channel_map(devid: AudioDeviceID, count: Ptr[c_int, AnyOrigin[True]]) raises -> Ptr[c_int, AnyOrigin[True]]:
     """Get the current channel map of an audio device.
 
     Channel maps are optional; most things do not need them, instead passing
@@ -478,10 +478,10 @@ fn get_audio_device_channel_map(devid: AudioDeviceID, count: Ptr[c_int, mut=True
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetAudioDeviceChannelMap.
     """
 
-    return _get_dylib_function[lib, "SDL_GetAudioDeviceChannelMap", fn (devid: AudioDeviceID, count: Ptr[c_int, mut=True]) -> Ptr[c_int, mut=True]]()(devid, count)
+    return _get_dylib_function[lib, "SDL_GetAudioDeviceChannelMap", fn (devid: AudioDeviceID, count: Ptr[c_int, AnyOrigin[True]]) -> Ptr[c_int, AnyOrigin[True]]]()(devid, count)
 
 
-fn open_audio_device(devid: AudioDeviceID, spec: Ptr[AudioSpec, mut=False]) -> AudioDeviceID:
+fn open_audio_device(devid: AudioDeviceID, spec: Ptr[AudioSpec, AnyOrigin[False]]) raises -> AudioDeviceID:
     """Open a specific audio device.
 
     You can open both playback and recording devices through this function.
@@ -557,10 +557,10 @@ fn open_audio_device(devid: AudioDeviceID, spec: Ptr[AudioSpec, mut=False]) -> A
     Docs: https://wiki.libsdl.org/SDL3/SDL_OpenAudioDevice.
     """
 
-    return _get_dylib_function[lib, "SDL_OpenAudioDevice", fn (devid: AudioDeviceID, spec: Ptr[AudioSpec, mut=False]) -> AudioDeviceID]()(devid, spec)
+    return _get_dylib_function[lib, "SDL_OpenAudioDevice", fn (devid: AudioDeviceID, spec: Ptr[AudioSpec, AnyOrigin[False]]) -> AudioDeviceID]()(devid, spec)
 
 
-fn is_audio_device_physical(devid: AudioDeviceID) -> Bool:
+fn is_audio_device_physical(devid: AudioDeviceID) raises -> Bool:
     """Determine if an audio device is physical (instead of logical).
 
     An SDL_AudioDeviceID that represents physical hardware is a physical
@@ -591,7 +591,7 @@ fn is_audio_device_physical(devid: AudioDeviceID) -> Bool:
     return _get_dylib_function[lib, "SDL_IsAudioDevicePhysical", fn (devid: AudioDeviceID) -> Bool]()(devid)
 
 
-fn is_audio_device_playback(devid: AudioDeviceID) -> Bool:
+fn is_audio_device_playback(devid: AudioDeviceID) raises -> Bool:
     """Determine if an audio device is a playback device (instead of recording).
 
     This function may return either true or false for invalid device IDs.
@@ -644,7 +644,7 @@ fn pause_audio_device(devid: AudioDeviceID) raises:
 
     ret = _get_dylib_function[lib, "SDL_PauseAudioDevice", fn (devid: AudioDeviceID) -> Bool]()(devid)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
 fn resume_audio_device(devid: AudioDeviceID) raises:
@@ -677,10 +677,10 @@ fn resume_audio_device(devid: AudioDeviceID) raises:
 
     ret = _get_dylib_function[lib, "SDL_ResumeAudioDevice", fn (devid: AudioDeviceID) -> Bool]()(devid)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn audio_device_paused(devid: AudioDeviceID) -> Bool:
+fn audio_device_paused(devid: AudioDeviceID) raises -> Bool:
     """Use this function to query if an audio device is paused.
 
     Unlike in SDL2, audio devices start in an _unpaused_ state, since an app
@@ -705,7 +705,7 @@ fn audio_device_paused(devid: AudioDeviceID) -> Bool:
     return _get_dylib_function[lib, "SDL_AudioDevicePaused", fn (devid: AudioDeviceID) -> Bool]()(devid)
 
 
-fn get_audio_device_gain(devid: AudioDeviceID) -> c_float:
+fn get_audio_device_gain(devid: AudioDeviceID) raises -> c_float:
     """Get the gain of an audio device.
 
     The gain of a device is its volume; a larger gain means a louder output,
@@ -770,10 +770,10 @@ fn set_audio_device_gain(devid: AudioDeviceID, gain: c_float) raises:
 
     ret = _get_dylib_function[lib, "SDL_SetAudioDeviceGain", fn (devid: AudioDeviceID, gain: c_float) -> Bool]()(devid, gain)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn close_audio_device(devid: AudioDeviceID) -> None:
+fn close_audio_device(devid: AudioDeviceID) raises -> None:
     """Close a previously-opened audio device.
 
     The application should close open audio devices once they are no longer
@@ -796,7 +796,7 @@ fn close_audio_device(devid: AudioDeviceID) -> None:
     return _get_dylib_function[lib, "SDL_CloseAudioDevice", fn (devid: AudioDeviceID) -> None]()(devid)
 
 
-fn bind_audio_streams(devid: AudioDeviceID, streams: Ptr[AudioStream, mut=True], num_streams: c_int) raises:
+fn bind_audio_streams(devid: AudioDeviceID, streams: Ptr[AudioStream, AnyOrigin[True]], num_streams: c_int) raises:
     """Bind a list of audio streams to an audio device.
 
     Audio data will flow through any bound streams. For a playback device, data
@@ -815,7 +815,10 @@ fn bind_audio_streams(devid: AudioDeviceID, streams: Ptr[AudioStream, mut=True],
     Binding a stream to a device will set its output format for playback
     devices, and its input format for recording devices, so they match the
     device's settings. The caller is welcome to change the other end of the
-    stream's format at any time with SDL_SetAudioStreamFormat().
+    stream's format at any time with SDL_SetAudioStreamFormat(). If the other
+    end of the stream's format has never been set (the audio stream was created
+    with a NULL audio spec), this function will set it to match the device
+    end's format.
 
     Args:
         devid: An audio device to bind a stream to.
@@ -832,12 +835,12 @@ fn bind_audio_streams(devid: AudioDeviceID, streams: Ptr[AudioStream, mut=True],
     Docs: https://wiki.libsdl.org/SDL3/SDL_BindAudioStreams.
     """
 
-    ret = _get_dylib_function[lib, "SDL_BindAudioStreams", fn (devid: AudioDeviceID, streams: Ptr[AudioStream, mut=True], num_streams: c_int) -> Bool]()(devid, streams, num_streams)
+    ret = _get_dylib_function[lib, "SDL_BindAudioStreams", fn (devid: AudioDeviceID, streams: Ptr[AudioStream, AnyOrigin[True]], num_streams: c_int) -> Bool]()(devid, streams, num_streams)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn bind_audio_stream(devid: AudioDeviceID, stream: Ptr[AudioStream, mut=True]) raises:
+fn bind_audio_stream(devid: AudioDeviceID, stream: Ptr[AudioStream, AnyOrigin[True]]) raises:
     """Bind a single audio stream to an audio device.
 
     This is a convenience function, equivalent to calling
@@ -857,12 +860,12 @@ fn bind_audio_stream(devid: AudioDeviceID, stream: Ptr[AudioStream, mut=True]) r
     Docs: https://wiki.libsdl.org/SDL3/SDL_BindAudioStream.
     """
 
-    ret = _get_dylib_function[lib, "SDL_BindAudioStream", fn (devid: AudioDeviceID, stream: Ptr[AudioStream, mut=True]) -> Bool]()(devid, stream)
+    ret = _get_dylib_function[lib, "SDL_BindAudioStream", fn (devid: AudioDeviceID, stream: Ptr[AudioStream, AnyOrigin[True]]) -> Bool]()(devid, stream)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn unbind_audio_streams(streams: Ptr[AudioStream, mut=True], num_streams: c_int) -> None:
+fn unbind_audio_streams(streams: Ptr[AudioStream, AnyOrigin[True]], num_streams: c_int) raises -> None:
     """Unbind a list of audio streams from their audio devices.
 
     The streams being unbound do not all have to be on the same device. All
@@ -882,10 +885,10 @@ fn unbind_audio_streams(streams: Ptr[AudioStream, mut=True], num_streams: c_int)
     Docs: https://wiki.libsdl.org/SDL3/SDL_UnbindAudioStreams.
     """
 
-    return _get_dylib_function[lib, "SDL_UnbindAudioStreams", fn (streams: Ptr[AudioStream, mut=True], num_streams: c_int) -> None]()(streams, num_streams)
+    return _get_dylib_function[lib, "SDL_UnbindAudioStreams", fn (streams: Ptr[AudioStream, AnyOrigin[True]], num_streams: c_int) -> None]()(streams, num_streams)
 
 
-fn unbind_audio_stream(stream: Ptr[AudioStream, mut=True]) -> None:
+fn unbind_audio_stream(stream: Ptr[AudioStream, AnyOrigin[True]]) raises -> None:
     """Unbind a single audio stream from its audio device.
 
     This is a convenience function, equivalent to calling
@@ -900,10 +903,10 @@ fn unbind_audio_stream(stream: Ptr[AudioStream, mut=True]) -> None:
     Docs: https://wiki.libsdl.org/SDL3/SDL_UnbindAudioStream.
     """
 
-    return _get_dylib_function[lib, "SDL_UnbindAudioStream", fn (stream: Ptr[AudioStream, mut=True]) -> None]()(stream)
+    return _get_dylib_function[lib, "SDL_UnbindAudioStream", fn (stream: Ptr[AudioStream, AnyOrigin[True]]) -> None]()(stream)
 
 
-fn get_audio_stream_device(stream: Ptr[AudioStream, mut=True]) -> AudioDeviceID:
+fn get_audio_stream_device(stream: Ptr[AudioStream, AnyOrigin[True]]) raises -> AudioDeviceID:
     """Query an audio stream for its currently-bound device.
 
     This reports the logical audio device that an audio stream is currently bound to.
@@ -923,10 +926,10 @@ fn get_audio_stream_device(stream: Ptr[AudioStream, mut=True]) -> AudioDeviceID:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetAudioStreamDevice.
     """
 
-    return _get_dylib_function[lib, "SDL_GetAudioStreamDevice", fn (stream: Ptr[AudioStream, mut=True]) -> AudioDeviceID]()(stream)
+    return _get_dylib_function[lib, "SDL_GetAudioStreamDevice", fn (stream: Ptr[AudioStream, AnyOrigin[True]]) -> AudioDeviceID]()(stream)
 
 
-fn create_audio_stream(src_spec: Ptr[AudioSpec, mut=False], dst_spec: Ptr[AudioSpec, mut=False], out ret: Ptr[AudioStream, mut=True]) raises:
+fn create_audio_stream(src_spec: Ptr[AudioSpec, AnyOrigin[False]], dst_spec: Ptr[AudioSpec, AnyOrigin[False]], out ret: Ptr[AudioStream, AnyOrigin[True]]) raises:
     """Create a new audio stream.
 
     Args:
@@ -943,12 +946,12 @@ fn create_audio_stream(src_spec: Ptr[AudioSpec, mut=False], dst_spec: Ptr[AudioS
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateAudioStream.
     """
 
-    ret = _get_dylib_function[lib, "SDL_CreateAudioStream", fn (src_spec: Ptr[AudioSpec, mut=False], dst_spec: Ptr[AudioSpec, mut=False]) -> Ptr[AudioStream, mut=True]]()(src_spec, dst_spec)
+    ret = _get_dylib_function[lib, "SDL_CreateAudioStream", fn (src_spec: Ptr[AudioSpec, AnyOrigin[False]], dst_spec: Ptr[AudioSpec, AnyOrigin[False]]) -> Ptr[AudioStream, AnyOrigin[True]]]()(src_spec, dst_spec)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn get_audio_stream_properties(stream: Ptr[AudioStream, mut=True]) -> PropertiesID:
+fn get_audio_stream_properties(stream: Ptr[AudioStream, AnyOrigin[True]]) raises -> PropertiesID:
     """Get the properties associated with an audio stream.
 
     Args:
@@ -964,10 +967,10 @@ fn get_audio_stream_properties(stream: Ptr[AudioStream, mut=True]) -> Properties
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetAudioStreamProperties.
     """
 
-    return _get_dylib_function[lib, "SDL_GetAudioStreamProperties", fn (stream: Ptr[AudioStream, mut=True]) -> PropertiesID]()(stream)
+    return _get_dylib_function[lib, "SDL_GetAudioStreamProperties", fn (stream: Ptr[AudioStream, AnyOrigin[True]]) -> PropertiesID]()(stream)
 
 
-fn get_audio_stream_format(stream: Ptr[AudioStream, mut=True], src_spec: Ptr[AudioSpec, mut=True], dst_spec: Ptr[AudioSpec, mut=True]) raises:
+fn get_audio_stream_format(stream: Ptr[AudioStream, AnyOrigin[True]], src_spec: Ptr[AudioSpec, AnyOrigin[True]], dst_spec: Ptr[AudioSpec, AnyOrigin[True]]) raises:
     """Query the current format of an audio stream.
 
     Args:
@@ -986,12 +989,12 @@ fn get_audio_stream_format(stream: Ptr[AudioStream, mut=True], src_spec: Ptr[Aud
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetAudioStreamFormat.
     """
 
-    ret = _get_dylib_function[lib, "SDL_GetAudioStreamFormat", fn (stream: Ptr[AudioStream, mut=True], src_spec: Ptr[AudioSpec, mut=True], dst_spec: Ptr[AudioSpec, mut=True]) -> Bool]()(stream, src_spec, dst_spec)
+    ret = _get_dylib_function[lib, "SDL_GetAudioStreamFormat", fn (stream: Ptr[AudioStream, AnyOrigin[True]], src_spec: Ptr[AudioSpec, AnyOrigin[True]], dst_spec: Ptr[AudioSpec, AnyOrigin[True]]) -> Bool]()(stream, src_spec, dst_spec)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn set_audio_stream_format(stream: Ptr[AudioStream, mut=True], src_spec: Ptr[AudioSpec, mut=False], dst_spec: Ptr[AudioSpec, mut=False]) raises:
+fn set_audio_stream_format(stream: Ptr[AudioStream, AnyOrigin[True]], src_spec: Ptr[AudioSpec, AnyOrigin[False]], dst_spec: Ptr[AudioSpec, AnyOrigin[False]]) raises:
     """Change the input and output formats of an audio stream.
 
     Future calls to and SDL_GetAudioStreamAvailable and SDL_GetAudioStreamData
@@ -1028,12 +1031,12 @@ fn set_audio_stream_format(stream: Ptr[AudioStream, mut=True], src_spec: Ptr[Aud
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetAudioStreamFormat.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetAudioStreamFormat", fn (stream: Ptr[AudioStream, mut=True], src_spec: Ptr[AudioSpec, mut=False], dst_spec: Ptr[AudioSpec, mut=False]) -> Bool]()(stream, src_spec, dst_spec)
+    ret = _get_dylib_function[lib, "SDL_SetAudioStreamFormat", fn (stream: Ptr[AudioStream, AnyOrigin[True]], src_spec: Ptr[AudioSpec, AnyOrigin[False]], dst_spec: Ptr[AudioSpec, AnyOrigin[False]]) -> Bool]()(stream, src_spec, dst_spec)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn get_audio_stream_frequency_ratio(stream: Ptr[AudioStream, mut=True]) -> c_float:
+fn get_audio_stream_frequency_ratio(stream: Ptr[AudioStream, AnyOrigin[True]]) raises -> c_float:
     """Get the frequency ratio of an audio stream.
 
     Args:
@@ -1050,10 +1053,10 @@ fn get_audio_stream_frequency_ratio(stream: Ptr[AudioStream, mut=True]) -> c_flo
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetAudioStreamFrequencyRatio.
     """
 
-    return _get_dylib_function[lib, "SDL_GetAudioStreamFrequencyRatio", fn (stream: Ptr[AudioStream, mut=True]) -> c_float]()(stream)
+    return _get_dylib_function[lib, "SDL_GetAudioStreamFrequencyRatio", fn (stream: Ptr[AudioStream, AnyOrigin[True]]) -> c_float]()(stream)
 
 
-fn set_audio_stream_frequency_ratio(stream: Ptr[AudioStream, mut=True], ratio: c_float) raises:
+fn set_audio_stream_frequency_ratio(stream: Ptr[AudioStream, AnyOrigin[True]], ratio: c_float) raises:
     """Change the frequency ratio of an audio stream.
 
     The frequency ratio is used to adjust the rate at which input data is
@@ -1081,12 +1084,12 @@ fn set_audio_stream_frequency_ratio(stream: Ptr[AudioStream, mut=True], ratio: c
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetAudioStreamFrequencyRatio.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetAudioStreamFrequencyRatio", fn (stream: Ptr[AudioStream, mut=True], ratio: c_float) -> Bool]()(stream, ratio)
+    ret = _get_dylib_function[lib, "SDL_SetAudioStreamFrequencyRatio", fn (stream: Ptr[AudioStream, AnyOrigin[True]], ratio: c_float) -> Bool]()(stream, ratio)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn get_audio_stream_gain(stream: Ptr[AudioStream, mut=True]) -> c_float:
+fn get_audio_stream_gain(stream: Ptr[AudioStream, AnyOrigin[True]]) raises -> c_float:
     """Get the gain of an audio stream.
 
     The gain of a stream is its volume; a larger gain means a louder output,
@@ -1108,10 +1111,10 @@ fn get_audio_stream_gain(stream: Ptr[AudioStream, mut=True]) -> c_float:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetAudioStreamGain.
     """
 
-    return _get_dylib_function[lib, "SDL_GetAudioStreamGain", fn (stream: Ptr[AudioStream, mut=True]) -> c_float]()(stream)
+    return _get_dylib_function[lib, "SDL_GetAudioStreamGain", fn (stream: Ptr[AudioStream, AnyOrigin[True]]) -> c_float]()(stream)
 
 
-fn set_audio_stream_gain(stream: Ptr[AudioStream, mut=True], gain: c_float) raises:
+fn set_audio_stream_gain(stream: Ptr[AudioStream, AnyOrigin[True]], gain: c_float) raises:
     """Change the gain of an audio stream.
 
     The gain of a stream is its volume; a larger gain means a louder output,
@@ -1137,12 +1140,12 @@ fn set_audio_stream_gain(stream: Ptr[AudioStream, mut=True], gain: c_float) rais
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetAudioStreamGain.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetAudioStreamGain", fn (stream: Ptr[AudioStream, mut=True], gain: c_float) -> Bool]()(stream, gain)
+    ret = _get_dylib_function[lib, "SDL_SetAudioStreamGain", fn (stream: Ptr[AudioStream, AnyOrigin[True]], gain: c_float) -> Bool]()(stream, gain)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn get_audio_stream_input_channel_map(stream: Ptr[AudioStream, mut=True], count: Ptr[c_int, mut=True]) -> Ptr[c_int, mut=True]:
+fn get_audio_stream_input_channel_map(stream: Ptr[AudioStream, AnyOrigin[True]], count: Ptr[c_int, AnyOrigin[True]]) raises -> Ptr[c_int, AnyOrigin[True]]:
     """Get the current input channel map of an audio stream.
 
     Channel maps are optional; most things do not need them, instead passing
@@ -1167,10 +1170,10 @@ fn get_audio_stream_input_channel_map(stream: Ptr[AudioStream, mut=True], count:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetAudioStreamInputChannelMap.
     """
 
-    return _get_dylib_function[lib, "SDL_GetAudioStreamInputChannelMap", fn (stream: Ptr[AudioStream, mut=True], count: Ptr[c_int, mut=True]) -> Ptr[c_int, mut=True]]()(stream, count)
+    return _get_dylib_function[lib, "SDL_GetAudioStreamInputChannelMap", fn (stream: Ptr[AudioStream, AnyOrigin[True]], count: Ptr[c_int, AnyOrigin[True]]) -> Ptr[c_int, AnyOrigin[True]]]()(stream, count)
 
 
-fn get_audio_stream_output_channel_map(stream: Ptr[AudioStream, mut=True], count: Ptr[c_int, mut=True]) -> Ptr[c_int, mut=True]:
+fn get_audio_stream_output_channel_map(stream: Ptr[AudioStream, AnyOrigin[True]], count: Ptr[c_int, AnyOrigin[True]]) raises -> Ptr[c_int, AnyOrigin[True]]:
     """Get the current output channel map of an audio stream.
 
     Channel maps are optional; most things do not need them, instead passing
@@ -1195,10 +1198,10 @@ fn get_audio_stream_output_channel_map(stream: Ptr[AudioStream, mut=True], count
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetAudioStreamOutputChannelMap.
     """
 
-    return _get_dylib_function[lib, "SDL_GetAudioStreamOutputChannelMap", fn (stream: Ptr[AudioStream, mut=True], count: Ptr[c_int, mut=True]) -> Ptr[c_int, mut=True]]()(stream, count)
+    return _get_dylib_function[lib, "SDL_GetAudioStreamOutputChannelMap", fn (stream: Ptr[AudioStream, AnyOrigin[True]], count: Ptr[c_int, AnyOrigin[True]]) -> Ptr[c_int, AnyOrigin[True]]]()(stream, count)
 
 
-fn set_audio_stream_input_channel_map(stream: Ptr[AudioStream, mut=True], chmap: Ptr[c_int, mut=False], count: c_int) raises:
+fn set_audio_stream_input_channel_map(stream: Ptr[AudioStream, AnyOrigin[True]], chmap: Ptr[c_int, AnyOrigin[False]], count: c_int) raises:
     """Set the current input channel map of an audio stream.
 
     Channel maps are optional; most things do not need them, instead passing
@@ -1259,12 +1262,12 @@ fn set_audio_stream_input_channel_map(stream: Ptr[AudioStream, mut=True], chmap:
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetAudioStreamInputChannelMap.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetAudioStreamInputChannelMap", fn (stream: Ptr[AudioStream, mut=True], chmap: Ptr[c_int, mut=False], count: c_int) -> Bool]()(stream, chmap, count)
+    ret = _get_dylib_function[lib, "SDL_SetAudioStreamInputChannelMap", fn (stream: Ptr[AudioStream, AnyOrigin[True]], chmap: Ptr[c_int, AnyOrigin[False]], count: c_int) -> Bool]()(stream, chmap, count)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn set_audio_stream_output_channel_map(stream: Ptr[AudioStream, mut=True], chmap: Ptr[c_int, mut=False], count: c_int) raises:
+fn set_audio_stream_output_channel_map(stream: Ptr[AudioStream, AnyOrigin[True]], chmap: Ptr[c_int, AnyOrigin[False]], count: c_int) raises:
     """Set the current output channel map of an audio stream.
 
     Channel maps are optional; most things do not need them, instead passing
@@ -1323,12 +1326,12 @@ fn set_audio_stream_output_channel_map(stream: Ptr[AudioStream, mut=True], chmap
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetAudioStreamOutputChannelMap.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetAudioStreamOutputChannelMap", fn (stream: Ptr[AudioStream, mut=True], chmap: Ptr[c_int, mut=False], count: c_int) -> Bool]()(stream, chmap, count)
+    ret = _get_dylib_function[lib, "SDL_SetAudioStreamOutputChannelMap", fn (stream: Ptr[AudioStream, AnyOrigin[True]], chmap: Ptr[c_int, AnyOrigin[False]], count: c_int) -> Bool]()(stream, chmap, count)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn put_audio_stream_data(stream: Ptr[AudioStream, mut=True], buf: Ptr[NoneType, mut=False], len: c_int) raises:
+fn put_audio_stream_data(stream: Ptr[AudioStream, AnyOrigin[True]], buf: Ptr[NoneType, AnyOrigin[False]], len: c_int) raises:
     """Add data to the stream.
 
     This data must match the format/channels/samplerate specified in the latest
@@ -1356,12 +1359,12 @@ fn put_audio_stream_data(stream: Ptr[AudioStream, mut=True], buf: Ptr[NoneType, 
     Docs: https://wiki.libsdl.org/SDL3/SDL_PutAudioStreamData.
     """
 
-    ret = _get_dylib_function[lib, "SDL_PutAudioStreamData", fn (stream: Ptr[AudioStream, mut=True], buf: Ptr[NoneType, mut=False], len: c_int) -> Bool]()(stream, buf, len)
+    ret = _get_dylib_function[lib, "SDL_PutAudioStreamData", fn (stream: Ptr[AudioStream, AnyOrigin[True]], buf: Ptr[NoneType, AnyOrigin[False]], len: c_int) -> Bool]()(stream, buf, len)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn get_audio_stream_data(stream: Ptr[AudioStream, mut=True], buf: Ptr[NoneType, mut=True], len: c_int) -> c_int:
+fn get_audio_stream_data(stream: Ptr[AudioStream, AnyOrigin[True]], buf: Ptr[NoneType, AnyOrigin[True]], len: c_int) raises -> c_int:
     """Get converted/resampled data from the stream.
 
     The input/output data format/channels/samplerate is specified when creating
@@ -1390,10 +1393,10 @@ fn get_audio_stream_data(stream: Ptr[AudioStream, mut=True], buf: Ptr[NoneType, 
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetAudioStreamData.
     """
 
-    return _get_dylib_function[lib, "SDL_GetAudioStreamData", fn (stream: Ptr[AudioStream, mut=True], buf: Ptr[NoneType, mut=True], len: c_int) -> c_int]()(stream, buf, len)
+    return _get_dylib_function[lib, "SDL_GetAudioStreamData", fn (stream: Ptr[AudioStream, AnyOrigin[True]], buf: Ptr[NoneType, AnyOrigin[True]], len: c_int) -> c_int]()(stream, buf, len)
 
 
-fn get_audio_stream_available(stream: Ptr[AudioStream, mut=True]) -> c_int:
+fn get_audio_stream_available(stream: Ptr[AudioStream, AnyOrigin[True]]) raises -> c_int:
     """Get the number of converted/resampled bytes available.
 
     The stream may be buffering data behind the scenes until it has enough to
@@ -1419,10 +1422,10 @@ fn get_audio_stream_available(stream: Ptr[AudioStream, mut=True]) -> c_int:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetAudioStreamAvailable.
     """
 
-    return _get_dylib_function[lib, "SDL_GetAudioStreamAvailable", fn (stream: Ptr[AudioStream, mut=True]) -> c_int]()(stream)
+    return _get_dylib_function[lib, "SDL_GetAudioStreamAvailable", fn (stream: Ptr[AudioStream, AnyOrigin[True]]) -> c_int]()(stream)
 
 
-fn get_audio_stream_queued(stream: Ptr[AudioStream, mut=True]) -> c_int:
+fn get_audio_stream_queued(stream: Ptr[AudioStream, AnyOrigin[True]]) raises -> c_int:
     """Get the number of bytes currently queued.
 
     This is the number of bytes put into a stream as input, not the number that
@@ -1460,10 +1463,10 @@ fn get_audio_stream_queued(stream: Ptr[AudioStream, mut=True]) -> c_int:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetAudioStreamQueued.
     """
 
-    return _get_dylib_function[lib, "SDL_GetAudioStreamQueued", fn (stream: Ptr[AudioStream, mut=True]) -> c_int]()(stream)
+    return _get_dylib_function[lib, "SDL_GetAudioStreamQueued", fn (stream: Ptr[AudioStream, AnyOrigin[True]]) -> c_int]()(stream)
 
 
-fn flush_audio_stream(stream: Ptr[AudioStream, mut=True]) raises:
+fn flush_audio_stream(stream: Ptr[AudioStream, AnyOrigin[True]]) raises:
     """Tell the stream that you're done sending data, and anything being buffered
     should be converted/resampled and made available immediately.
 
@@ -1484,12 +1487,12 @@ fn flush_audio_stream(stream: Ptr[AudioStream, mut=True]) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_FlushAudioStream.
     """
 
-    ret = _get_dylib_function[lib, "SDL_FlushAudioStream", fn (stream: Ptr[AudioStream, mut=True]) -> Bool]()(stream)
+    ret = _get_dylib_function[lib, "SDL_FlushAudioStream", fn (stream: Ptr[AudioStream, AnyOrigin[True]]) -> Bool]()(stream)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn clear_audio_stream(stream: Ptr[AudioStream, mut=True]) raises:
+fn clear_audio_stream(stream: Ptr[AudioStream, AnyOrigin[True]]) raises:
     """Clear any pending data in the stream.
 
     This drops any queued data, so there will be nothing to read from the
@@ -1508,12 +1511,12 @@ fn clear_audio_stream(stream: Ptr[AudioStream, mut=True]) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_ClearAudioStream.
     """
 
-    ret = _get_dylib_function[lib, "SDL_ClearAudioStream", fn (stream: Ptr[AudioStream, mut=True]) -> Bool]()(stream)
+    ret = _get_dylib_function[lib, "SDL_ClearAudioStream", fn (stream: Ptr[AudioStream, AnyOrigin[True]]) -> Bool]()(stream)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn pause_audio_stream_device(stream: Ptr[AudioStream, mut=True]) raises:
+fn pause_audio_stream_device(stream: Ptr[AudioStream, AnyOrigin[True]]) raises:
     """Use this function to pause audio playback on the audio device associated
     with an audio stream.
 
@@ -1538,12 +1541,12 @@ fn pause_audio_stream_device(stream: Ptr[AudioStream, mut=True]) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_PauseAudioStreamDevice.
     """
 
-    ret = _get_dylib_function[lib, "SDL_PauseAudioStreamDevice", fn (stream: Ptr[AudioStream, mut=True]) -> Bool]()(stream)
+    ret = _get_dylib_function[lib, "SDL_PauseAudioStreamDevice", fn (stream: Ptr[AudioStream, AnyOrigin[True]]) -> Bool]()(stream)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn resume_audio_stream_device(stream: Ptr[AudioStream, mut=True]) raises:
+fn resume_audio_stream_device(stream: Ptr[AudioStream, AnyOrigin[True]]) raises:
     """Use this function to unpause audio playback on the audio device associated
     with an audio stream.
 
@@ -1567,12 +1570,12 @@ fn resume_audio_stream_device(stream: Ptr[AudioStream, mut=True]) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_ResumeAudioStreamDevice.
     """
 
-    ret = _get_dylib_function[lib, "SDL_ResumeAudioStreamDevice", fn (stream: Ptr[AudioStream, mut=True]) -> Bool]()(stream)
+    ret = _get_dylib_function[lib, "SDL_ResumeAudioStreamDevice", fn (stream: Ptr[AudioStream, AnyOrigin[True]]) -> Bool]()(stream)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn audio_stream_device_paused(stream: Ptr[AudioStream, mut=True]) -> Bool:
+fn audio_stream_device_paused(stream: Ptr[AudioStream, AnyOrigin[True]]) raises -> Bool:
     """Use this function to query if an audio device associated with a stream is
     paused.
 
@@ -1591,10 +1594,10 @@ fn audio_stream_device_paused(stream: Ptr[AudioStream, mut=True]) -> Bool:
     Docs: https://wiki.libsdl.org/SDL3/SDL_AudioStreamDevicePaused.
     """
 
-    return _get_dylib_function[lib, "SDL_AudioStreamDevicePaused", fn (stream: Ptr[AudioStream, mut=True]) -> Bool]()(stream)
+    return _get_dylib_function[lib, "SDL_AudioStreamDevicePaused", fn (stream: Ptr[AudioStream, AnyOrigin[True]]) -> Bool]()(stream)
 
 
-fn lock_audio_stream(stream: Ptr[AudioStream, mut=True]) raises:
+fn lock_audio_stream(stream: Ptr[AudioStream, AnyOrigin[True]]) raises:
     """Lock an audio stream for serialized access.
 
     Each SDL_AudioStream has an internal mutex it uses to protect its data
@@ -1623,12 +1626,12 @@ fn lock_audio_stream(stream: Ptr[AudioStream, mut=True]) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_LockAudioStream.
     """
 
-    ret = _get_dylib_function[lib, "SDL_LockAudioStream", fn (stream: Ptr[AudioStream, mut=True]) -> Bool]()(stream)
+    ret = _get_dylib_function[lib, "SDL_LockAudioStream", fn (stream: Ptr[AudioStream, AnyOrigin[True]]) -> Bool]()(stream)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn unlock_audio_stream(stream: Ptr[AudioStream, mut=True]) raises:
+fn unlock_audio_stream(stream: Ptr[AudioStream, AnyOrigin[True]]) raises:
     """Unlock an audio stream for serialized access.
 
     This unlocks an audio stream after a call to SDL_LockAudioStream.
@@ -1647,12 +1650,12 @@ fn unlock_audio_stream(stream: Ptr[AudioStream, mut=True]) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_UnlockAudioStream.
     """
 
-    ret = _get_dylib_function[lib, "SDL_UnlockAudioStream", fn (stream: Ptr[AudioStream, mut=True]) -> Bool]()(stream)
+    ret = _get_dylib_function[lib, "SDL_UnlockAudioStream", fn (stream: Ptr[AudioStream, AnyOrigin[True]]) -> Bool]()(stream)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-alias AudioStreamCallback = fn (userdata: Ptr[NoneType, mut=True], stream: Ptr[AudioStream, mut=True], additional_amount: c_int, total_amount: c_int) -> None
+comptime AudioStreamCallback = fn (userdata: Ptr[NoneType, AnyOrigin[True]], stream: Ptr[AudioStream, AnyOrigin[True]], additional_amount: c_int, total_amount: c_int) -> None
 """A callback that fires when data passes through an SDL_AudioStream.
     
     Apps can (optionally) register a callback with an audio stream that is
@@ -1693,7 +1696,7 @@ Docs: https://wiki.libsdl.org/SDL3/SDL_AudioStreamCallback.
 """
 
 
-fn set_audio_stream_get_callback(stream: Ptr[AudioStream, mut=True], callback: AudioStreamCallback, userdata: Ptr[NoneType, mut=True]) raises:
+fn set_audio_stream_get_callback(stream: Ptr[AudioStream, AnyOrigin[True]], callback: AudioStreamCallback, userdata: Ptr[NoneType, AnyOrigin[True]]) raises:
     """Set a callback that runs when data is requested from an audio stream.
 
     This callback is called _before_ data is obtained from the stream, giving
@@ -1740,12 +1743,12 @@ fn set_audio_stream_get_callback(stream: Ptr[AudioStream, mut=True], callback: A
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetAudioStreamGetCallback.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetAudioStreamGetCallback", fn (stream: Ptr[AudioStream, mut=True], callback: AudioStreamCallback, userdata: Ptr[NoneType, mut=True]) -> Bool]()(stream, callback, userdata)
+    ret = _get_dylib_function[lib, "SDL_SetAudioStreamGetCallback", fn (stream: Ptr[AudioStream, AnyOrigin[True]], callback: AudioStreamCallback, userdata: Ptr[NoneType, AnyOrigin[True]]) -> Bool]()(stream, callback, userdata)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn set_audio_stream_put_callback(stream: Ptr[AudioStream, mut=True], callback: AudioStreamCallback, userdata: Ptr[NoneType, mut=True]) raises:
+fn set_audio_stream_put_callback(stream: Ptr[AudioStream, AnyOrigin[True]], callback: AudioStreamCallback, userdata: Ptr[NoneType, AnyOrigin[True]]) raises:
     """Set a callback that runs when data is added to an audio stream.
 
     This callback is called _after_ the data is added to the stream, giving the
@@ -1795,12 +1798,12 @@ fn set_audio_stream_put_callback(stream: Ptr[AudioStream, mut=True], callback: A
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetAudioStreamPutCallback.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetAudioStreamPutCallback", fn (stream: Ptr[AudioStream, mut=True], callback: AudioStreamCallback, userdata: Ptr[NoneType, mut=True]) -> Bool]()(stream, callback, userdata)
+    ret = _get_dylib_function[lib, "SDL_SetAudioStreamPutCallback", fn (stream: Ptr[AudioStream, AnyOrigin[True]], callback: AudioStreamCallback, userdata: Ptr[NoneType, AnyOrigin[True]]) -> Bool]()(stream, callback, userdata)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn destroy_audio_stream(stream: Ptr[AudioStream, mut=True]) -> None:
+fn destroy_audio_stream(stream: Ptr[AudioStream, AnyOrigin[True]]) raises -> None:
     """Free an audio stream.
 
     This will release all allocated data, including any audio that is still
@@ -1820,10 +1823,10 @@ fn destroy_audio_stream(stream: Ptr[AudioStream, mut=True]) -> None:
     Docs: https://wiki.libsdl.org/SDL3/SDL_DestroyAudioStream.
     """
 
-    return _get_dylib_function[lib, "SDL_DestroyAudioStream", fn (stream: Ptr[AudioStream, mut=True]) -> None]()(stream)
+    return _get_dylib_function[lib, "SDL_DestroyAudioStream", fn (stream: Ptr[AudioStream, AnyOrigin[True]]) -> None]()(stream)
 
 
-fn open_audio_device_stream(devid: AudioDeviceID, spec: Ptr[AudioSpec, mut=False], callback: AudioStreamCallback, userdata: Ptr[NoneType, mut=True], out ret: Ptr[AudioStream, mut=True]) raises:
+fn open_audio_device_stream(devid: AudioDeviceID, spec: Ptr[AudioSpec, AnyOrigin[False]], callback: AudioStreamCallback, userdata: Ptr[NoneType, AnyOrigin[True]], out ret: Ptr[AudioStream, AnyOrigin[True]]) raises:
     """Convenience function for straightforward audio init for the common case.
 
     If all your app intends to do is provide a single source of PCM audio, this
@@ -1885,12 +1888,12 @@ fn open_audio_device_stream(devid: AudioDeviceID, spec: Ptr[AudioSpec, mut=False
     Docs: https://wiki.libsdl.org/SDL3/SDL_OpenAudioDeviceStream.
     """
 
-    ret = _get_dylib_function[lib, "SDL_OpenAudioDeviceStream", fn (devid: AudioDeviceID, spec: Ptr[AudioSpec, mut=False], callback: AudioStreamCallback, userdata: Ptr[NoneType, mut=True]) -> Ptr[AudioStream, mut=True]]()(devid, spec, callback, userdata)
+    ret = _get_dylib_function[lib, "SDL_OpenAudioDeviceStream", fn (devid: AudioDeviceID, spec: Ptr[AudioSpec, AnyOrigin[False]], callback: AudioStreamCallback, userdata: Ptr[NoneType, AnyOrigin[True]]) -> Ptr[AudioStream, AnyOrigin[True]]]()(devid, spec, callback, userdata)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-alias AudioPostmixCallback = fn (userdata: Ptr[NoneType, mut=True], spec: Ptr[AudioSpec, mut=False], buffer: Ptr[c_float, mut=True], buflen: c_int) -> None
+comptime AudioPostmixCallback = fn (userdata: Ptr[NoneType, AnyOrigin[True]], spec: Ptr[AudioSpec, AnyOrigin[False]], buffer: Ptr[c_float, AnyOrigin[True]], buflen: c_int) -> None
 """A callback that fires when data is about to be fed to an audio device.
     
     This is useful for accessing the final mix, perhaps for writing a
@@ -1927,7 +1930,7 @@ Docs: https://wiki.libsdl.org/SDL3/SDL_AudioPostmixCallback.
 """
 
 
-fn set_audio_postmix_callback(devid: AudioDeviceID, callback: AudioPostmixCallback, userdata: Ptr[NoneType, mut=True]) raises:
+fn set_audio_postmix_callback(devid: AudioDeviceID, callback: AudioPostmixCallback, userdata: Ptr[NoneType, AnyOrigin[True]]) raises:
     """Set a callback that fires when data is about to be fed to an audio device.
 
     This is useful for accessing the final mix, perhaps for writing a
@@ -1984,12 +1987,12 @@ fn set_audio_postmix_callback(devid: AudioDeviceID, callback: AudioPostmixCallba
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetAudioPostmixCallback.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetAudioPostmixCallback", fn (devid: AudioDeviceID, callback: AudioPostmixCallback, userdata: Ptr[NoneType, mut=True]) -> Bool]()(devid, callback, userdata)
+    ret = _get_dylib_function[lib, "SDL_SetAudioPostmixCallback", fn (devid: AudioDeviceID, callback: AudioPostmixCallback, userdata: Ptr[NoneType, AnyOrigin[True]]) -> Bool]()(devid, callback, userdata)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn load_wav_io(src: Ptr[IOStream, mut=True], closeio: Bool, spec: Ptr[AudioSpec, mut=True], audio_buf: Ptr[Ptr[UInt8, mut=True], mut=True], audio_len: Ptr[UInt32, mut=True]) raises:
+fn load_wav_io(src: Ptr[IOStream, AnyOrigin[True]], closeio: Bool, spec: Ptr[AudioSpec, AnyOrigin[True]], audio_buf: Ptr[Ptr[UInt8, AnyOrigin[True]], AnyOrigin[True]], audio_len: Ptr[UInt32, AnyOrigin[True]]) raises:
     """Load the audio data of a WAVE file into memory.
 
     Loading a WAVE file requires `src`, `spec`, `audio_buf` and `audio_len` to
@@ -2069,12 +2072,12 @@ fn load_wav_io(src: Ptr[IOStream, mut=True], closeio: Bool, spec: Ptr[AudioSpec,
     Docs: https://wiki.libsdl.org/SDL3/SDL_LoadWAV_IO.
     """
 
-    ret = _get_dylib_function[lib, "SDL_LoadWAV_IO", fn (src: Ptr[IOStream, mut=True], closeio: Bool, spec: Ptr[AudioSpec, mut=True], audio_buf: Ptr[Ptr[UInt8, mut=True], mut=True], audio_len: Ptr[UInt32, mut=True]) -> Bool]()(src, closeio, spec, audio_buf, audio_len)
+    ret = _get_dylib_function[lib, "SDL_LoadWAV_IO", fn (src: Ptr[IOStream, AnyOrigin[True]], closeio: Bool, spec: Ptr[AudioSpec, AnyOrigin[True]], audio_buf: Ptr[Ptr[UInt8, AnyOrigin[True]], AnyOrigin[True]], audio_len: Ptr[UInt32, AnyOrigin[True]]) -> Bool]()(src, closeio, spec, audio_buf, audio_len)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn load_wav(owned path: String, spec: Ptr[AudioSpec, mut=True], audio_buf: Ptr[Ptr[UInt8, mut=True], mut=True], audio_len: Ptr[UInt32, mut=True]) raises:
+fn load_wav(var path: String, spec: Ptr[AudioSpec, AnyOrigin[True]], audio_buf: Ptr[Ptr[UInt8, AnyOrigin[True]], AnyOrigin[True]], audio_len: Ptr[UInt32, AnyOrigin[True]]) raises:
     """Loads a WAV from a file path.
 
     This is a convenience function that is effectively the same as:
@@ -2110,12 +2113,12 @@ fn load_wav(owned path: String, spec: Ptr[AudioSpec, mut=True], audio_buf: Ptr[P
     Docs: https://wiki.libsdl.org/SDL3/SDL_LoadWAV.
     """
 
-    ret = _get_dylib_function[lib, "SDL_LoadWAV", fn (path: Ptr[c_char, mut=False], spec: Ptr[AudioSpec, mut=True], audio_buf: Ptr[Ptr[UInt8, mut=True], mut=True], audio_len: Ptr[UInt32, mut=True]) -> Bool]()(path.unsafe_cstr_ptr(), spec, audio_buf, audio_len)
+    ret = _get_dylib_function[lib, "SDL_LoadWAV", fn (path: Ptr[c_char, AnyOrigin[False]], spec: Ptr[AudioSpec, AnyOrigin[True]], audio_buf: Ptr[Ptr[UInt8, AnyOrigin[True]], AnyOrigin[True]], audio_len: Ptr[UInt32, AnyOrigin[True]]) -> Bool]()(path.unsafe_cstr_ptr(), spec, audio_buf, audio_len)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn mix_audio(dst: Ptr[UInt8, mut=True], src: Ptr[UInt8, mut=False], format: AudioFormat, len: UInt32, volume: c_float) raises:
+fn mix_audio(dst: Ptr[UInt8, AnyOrigin[True]], src: Ptr[UInt8, AnyOrigin[False]], format: AudioFormat, len: UInt32, volume: c_float) raises:
     """Mix audio data in a specified format.
 
     This takes an audio buffer `src` of `len` bytes of `format` data and mixes
@@ -2154,12 +2157,12 @@ fn mix_audio(dst: Ptr[UInt8, mut=True], src: Ptr[UInt8, mut=False], format: Audi
     Docs: https://wiki.libsdl.org/SDL3/SDL_MixAudio.
     """
 
-    ret = _get_dylib_function[lib, "SDL_MixAudio", fn (dst: Ptr[UInt8, mut=True], src: Ptr[UInt8, mut=False], format: AudioFormat, len: UInt32, volume: c_float) -> Bool]()(dst, src, format, len, volume)
+    ret = _get_dylib_function[lib, "SDL_MixAudio", fn (dst: Ptr[UInt8, AnyOrigin[True]], src: Ptr[UInt8, AnyOrigin[False]], format: AudioFormat, len: UInt32, volume: c_float) -> Bool]()(dst, src, format, len, volume)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn convert_audio_samples(src_spec: Ptr[AudioSpec, mut=False], src_data: Ptr[UInt8, mut=False], src_len: c_int, dst_spec: Ptr[AudioSpec, mut=False], dst_data: Ptr[Ptr[UInt8, mut=True], mut=True], dst_len: Ptr[c_int, mut=True]) raises:
+fn convert_audio_samples(src_spec: Ptr[AudioSpec, AnyOrigin[False]], src_data: Ptr[UInt8, AnyOrigin[False]], src_len: c_int, dst_spec: Ptr[AudioSpec, AnyOrigin[False]], dst_data: Ptr[Ptr[UInt8, AnyOrigin[True]], AnyOrigin[True]], dst_len: Ptr[c_int, AnyOrigin[True]]) raises:
     """Convert some audio data of one format to another format.
 
     Please note that this function is for convenience, but should not be used
@@ -2192,12 +2195,12 @@ fn convert_audio_samples(src_spec: Ptr[AudioSpec, mut=False], src_data: Ptr[UInt
     Docs: https://wiki.libsdl.org/SDL3/SDL_ConvertAudioSamples.
     """
 
-    ret = _get_dylib_function[lib, "SDL_ConvertAudioSamples", fn (src_spec: Ptr[AudioSpec, mut=False], src_data: Ptr[UInt8, mut=False], src_len: c_int, dst_spec: Ptr[AudioSpec, mut=False], dst_data: Ptr[Ptr[UInt8, mut=True], mut=True], dst_len: Ptr[c_int, mut=True]) -> Bool]()(src_spec, src_data, src_len, dst_spec, dst_data, dst_len)
+    ret = _get_dylib_function[lib, "SDL_ConvertAudioSamples", fn (src_spec: Ptr[AudioSpec, AnyOrigin[False]], src_data: Ptr[UInt8, AnyOrigin[False]], src_len: c_int, dst_spec: Ptr[AudioSpec, AnyOrigin[False]], dst_data: Ptr[Ptr[UInt8, AnyOrigin[True]], AnyOrigin[True]], dst_len: Ptr[c_int, AnyOrigin[True]]) -> Bool]()(src_spec, src_data, src_len, dst_spec, dst_data, dst_len)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn get_audio_format_name(format: AudioFormat) -> Ptr[c_char, mut=False]:
+fn get_audio_format_name(format: AudioFormat) raises -> Ptr[c_char, AnyOrigin[False]]:
     """Get the human readable name of an audio format.
 
     Args:
@@ -2213,10 +2216,10 @@ fn get_audio_format_name(format: AudioFormat) -> Ptr[c_char, mut=False]:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetAudioFormatName.
     """
 
-    return _get_dylib_function[lib, "SDL_GetAudioFormatName", fn (format: AudioFormat) -> Ptr[c_char, mut=False]]()(format)
+    return _get_dylib_function[lib, "SDL_GetAudioFormatName", fn (format: AudioFormat) -> Ptr[c_char, AnyOrigin[False]]]()(format)
 
 
-fn get_silence_value_for_format(format: AudioFormat) -> c_int:
+fn get_silence_value_for_format(format: AudioFormat) raises -> c_int:
     """Get the appropriate memset value for silencing an audio format.
 
     The value returned by this function can be used as the second argument to

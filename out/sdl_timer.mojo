@@ -40,7 +40,7 @@ SDL_SECONDS_TO_NS() and such.
 """
 
 
-fn get_ticks() -> UInt64:
+fn get_ticks() raises -> UInt64:
     """Get the number of milliseconds since SDL library initialization.
 
     Returns:
@@ -56,7 +56,7 @@ fn get_ticks() -> UInt64:
     return _get_dylib_function[lib, "SDL_GetTicks", fn () -> UInt64]()()
 
 
-fn get_ticks_ns() -> UInt64:
+fn get_ticks_ns() raises -> UInt64:
     """Get the number of nanoseconds since SDL library initialization.
 
     Returns:
@@ -72,7 +72,7 @@ fn get_ticks_ns() -> UInt64:
     return _get_dylib_function[lib, "SDL_GetTicksNS", fn () -> UInt64]()()
 
 
-fn get_performance_counter() -> UInt64:
+fn get_performance_counter() raises -> UInt64:
     """Get the current value of the high resolution counter.
 
     This function is typically used for profiling.
@@ -93,7 +93,7 @@ fn get_performance_counter() -> UInt64:
     return _get_dylib_function[lib, "SDL_GetPerformanceCounter", fn () -> UInt64]()()
 
 
-fn get_performance_frequency() -> UInt64:
+fn get_performance_frequency() raises -> UInt64:
     """Get the count per second of the high resolution counter.
 
     Returns:
@@ -108,7 +108,7 @@ fn get_performance_frequency() -> UInt64:
     return _get_dylib_function[lib, "SDL_GetPerformanceFrequency", fn () -> UInt64]()()
 
 
-fn delay(ms: UInt32) -> None:
+fn delay(ms: UInt32) raises -> None:
     """Wait a specified number of milliseconds before returning.
 
     This function waits a specified number of milliseconds before returning. It
@@ -127,7 +127,7 @@ fn delay(ms: UInt32) -> None:
     return _get_dylib_function[lib, "SDL_Delay", fn (ms: UInt32) -> None]()(ms)
 
 
-fn delay_ns(ns: UInt64) -> None:
+fn delay_ns(ns: UInt64) raises -> None:
     """Wait a specified number of nanoseconds before returning.
 
     This function waits a specified number of nanoseconds before returning. It
@@ -146,7 +146,7 @@ fn delay_ns(ns: UInt64) -> None:
     return _get_dylib_function[lib, "SDL_DelayNS", fn (ns: UInt64) -> None]()(ns)
 
 
-fn delay_precise(ns: UInt64) -> None:
+fn delay_precise(ns: UInt64) raises -> None:
     """Wait a specified number of nanoseconds before returning.
 
     This function waits a specified number of nanoseconds before returning. It
@@ -187,7 +187,7 @@ struct TimerID(Intable):
         return Self(lhs.value | rhs.value)
 
 
-alias TimerCallback = fn (userdata: Ptr[NoneType, mut=True], timer_id: TimerID, interval: UInt32) -> UInt32
+comptime TimerCallback = fn (userdata: Ptr[NoneType, AnyOrigin[True]], timer_id: TimerID, interval: UInt32) -> UInt32
 """Function prototype for the millisecond timer callback function.
     
     The callback function is passed the current timer interval and returns the
@@ -215,7 +215,7 @@ Docs: https://wiki.libsdl.org/SDL3/SDL_TimerCallback.
 """
 
 
-fn add_timer(interval: UInt32, callback: TimerCallback, userdata: Ptr[NoneType, mut=True]) -> TimerID:
+fn add_timer(interval: UInt32, callback: TimerCallback, userdata: Ptr[NoneType, AnyOrigin[True]]) raises -> TimerID:
     """Call a callback function at a future time.
 
     The callback function is passed the current timer interval and the user
@@ -251,10 +251,10 @@ fn add_timer(interval: UInt32, callback: TimerCallback, userdata: Ptr[NoneType, 
     Docs: https://wiki.libsdl.org/SDL3/SDL_AddTimer.
     """
 
-    return _get_dylib_function[lib, "SDL_AddTimer", fn (interval: UInt32, callback: TimerCallback, userdata: Ptr[NoneType, mut=True]) -> TimerID]()(interval, callback, userdata)
+    return _get_dylib_function[lib, "SDL_AddTimer", fn (interval: UInt32, callback: TimerCallback, userdata: Ptr[NoneType, AnyOrigin[True]]) -> TimerID]()(interval, callback, userdata)
 
 
-alias NSTimerCallback = fn (userdata: Ptr[NoneType, mut=True], timer_id: TimerID, interval: UInt64) -> UInt64
+comptime NSTimerCallback = fn (userdata: Ptr[NoneType, AnyOrigin[True]], timer_id: TimerID, interval: UInt64) -> UInt64
 """Function prototype for the nanosecond timer callback function.
     
     The callback function is passed the current timer interval and returns the
@@ -282,7 +282,7 @@ Docs: https://wiki.libsdl.org/SDL3/SDL_NSTimerCallback.
 """
 
 
-fn add_timer_ns(interval: UInt64, callback: NSTimerCallback, userdata: Ptr[NoneType, mut=True]) -> TimerID:
+fn add_timer_ns(interval: UInt64, callback: NSTimerCallback, userdata: Ptr[NoneType, AnyOrigin[True]]) raises -> TimerID:
     """Call a callback function at a future time.
 
     The callback function is passed the current timer interval and the user
@@ -318,7 +318,7 @@ fn add_timer_ns(interval: UInt64, callback: NSTimerCallback, userdata: Ptr[NoneT
     Docs: https://wiki.libsdl.org/SDL3/SDL_AddTimerNS.
     """
 
-    return _get_dylib_function[lib, "SDL_AddTimerNS", fn (interval: UInt64, callback: NSTimerCallback, userdata: Ptr[NoneType, mut=True]) -> TimerID]()(interval, callback, userdata)
+    return _get_dylib_function[lib, "SDL_AddTimerNS", fn (interval: UInt64, callback: NSTimerCallback, userdata: Ptr[NoneType, AnyOrigin[True]]) -> TimerID]()(interval, callback, userdata)
 
 
 fn remove_timer(id: TimerID) raises:
@@ -339,4 +339,4 @@ fn remove_timer(id: TimerID) raises:
 
     ret = _get_dylib_function[lib, "SDL_RemoveTimer", fn (id: TimerID) -> Bool]()(id)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))

@@ -1,6 +1,6 @@
-# x--------------------------------------------------------------------------x #
+# +--------------------------------------------------------------------------+ #
 # | SDL3 Bindings in Mojo
-# x--------------------------------------------------------------------------x #
+# +--------------------------------------------------------------------------+ #
 
 """SDL3 Bindings in Mojo"""
 
@@ -39,29 +39,30 @@ from .sdl_version import *
 from .sdl_video import *
 
 
-alias Ptr = stdlib.memory.UnsafePointer
+comptime AnyOrigin[mut: Bool] = __mlir_attr[`#lit.any.origin<`, mut._mlir_value, `>: !lit.origin<`, mut._mlir_value, `>`]
+comptime Ptr = stdlib.memory.UnsafePointer
 
 
-from sys import os_is_linux, os_is_macos, is_little_endian, is_big_endian
-from sys.ffi import _Global, _OwnedDLHandle, _get_dylib_function, c_char, c_uchar, c_int, c_uint, c_short, c_ushort, c_long, c_long_long, c_size_t, c_ssize_t, c_float, c_double
+from sys import CompilationTarget, is_little_endian, is_big_endian
+from sys.ffi import _Global, OwnedDLHandle, _get_dylib_function, c_char, c_uchar, c_int, c_uint, c_short, c_ushort, c_long, c_long_long, c_size_t, c_ssize_t, c_float, c_double
 
-alias lib = _Global["SDL", _OwnedDLHandle, _init_sdl_handle]()
+comptime lib = _Global["SDL", _init_sdl_handle]()
 
 
-fn _init_sdl_handle() -> _OwnedDLHandle:
+fn _init_sdl_handle() -> OwnedDLHandle:
     try:
 
         @parameter
-        if os_is_macos():
-            return _OwnedDLHandle(".pixi/envs/default/lib/libSDL3.dylib")
-        elif os_is_linux():
-            return _OwnedDLHandle(".pixi/envs/default/lib/libSDL3.so")
+        if CompilationTarget.is_macos():
+            return OwnedDLHandle(".pixi/envs/default/lib/libSDL3.dylib")
+        elif CompilationTarget.is_linux():
+            return OwnedDLHandle(".pixi/envs/default/lib/libSDL3.so")
         else:
             constrained[False, "OS is not supported"]()
-            return _uninit[_OwnedDLHandle]()
+            return _uninit[OwnedDLHandle]()
     except:
         print("libSDL3 not found at .pixi/envs/default/lib/")
-        return _uninit[_OwnedDLHandle]()
+        return _uninit[OwnedDLHandle]()
 
 
 @always_inline
@@ -70,5 +71,5 @@ fn _uninit[T: AnyType](out value: T):
     __mlir_op.`lit.ownership.mark_initialized`(__get_mvalue_as_litref(value))
 
 
-struct ArrayHelper[type: Copyable & Movable, size: Int, *, mut: Bool = True]:
-    alias result = Ptr[InlineArray[type, size], mut=mut]
+struct ArrayHelper[type: ImplicitlyCopyable & Movable, size: Int, origin: Origin]:
+    comptime result = Ptr[InlineArray[type, size], origin]

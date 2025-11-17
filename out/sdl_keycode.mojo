@@ -64,525 +64,525 @@ struct Keycode(Intable):
     fn __or__(lhs, rhs: Self) -> Self:
         return Self(lhs.value | rhs.value)
 
-    alias SDLK_EXTENDED_MASK = Self(1 << 29)
-    alias SDLK_SCANCODE_MASK = Self(1 << 30)
+    comptime SDLK_EXTENDED_MASK = Self(1 << 29)
+    comptime SDLK_SCANCODE_MASK = Self(1 << 30)
 
     @always_inline
     @staticmethod
     fn SCANCODE_TO_KEYCODE(X: UInt32) -> UInt32:
         return X | Self.SDLK_SCANCODE_MASK.value
 
-    alias SDLK_UNKNOWN = Self(0x00000000)
+    comptime SDLK_UNKNOWN = Self(0x00000000)
     """0."""
-    alias SDLK_RETURN = Self(0x0000000D)
+    comptime SDLK_RETURN = Self(0x0000000D)
     """'\\r'."""
-    alias SDLK_ESCAPE = Self(0x0000001B)
+    comptime SDLK_ESCAPE = Self(0x0000001B)
     """'\\x1B'."""
-    alias SDLK_BACKSPACE = Self(0x00000008)
+    comptime SDLK_BACKSPACE = Self(0x00000008)
     """'\\b'."""
-    alias SDLK_TAB = Self(0x00000009)
+    comptime SDLK_TAB = Self(0x00000009)
     """'\\t'."""
-    alias SDLK_SPACE = Self(0x00000020)
+    comptime SDLK_SPACE = Self(0x00000020)
     """' '."""
-    alias SDLK_EXCLAIM = Self(0x00000021)
+    comptime SDLK_EXCLAIM = Self(0x00000021)
     """'!'."""
-    alias SDLK_DBLAPOSTROPHE = Self(0x00000022)
+    comptime SDLK_DBLAPOSTROPHE = Self(0x00000022)
     """'"'."""
-    alias SDLK_HASH = Self(0x00000023)
+    comptime SDLK_HASH = Self(0x00000023)
     """'#'."""
-    alias SDLK_DOLLAR = Self(0x00000024)
+    comptime SDLK_DOLLAR = Self(0x00000024)
     """'$'."""
-    alias SDLK_PERCENT = Self(0x00000025)
+    comptime SDLK_PERCENT = Self(0x00000025)
     """'%'."""
-    alias SDLK_AMPERSAND = Self(0x00000026)
+    comptime SDLK_AMPERSAND = Self(0x00000026)
     """'&'."""
-    alias SDLK_APOSTROPHE = Self(0x00000027)
+    comptime SDLK_APOSTROPHE = Self(0x00000027)
     """'\\''."""
-    alias SDLK_LEFTPAREN = Self(0x00000028)
+    comptime SDLK_LEFTPAREN = Self(0x00000028)
     """'('."""
-    alias SDLK_RIGHTPAREN = Self(0x00000029)
+    comptime SDLK_RIGHTPAREN = Self(0x00000029)
     """')'."""
-    alias SDLK_ASTERISK = Self(0x0000002A)
+    comptime SDLK_ASTERISK = Self(0x0000002A)
     """'*'."""
-    alias SDLK_PLUS = Self(0x0000002B)
+    comptime SDLK_PLUS = Self(0x0000002B)
     """'+'."""
-    alias SDLK_COMMA = Self(0x0000002C)
+    comptime SDLK_COMMA = Self(0x0000002C)
     """','."""
-    alias SDLK_MINUS = Self(0x0000002D)
+    comptime SDLK_MINUS = Self(0x0000002D)
     """'-'."""
-    alias SDLK_PERIOD = Self(0x0000002E)
+    comptime SDLK_PERIOD = Self(0x0000002E)
     """'.'."""
-    alias SDLK_SLASH = Self(0x0000002F)
+    comptime SDLK_SLASH = Self(0x0000002F)
     """'/'."""
-    alias SDLK_0 = Self(0x00000030)
+    comptime SDLK_0 = Self(0x00000030)
     """'0'."""
-    alias SDLK_1 = Self(0x00000031)
+    comptime SDLK_1 = Self(0x00000031)
     """'1'."""
-    alias SDLK_2 = Self(0x00000032)
+    comptime SDLK_2 = Self(0x00000032)
     """'2'."""
-    alias SDLK_3 = Self(0x00000033)
+    comptime SDLK_3 = Self(0x00000033)
     """'3'."""
-    alias SDLK_4 = Self(0x00000034)
+    comptime SDLK_4 = Self(0x00000034)
     """'4'."""
-    alias SDLK_5 = Self(0x00000035)
+    comptime SDLK_5 = Self(0x00000035)
     """'5'."""
-    alias SDLK_6 = Self(0x00000036)
+    comptime SDLK_6 = Self(0x00000036)
     """'6'."""
-    alias SDLK_7 = Self(0x00000037)
+    comptime SDLK_7 = Self(0x00000037)
     """'7'."""
-    alias SDLK_8 = Self(0x00000038)
+    comptime SDLK_8 = Self(0x00000038)
     """'8'."""
-    alias SDLK_9 = Self(0x00000039)
+    comptime SDLK_9 = Self(0x00000039)
     """'9'."""
-    alias SDLK_COLON = Self(0x0000003A)
+    comptime SDLK_COLON = Self(0x0000003A)
     """':'."""
-    alias SDLK_SEMICOLON = Self(0x0000003B)
+    comptime SDLK_SEMICOLON = Self(0x0000003B)
     """';'."""
-    alias SDLK_LESS = Self(0x0000003C)
+    comptime SDLK_LESS = Self(0x0000003C)
     """'<'."""
-    alias SDLK_EQUALS = Self(0x0000003D)
+    comptime SDLK_EQUALS = Self(0x0000003D)
     """'='."""
-    alias SDLK_GREATER = Self(0x0000003E)
+    comptime SDLK_GREATER = Self(0x0000003E)
     """'>'."""
-    alias SDLK_QUESTION = Self(0x0000003F)
+    comptime SDLK_QUESTION = Self(0x0000003F)
     """'?'."""
-    alias SDLK_AT = Self(0x00000040)
+    comptime SDLK_AT = Self(0x00000040)
     """'@'."""
-    alias SDLK_LEFTBRACKET = Self(0x0000005B)
+    comptime SDLK_LEFTBRACKET = Self(0x0000005B)
     """'['."""
-    alias SDLK_BACKSLASH = Self(0x0000005C)
+    comptime SDLK_BACKSLASH = Self(0x0000005C)
     """'\\\\'."""
-    alias SDLK_RIGHTBRACKET = Self(0x0000005D)
+    comptime SDLK_RIGHTBRACKET = Self(0x0000005D)
     """']'."""
-    alias SDLK_CARET = Self(0x0000005E)
+    comptime SDLK_CARET = Self(0x0000005E)
     """'^'."""
-    alias SDLK_UNDERSCORE = Self(0x0000005F)
+    comptime SDLK_UNDERSCORE = Self(0x0000005F)
     """'_'."""
-    alias SDLK_GRAVE = Self(0x00000060)
+    comptime SDLK_GRAVE = Self(0x00000060)
     """'`'."""
-    alias SDLK_A = Self(0x00000061)
+    comptime SDLK_A = Self(0x00000061)
     """'a'."""
-    alias SDLK_B = Self(0x00000062)
+    comptime SDLK_B = Self(0x00000062)
     """'b'."""
-    alias SDLK_C = Self(0x00000063)
+    comptime SDLK_C = Self(0x00000063)
     """'c'."""
-    alias SDLK_D = Self(0x00000064)
+    comptime SDLK_D = Self(0x00000064)
     """'d'."""
-    alias SDLK_E = Self(0x00000065)
+    comptime SDLK_E = Self(0x00000065)
     """'e'."""
-    alias SDLK_F = Self(0x00000066)
+    comptime SDLK_F = Self(0x00000066)
     """'f'."""
-    alias SDLK_G = Self(0x00000067)
+    comptime SDLK_G = Self(0x00000067)
     """'g'."""
-    alias SDLK_H = Self(0x00000068)
+    comptime SDLK_H = Self(0x00000068)
     """'h'."""
-    alias SDLK_I = Self(0x00000069)
+    comptime SDLK_I = Self(0x00000069)
     """'i'."""
-    alias SDLK_J = Self(0x0000006A)
+    comptime SDLK_J = Self(0x0000006A)
     """'j'."""
-    alias SDLK_K = Self(0x0000006B)
+    comptime SDLK_K = Self(0x0000006B)
     """'k'."""
-    alias SDLK_L = Self(0x0000006C)
+    comptime SDLK_L = Self(0x0000006C)
     """'l'."""
-    alias SDLK_M = Self(0x0000006D)
+    comptime SDLK_M = Self(0x0000006D)
     """'m'."""
-    alias SDLK_N = Self(0x0000006E)
+    comptime SDLK_N = Self(0x0000006E)
     """'n'."""
-    alias SDLK_O = Self(0x0000006F)
+    comptime SDLK_O = Self(0x0000006F)
     """'o'."""
-    alias SDLK_P = Self(0x00000070)
+    comptime SDLK_P = Self(0x00000070)
     """'p'."""
-    alias SDLK_Q = Self(0x00000071)
+    comptime SDLK_Q = Self(0x00000071)
     """'q'."""
-    alias SDLK_R = Self(0x00000072)
+    comptime SDLK_R = Self(0x00000072)
     """'r'."""
-    alias SDLK_S = Self(0x00000073)
+    comptime SDLK_S = Self(0x00000073)
     """'s'."""
-    alias SDLK_T = Self(0x00000074)
+    comptime SDLK_T = Self(0x00000074)
     """'t'."""
-    alias SDLK_U = Self(0x00000075)
+    comptime SDLK_U = Self(0x00000075)
     """'u'."""
-    alias SDLK_V = Self(0x00000076)
+    comptime SDLK_V = Self(0x00000076)
     """'v'."""
-    alias SDLK_W = Self(0x00000077)
+    comptime SDLK_W = Self(0x00000077)
     """'w'."""
-    alias SDLK_X = Self(0x00000078)
+    comptime SDLK_X = Self(0x00000078)
     """'x'."""
-    alias SDLK_Y = Self(0x00000079)
+    comptime SDLK_Y = Self(0x00000079)
     """'y'."""
-    alias SDLK_Z = Self(0x0000007A)
+    comptime SDLK_Z = Self(0x0000007A)
     """'z'."""
-    alias SDLK_LEFTBRACE = Self(0x0000007B)
+    comptime SDLK_LEFTBRACE = Self(0x0000007B)
     """'{'."""
-    alias SDLK_PIPE = Self(0x0000007C)
+    comptime SDLK_PIPE = Self(0x0000007C)
     """'|'."""
-    alias SDLK_RIGHTBRACE = Self(0x0000007D)
+    comptime SDLK_RIGHTBRACE = Self(0x0000007D)
     """'}'."""
-    alias SDLK_TILDE = Self(0x0000007E)
+    comptime SDLK_TILDE = Self(0x0000007E)
     """'~'."""
-    alias SDLK_DELETE = Self(0x0000007F)
+    comptime SDLK_DELETE = Self(0x0000007F)
     """'\\x7F'."""
-    alias SDLK_PLUSMINUS = Self(0x000000B1)
+    comptime SDLK_PLUSMINUS = Self(0x000000B1)
     """'\\xB1'."""
-    alias SDLK_CAPSLOCK = Self(0x40000039)
+    comptime SDLK_CAPSLOCK = Self(0x40000039)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_CAPSLOCK)."""
-    alias SDLK_F1 = Self(0x4000003A)
+    comptime SDLK_F1 = Self(0x4000003A)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_F1)."""
-    alias SDLK_F2 = Self(0x4000003B)
+    comptime SDLK_F2 = Self(0x4000003B)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_F2)."""
-    alias SDLK_F3 = Self(0x4000003C)
+    comptime SDLK_F3 = Self(0x4000003C)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_F3)."""
-    alias SDLK_F4 = Self(0x4000003D)
+    comptime SDLK_F4 = Self(0x4000003D)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_F4)."""
-    alias SDLK_F5 = Self(0x4000003E)
+    comptime SDLK_F5 = Self(0x4000003E)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_F5)."""
-    alias SDLK_F6 = Self(0x4000003F)
+    comptime SDLK_F6 = Self(0x4000003F)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_F6)."""
-    alias SDLK_F7 = Self(0x40000040)
+    comptime SDLK_F7 = Self(0x40000040)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_F7)."""
-    alias SDLK_F8 = Self(0x40000041)
+    comptime SDLK_F8 = Self(0x40000041)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_F8)."""
-    alias SDLK_F9 = Self(0x40000042)
+    comptime SDLK_F9 = Self(0x40000042)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_F9)."""
-    alias SDLK_F10 = Self(0x40000043)
+    comptime SDLK_F10 = Self(0x40000043)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_F10)."""
-    alias SDLK_F11 = Self(0x40000044)
+    comptime SDLK_F11 = Self(0x40000044)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_F11)."""
-    alias SDLK_F12 = Self(0x40000045)
+    comptime SDLK_F12 = Self(0x40000045)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_F12)."""
-    alias SDLK_PRINTSCREEN = Self(0x40000046)
+    comptime SDLK_PRINTSCREEN = Self(0x40000046)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_PRINTSCREEN)."""
-    alias SDLK_SCROLLLOCK = Self(0x40000047)
+    comptime SDLK_SCROLLLOCK = Self(0x40000047)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_SCROLLLOCK)."""
-    alias SDLK_PAUSE = Self(0x40000048)
+    comptime SDLK_PAUSE = Self(0x40000048)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_PAUSE)."""
-    alias SDLK_INSERT = Self(0x40000049)
+    comptime SDLK_INSERT = Self(0x40000049)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_INSERT)."""
-    alias SDLK_HOME = Self(0x4000004A)
+    comptime SDLK_HOME = Self(0x4000004A)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_HOME)."""
-    alias SDLK_PAGEUP = Self(0x4000004B)
+    comptime SDLK_PAGEUP = Self(0x4000004B)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_PAGEUP)."""
-    alias SDLK_END = Self(0x4000004D)
+    comptime SDLK_END = Self(0x4000004D)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_END)."""
-    alias SDLK_PAGEDOWN = Self(0x4000004E)
+    comptime SDLK_PAGEDOWN = Self(0x4000004E)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_PAGEDOWN)."""
-    alias SDLK_RIGHT = Self(0x4000004F)
+    comptime SDLK_RIGHT = Self(0x4000004F)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_RIGHT)."""
-    alias SDLK_LEFT = Self(0x40000050)
+    comptime SDLK_LEFT = Self(0x40000050)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_LEFT)."""
-    alias SDLK_DOWN = Self(0x40000051)
+    comptime SDLK_DOWN = Self(0x40000051)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_DOWN)."""
-    alias SDLK_UP = Self(0x40000052)
+    comptime SDLK_UP = Self(0x40000052)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_UP)."""
-    alias SDLK_NUMLOCKCLEAR = Self(0x40000053)
+    comptime SDLK_NUMLOCKCLEAR = Self(0x40000053)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_NUMLOCKCLEAR)."""
-    alias SDLK_KP_DIVIDE = Self(0x40000054)
+    comptime SDLK_KP_DIVIDE = Self(0x40000054)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_DIVIDE)."""
-    alias SDLK_KP_MULTIPLY = Self(0x40000055)
+    comptime SDLK_KP_MULTIPLY = Self(0x40000055)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_MULTIPLY)."""
-    alias SDLK_KP_MINUS = Self(0x40000056)
+    comptime SDLK_KP_MINUS = Self(0x40000056)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_MINUS)."""
-    alias SDLK_KP_PLUS = Self(0x40000057)
+    comptime SDLK_KP_PLUS = Self(0x40000057)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_PLUS)."""
-    alias SDLK_KP_ENTER = Self(0x40000058)
+    comptime SDLK_KP_ENTER = Self(0x40000058)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_ENTER)."""
-    alias SDLK_KP_1 = Self(0x40000059)
+    comptime SDLK_KP_1 = Self(0x40000059)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_1)."""
-    alias SDLK_KP_2 = Self(0x4000005A)
+    comptime SDLK_KP_2 = Self(0x4000005A)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_2)."""
-    alias SDLK_KP_3 = Self(0x4000005B)
+    comptime SDLK_KP_3 = Self(0x4000005B)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_3)."""
-    alias SDLK_KP_4 = Self(0x4000005C)
+    comptime SDLK_KP_4 = Self(0x4000005C)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_4)."""
-    alias SDLK_KP_5 = Self(0x4000005D)
+    comptime SDLK_KP_5 = Self(0x4000005D)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_5)."""
-    alias SDLK_KP_6 = Self(0x4000005E)
+    comptime SDLK_KP_6 = Self(0x4000005E)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_6)."""
-    alias SDLK_KP_7 = Self(0x4000005F)
+    comptime SDLK_KP_7 = Self(0x4000005F)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_7)."""
-    alias SDLK_KP_8 = Self(0x40000060)
+    comptime SDLK_KP_8 = Self(0x40000060)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_8)."""
-    alias SDLK_KP_9 = Self(0x40000061)
+    comptime SDLK_KP_9 = Self(0x40000061)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_9)."""
-    alias SDLK_KP_0 = Self(0x40000062)
+    comptime SDLK_KP_0 = Self(0x40000062)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_0)."""
-    alias SDLK_KP_PERIOD = Self(0x40000063)
+    comptime SDLK_KP_PERIOD = Self(0x40000063)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_PERIOD)."""
-    alias SDLK_APPLICATION = Self(0x40000065)
+    comptime SDLK_APPLICATION = Self(0x40000065)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_APPLICATION)."""
-    alias SDLK_POWER = Self(0x40000066)
+    comptime SDLK_POWER = Self(0x40000066)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_POWER)."""
-    alias SDLK_KP_EQUALS = Self(0x40000067)
+    comptime SDLK_KP_EQUALS = Self(0x40000067)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_EQUALS)."""
-    alias SDLK_F13 = Self(0x40000068)
+    comptime SDLK_F13 = Self(0x40000068)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_F13)."""
-    alias SDLK_F14 = Self(0x40000069)
+    comptime SDLK_F14 = Self(0x40000069)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_F14)."""
-    alias SDLK_F15 = Self(0x4000006A)
+    comptime SDLK_F15 = Self(0x4000006A)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_F15)."""
-    alias SDLK_F16 = Self(0x4000006B)
+    comptime SDLK_F16 = Self(0x4000006B)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_F16)."""
-    alias SDLK_F17 = Self(0x4000006C)
+    comptime SDLK_F17 = Self(0x4000006C)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_F17)."""
-    alias SDLK_F18 = Self(0x4000006D)
+    comptime SDLK_F18 = Self(0x4000006D)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_F18)."""
-    alias SDLK_F19 = Self(0x4000006E)
+    comptime SDLK_F19 = Self(0x4000006E)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_F19)."""
-    alias SDLK_F20 = Self(0x4000006F)
+    comptime SDLK_F20 = Self(0x4000006F)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_F20)."""
-    alias SDLK_F21 = Self(0x40000070)
+    comptime SDLK_F21 = Self(0x40000070)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_F21)."""
-    alias SDLK_F22 = Self(0x40000071)
+    comptime SDLK_F22 = Self(0x40000071)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_F22)."""
-    alias SDLK_F23 = Self(0x40000072)
+    comptime SDLK_F23 = Self(0x40000072)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_F23)."""
-    alias SDLK_F24 = Self(0x40000073)
+    comptime SDLK_F24 = Self(0x40000073)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_F24)."""
-    alias SDLK_EXECUTE = Self(0x40000074)
+    comptime SDLK_EXECUTE = Self(0x40000074)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_EXECUTE)."""
-    alias SDLK_HELP = Self(0x40000075)
+    comptime SDLK_HELP = Self(0x40000075)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_HELP)."""
-    alias SDLK_MENU = Self(0x40000076)
+    comptime SDLK_MENU = Self(0x40000076)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_MENU)."""
-    alias SDLK_SELECT = Self(0x40000077)
+    comptime SDLK_SELECT = Self(0x40000077)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_SELECT)."""
-    alias SDLK_STOP = Self(0x40000078)
+    comptime SDLK_STOP = Self(0x40000078)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_STOP)."""
-    alias SDLK_AGAIN = Self(0x40000079)
+    comptime SDLK_AGAIN = Self(0x40000079)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_AGAIN)."""
-    alias SDLK_UNDO = Self(0x4000007A)
+    comptime SDLK_UNDO = Self(0x4000007A)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_UNDO)."""
-    alias SDLK_CUT = Self(0x4000007B)
+    comptime SDLK_CUT = Self(0x4000007B)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_CUT)."""
-    alias SDLK_COPY = Self(0x4000007C)
+    comptime SDLK_COPY = Self(0x4000007C)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_COPY)."""
-    alias SDLK_PASTE = Self(0x4000007D)
+    comptime SDLK_PASTE = Self(0x4000007D)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_PASTE)."""
-    alias SDLK_FIND = Self(0x4000007E)
+    comptime SDLK_FIND = Self(0x4000007E)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_FIND)."""
-    alias SDLK_MUTE = Self(0x4000007F)
+    comptime SDLK_MUTE = Self(0x4000007F)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_MUTE)."""
-    alias SDLK_VOLUMEUP = Self(0x40000080)
+    comptime SDLK_VOLUMEUP = Self(0x40000080)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_VOLUMEUP)."""
-    alias SDLK_VOLUMEDOWN = Self(0x40000081)
+    comptime SDLK_VOLUMEDOWN = Self(0x40000081)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_VOLUMEDOWN)."""
-    alias SDLK_KP_COMMA = Self(0x40000085)
+    comptime SDLK_KP_COMMA = Self(0x40000085)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_COMMA)."""
-    alias SDLK_KP_EQUALSAS400 = Self(0x40000086)
+    comptime SDLK_KP_EQUALSAS400 = Self(0x40000086)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_EQUALSAS400)."""
-    alias SDLK_ALTERASE = Self(0x40000099)
+    comptime SDLK_ALTERASE = Self(0x40000099)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_ALTERASE)."""
-    alias SDLK_SYSREQ = Self(0x4000009A)
+    comptime SDLK_SYSREQ = Self(0x4000009A)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_SYSREQ)."""
-    alias SDLK_CANCEL = Self(0x4000009B)
+    comptime SDLK_CANCEL = Self(0x4000009B)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_CANCEL)."""
-    alias SDLK_CLEAR = Self(0x4000009C)
+    comptime SDLK_CLEAR = Self(0x4000009C)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_CLEAR)."""
-    alias SDLK_PRIOR = Self(0x4000009D)
+    comptime SDLK_PRIOR = Self(0x4000009D)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_PRIOR)."""
-    alias SDLK_RETURN2 = Self(0x4000009E)
+    comptime SDLK_RETURN2 = Self(0x4000009E)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_RETURN2)."""
-    alias SDLK_SEPARATOR = Self(0x4000009F)
+    comptime SDLK_SEPARATOR = Self(0x4000009F)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_SEPARATOR)."""
-    alias SDLK_OUT = Self(0x400000A0)
+    comptime SDLK_OUT = Self(0x400000A0)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_OUT)."""
-    alias SDLK_OPER = Self(0x400000A1)
+    comptime SDLK_OPER = Self(0x400000A1)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_OPER)."""
-    alias SDLK_CLEARAGAIN = Self(0x400000A2)
+    comptime SDLK_CLEARAGAIN = Self(0x400000A2)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_CLEARAGAIN)."""
-    alias SDLK_CRSEL = Self(0x400000A3)
+    comptime SDLK_CRSEL = Self(0x400000A3)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_CRSEL)."""
-    alias SDLK_EXSEL = Self(0x400000A4)
+    comptime SDLK_EXSEL = Self(0x400000A4)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_EXSEL)."""
-    alias SDLK_KP_00 = Self(0x400000B0)
+    comptime SDLK_KP_00 = Self(0x400000B0)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_00)."""
-    alias SDLK_KP_000 = Self(0x400000B1)
+    comptime SDLK_KP_000 = Self(0x400000B1)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_000)."""
-    alias SDLK_THOUSANDSSEPARATOR = Self(0x400000B2)
+    comptime SDLK_THOUSANDSSEPARATOR = Self(0x400000B2)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_THOUSANDSSEPARATOR)."""
-    alias SDLK_DECIMALSEPARATOR = Self(0x400000B3)
+    comptime SDLK_DECIMALSEPARATOR = Self(0x400000B3)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_DECIMALSEPARATOR)."""
-    alias SDLK_CURRENCYUNIT = Self(0x400000B4)
+    comptime SDLK_CURRENCYUNIT = Self(0x400000B4)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_CURRENCYUNIT)."""
-    alias SDLK_CURRENCYSUBUNIT = Self(0x400000B5)
+    comptime SDLK_CURRENCYSUBUNIT = Self(0x400000B5)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_CURRENCYSUBUNIT)."""
-    alias SDLK_KP_LEFTPAREN = Self(0x400000B6)
+    comptime SDLK_KP_LEFTPAREN = Self(0x400000B6)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_LEFTPAREN)."""
-    alias SDLK_KP_RIGHTPAREN = Self(0x400000B7)
+    comptime SDLK_KP_RIGHTPAREN = Self(0x400000B7)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_RIGHTPAREN)."""
-    alias SDLK_KP_LEFTBRACE = Self(0x400000B8)
+    comptime SDLK_KP_LEFTBRACE = Self(0x400000B8)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_LEFTBRACE)."""
-    alias SDLK_KP_RIGHTBRACE = Self(0x400000B9)
+    comptime SDLK_KP_RIGHTBRACE = Self(0x400000B9)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_RIGHTBRACE)."""
-    alias SDLK_KP_TAB = Self(0x400000BA)
+    comptime SDLK_KP_TAB = Self(0x400000BA)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_TAB)."""
-    alias SDLK_KP_BACKSPACE = Self(0x400000BB)
+    comptime SDLK_KP_BACKSPACE = Self(0x400000BB)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_BACKSPACE)."""
-    alias SDLK_KP_A = Self(0x400000BC)
+    comptime SDLK_KP_A = Self(0x400000BC)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_A)."""
-    alias SDLK_KP_B = Self(0x400000BD)
+    comptime SDLK_KP_B = Self(0x400000BD)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_B)."""
-    alias SDLK_KP_C = Self(0x400000BE)
+    comptime SDLK_KP_C = Self(0x400000BE)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_C)."""
-    alias SDLK_KP_D = Self(0x400000BF)
+    comptime SDLK_KP_D = Self(0x400000BF)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_D)."""
-    alias SDLK_KP_E = Self(0x400000C0)
+    comptime SDLK_KP_E = Self(0x400000C0)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_E)."""
-    alias SDLK_KP_F = Self(0x400000C1)
+    comptime SDLK_KP_F = Self(0x400000C1)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_F)."""
-    alias SDLK_KP_XOR = Self(0x400000C2)
+    comptime SDLK_KP_XOR = Self(0x400000C2)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_XOR)."""
-    alias SDLK_KP_POWER = Self(0x400000C3)
+    comptime SDLK_KP_POWER = Self(0x400000C3)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_POWER)."""
-    alias SDLK_KP_PERCENT = Self(0x400000C4)
+    comptime SDLK_KP_PERCENT = Self(0x400000C4)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_PERCENT)."""
-    alias SDLK_KP_LESS = Self(0x400000C5)
+    comptime SDLK_KP_LESS = Self(0x400000C5)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_LESS)."""
-    alias SDLK_KP_GREATER = Self(0x400000C6)
+    comptime SDLK_KP_GREATER = Self(0x400000C6)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_GREATER)."""
-    alias SDLK_KP_AMPERSAND = Self(0x400000C7)
+    comptime SDLK_KP_AMPERSAND = Self(0x400000C7)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_AMPERSAND)."""
-    alias SDLK_KP_DBLAMPERSAND = Self(0x400000C8)
+    comptime SDLK_KP_DBLAMPERSAND = Self(0x400000C8)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_DBLAMPERSAND)."""
-    alias SDLK_KP_VERTICALBAR = Self(0x400000C9)
+    comptime SDLK_KP_VERTICALBAR = Self(0x400000C9)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_VERTICALBAR)."""
-    alias SDLK_KP_DBLVERTICALBAR = Self(0x400000CA)
+    comptime SDLK_KP_DBLVERTICALBAR = Self(0x400000CA)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_DBLVERTICALBAR)."""
-    alias SDLK_KP_COLON = Self(0x400000CB)
+    comptime SDLK_KP_COLON = Self(0x400000CB)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_COLON)."""
-    alias SDLK_KP_HASH = Self(0x400000CC)
+    comptime SDLK_KP_HASH = Self(0x400000CC)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_HASH)."""
-    alias SDLK_KP_SPACE = Self(0x400000CD)
+    comptime SDLK_KP_SPACE = Self(0x400000CD)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_SPACE)."""
-    alias SDLK_KP_AT = Self(0x400000CE)
+    comptime SDLK_KP_AT = Self(0x400000CE)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_AT)."""
-    alias SDLK_KP_EXCLAM = Self(0x400000CF)
+    comptime SDLK_KP_EXCLAM = Self(0x400000CF)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_EXCLAM)."""
-    alias SDLK_KP_MEMSTORE = Self(0x400000D0)
+    comptime SDLK_KP_MEMSTORE = Self(0x400000D0)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_MEMSTORE)."""
-    alias SDLK_KP_MEMRECALL = Self(0x400000D1)
+    comptime SDLK_KP_MEMRECALL = Self(0x400000D1)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_MEMRECALL)."""
-    alias SDLK_KP_MEMCLEAR = Self(0x400000D2)
+    comptime SDLK_KP_MEMCLEAR = Self(0x400000D2)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_MEMCLEAR)."""
-    alias SDLK_KP_MEMADD = Self(0x400000D3)
+    comptime SDLK_KP_MEMADD = Self(0x400000D3)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_MEMADD)."""
-    alias SDLK_KP_MEMSUBTRACT = Self(0x400000D4)
+    comptime SDLK_KP_MEMSUBTRACT = Self(0x400000D4)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_MEMSUBTRACT)."""
-    alias SDLK_KP_MEMMULTIPLY = Self(0x400000D5)
+    comptime SDLK_KP_MEMMULTIPLY = Self(0x400000D5)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_MEMMULTIPLY)."""
-    alias SDLK_KP_MEMDIVIDE = Self(0x400000D6)
+    comptime SDLK_KP_MEMDIVIDE = Self(0x400000D6)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_MEMDIVIDE)."""
-    alias SDLK_KP_PLUSMINUS = Self(0x400000D7)
+    comptime SDLK_KP_PLUSMINUS = Self(0x400000D7)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_PLUSMINUS)."""
-    alias SDLK_KP_CLEAR = Self(0x400000D8)
+    comptime SDLK_KP_CLEAR = Self(0x400000D8)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_CLEAR)."""
-    alias SDLK_KP_CLEARENTRY = Self(0x400000D9)
+    comptime SDLK_KP_CLEARENTRY = Self(0x400000D9)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_CLEARENTRY)."""
-    alias SDLK_KP_BINARY = Self(0x400000DA)
+    comptime SDLK_KP_BINARY = Self(0x400000DA)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_BINARY)."""
-    alias SDLK_KP_OCTAL = Self(0x400000DB)
+    comptime SDLK_KP_OCTAL = Self(0x400000DB)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_OCTAL)."""
-    alias SDLK_KP_DECIMAL = Self(0x400000DC)
+    comptime SDLK_KP_DECIMAL = Self(0x400000DC)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_DECIMAL)."""
-    alias SDLK_KP_HEXADECIMAL = Self(0x400000DD)
+    comptime SDLK_KP_HEXADECIMAL = Self(0x400000DD)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_KP_HEXADECIMAL)."""
-    alias SDLK_LCTRL = Self(0x400000E0)
+    comptime SDLK_LCTRL = Self(0x400000E0)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_LCTRL)."""
-    alias SDLK_LSHIFT = Self(0x400000E1)
+    comptime SDLK_LSHIFT = Self(0x400000E1)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_LSHIFT)."""
-    alias SDLK_LALT = Self(0x400000E2)
+    comptime SDLK_LALT = Self(0x400000E2)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_LALT)."""
-    alias SDLK_LGUI = Self(0x400000E3)
+    comptime SDLK_LGUI = Self(0x400000E3)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_LGUI)."""
-    alias SDLK_RCTRL = Self(0x400000E4)
+    comptime SDLK_RCTRL = Self(0x400000E4)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_RCTRL)."""
-    alias SDLK_RSHIFT = Self(0x400000E5)
+    comptime SDLK_RSHIFT = Self(0x400000E5)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_RSHIFT)."""
-    alias SDLK_RALT = Self(0x400000E6)
+    comptime SDLK_RALT = Self(0x400000E6)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_RALT)."""
-    alias SDLK_RGUI = Self(0x400000E7)
+    comptime SDLK_RGUI = Self(0x400000E7)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_RGUI)."""
-    alias SDLK_MODE = Self(0x40000101)
+    comptime SDLK_MODE = Self(0x40000101)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_MODE)."""
-    alias SDLK_SLEEP = Self(0x40000102)
+    comptime SDLK_SLEEP = Self(0x40000102)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_SLEEP)."""
-    alias SDLK_WAKE = Self(0x40000103)
+    comptime SDLK_WAKE = Self(0x40000103)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_WAKE)."""
-    alias SDLK_CHANNEL_INCREMENT = Self(0x40000104)
+    comptime SDLK_CHANNEL_INCREMENT = Self(0x40000104)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_CHANNEL_INCREMENT)."""
-    alias SDLK_CHANNEL_DECREMENT = Self(0x40000105)
+    comptime SDLK_CHANNEL_DECREMENT = Self(0x40000105)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_CHANNEL_DECREMENT)."""
-    alias SDLK_MEDIA_PLAY = Self(0x40000106)
+    comptime SDLK_MEDIA_PLAY = Self(0x40000106)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_MEDIA_PLAY)."""
-    alias SDLK_MEDIA_PAUSE = Self(0x40000107)
+    comptime SDLK_MEDIA_PAUSE = Self(0x40000107)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_MEDIA_PAUSE)."""
-    alias SDLK_MEDIA_RECORD = Self(0x40000108)
+    comptime SDLK_MEDIA_RECORD = Self(0x40000108)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_MEDIA_RECORD)."""
-    alias SDLK_MEDIA_FAST_FORWARD = Self(0x40000109)
+    comptime SDLK_MEDIA_FAST_FORWARD = Self(0x40000109)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_MEDIA_FAST_FORWARD)."""
-    alias SDLK_MEDIA_REWIND = Self(0x4000010A)
+    comptime SDLK_MEDIA_REWIND = Self(0x4000010A)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_MEDIA_REWIND)."""
-    alias SDLK_MEDIA_NEXT_TRACK = Self(0x4000010B)
+    comptime SDLK_MEDIA_NEXT_TRACK = Self(0x4000010B)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_MEDIA_NEXT_TRACK)."""
-    alias SDLK_MEDIA_PREVIOUS_TRACK = Self(0x4000010C)
+    comptime SDLK_MEDIA_PREVIOUS_TRACK = Self(0x4000010C)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_MEDIA_PREVIOUS_TRACK)."""
-    alias SDLK_MEDIA_STOP = Self(0x4000010D)
+    comptime SDLK_MEDIA_STOP = Self(0x4000010D)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_MEDIA_STOP)."""
-    alias SDLK_MEDIA_EJECT = Self(0x4000010E)
+    comptime SDLK_MEDIA_EJECT = Self(0x4000010E)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_MEDIA_EJECT)."""
-    alias SDLK_MEDIA_PLAY_PAUSE = Self(0x4000010F)
+    comptime SDLK_MEDIA_PLAY_PAUSE = Self(0x4000010F)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_MEDIA_PLAY_PAUSE)."""
-    alias SDLK_MEDIA_SELECT = Self(0x40000110)
+    comptime SDLK_MEDIA_SELECT = Self(0x40000110)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_MEDIA_SELECT)."""
-    alias SDLK_AC_NEW = Self(0x40000111)
+    comptime SDLK_AC_NEW = Self(0x40000111)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_AC_NEW)."""
-    alias SDLK_AC_OPEN = Self(0x40000112)
+    comptime SDLK_AC_OPEN = Self(0x40000112)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_AC_OPEN)."""
-    alias SDLK_AC_CLOSE = Self(0x40000113)
+    comptime SDLK_AC_CLOSE = Self(0x40000113)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_AC_CLOSE)."""
-    alias SDLK_AC_EXIT = Self(0x40000114)
+    comptime SDLK_AC_EXIT = Self(0x40000114)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_AC_EXIT)."""
-    alias SDLK_AC_SAVE = Self(0x40000115)
+    comptime SDLK_AC_SAVE = Self(0x40000115)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_AC_SAVE)."""
-    alias SDLK_AC_PRINT = Self(0x40000116)
+    comptime SDLK_AC_PRINT = Self(0x40000116)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_AC_PRINT)."""
-    alias SDLK_AC_PROPERTIES = Self(0x40000117)
+    comptime SDLK_AC_PROPERTIES = Self(0x40000117)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_AC_PROPERTIES)."""
-    alias SDLK_AC_SEARCH = Self(0x40000118)
+    comptime SDLK_AC_SEARCH = Self(0x40000118)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_AC_SEARCH)."""
-    alias SDLK_AC_HOME = Self(0x40000119)
+    comptime SDLK_AC_HOME = Self(0x40000119)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_AC_HOME)."""
-    alias SDLK_AC_BACK = Self(0x4000011A)
+    comptime SDLK_AC_BACK = Self(0x4000011A)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_AC_BACK)."""
-    alias SDLK_AC_FORWARD = Self(0x4000011B)
+    comptime SDLK_AC_FORWARD = Self(0x4000011B)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_AC_FORWARD)."""
-    alias SDLK_AC_STOP = Self(0x4000011C)
+    comptime SDLK_AC_STOP = Self(0x4000011C)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_AC_STOP)."""
-    alias SDLK_AC_REFRESH = Self(0x4000011D)
+    comptime SDLK_AC_REFRESH = Self(0x4000011D)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_AC_REFRESH)."""
-    alias SDLK_AC_BOOKMARKS = Self(0x4000011E)
+    comptime SDLK_AC_BOOKMARKS = Self(0x4000011E)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_AC_BOOKMARKS)."""
-    alias SDLK_SOFTLEFT = Self(0x4000011F)
+    comptime SDLK_SOFTLEFT = Self(0x4000011F)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_SOFTLEFT)."""
-    alias SDLK_SOFTRIGHT = Self(0x40000120)
+    comptime SDLK_SOFTRIGHT = Self(0x40000120)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_SOFTRIGHT)."""
-    alias SDLK_CALL = Self(0x40000121)
+    comptime SDLK_CALL = Self(0x40000121)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_CALL)."""
-    alias SDLK_ENDCALL = Self(0x40000122)
+    comptime SDLK_ENDCALL = Self(0x40000122)
     """SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_ENDCALL)."""
-    alias SDLK_LEFT_TAB = Self(0x20000001)
+    comptime SDLK_LEFT_TAB = Self(0x20000001)
     """Extended key Left Tab."""
-    alias SDLK_LEVEL5_SHIFT = Self(0x20000002)
+    comptime SDLK_LEVEL5_SHIFT = Self(0x20000002)
     """Extended key Level 5 Shift."""
-    alias SDLK_MULTI_KEY_COMPOSE = Self(0x20000003)
+    comptime SDLK_MULTI_KEY_COMPOSE = Self(0x20000003)
     """Extended key Multi-key Compose."""
-    alias SDLK_LMETA = Self(0x20000004)
+    comptime SDLK_LMETA = Self(0x20000004)
     """Extended key Left Meta."""
-    alias SDLK_RMETA = Self(0x20000005)
+    comptime SDLK_RMETA = Self(0x20000005)
     """Extended key Right Meta."""
-    alias SDLK_LHYPER = Self(0x20000006)
+    comptime SDLK_LHYPER = Self(0x20000006)
     """Extended key Left Hyper."""
-    alias SDLK_RHYPER = Self(0x20000007)
+    comptime SDLK_RHYPER = Self(0x20000007)
     """Extended key Right Hyper."""
 
 
@@ -607,39 +607,39 @@ struct Keymod(Intable):
     fn __or__(lhs, rhs: Self) -> Self:
         return Self(lhs.value | rhs.value)
 
-    alias KMOD_NONE = Self(0x0000)
+    comptime KMOD_NONE = Self(0x0000)
     """No modifier is applicable."""
-    alias KMOD_LSHIFT = Self(0x0001)
+    comptime KMOD_LSHIFT = Self(0x0001)
     """The left Shift key is down."""
-    alias KMOD_RSHIFT = Self(0x0002)
+    comptime KMOD_RSHIFT = Self(0x0002)
     """The right Shift key is down."""
-    alias KMOD_LEVEL5 = Self(0x0004)
+    comptime KMOD_LEVEL5 = Self(0x0004)
     """The Level 5 Shift key is down."""
-    alias KMOD_LCTRL = Self(0x0040)
+    comptime KMOD_LCTRL = Self(0x0040)
     """The left Ctrl (Control) key is down."""
-    alias KMOD_RCTRL = Self(0x0080)
+    comptime KMOD_RCTRL = Self(0x0080)
     """The right Ctrl (Control) key is down."""
-    alias KMOD_LALT = Self(0x0100)
+    comptime KMOD_LALT = Self(0x0100)
     """The left Alt key is down."""
-    alias KMOD_RALT = Self(0x0200)
+    comptime KMOD_RALT = Self(0x0200)
     """The right Alt key is down."""
-    alias KMOD_LGUI = Self(0x0400)
+    comptime KMOD_LGUI = Self(0x0400)
     """The left GUI key (often the Windows key) is down."""
-    alias KMOD_RGUI = Self(0x0800)
+    comptime KMOD_RGUI = Self(0x0800)
     """The right GUI key (often the Windows key) is down."""
-    alias KMOD_NUM = Self(0x1000)
+    comptime KMOD_NUM = Self(0x1000)
     """The Num Lock key (may be located on an extended keypad) is down."""
-    alias KMOD_CAPS = Self(0x2000)
+    comptime KMOD_CAPS = Self(0x2000)
     """The Caps Lock key is down."""
-    alias KMOD_MODE = Self(0x4000)
+    comptime KMOD_MODE = Self(0x4000)
     """The !AltGr key is down."""
-    alias KMOD_SCROLL = Self(0x8000)
+    comptime KMOD_SCROLL = Self(0x8000)
     """The Scroll Lock key is down."""
-    alias KMOD_CTRL = Self(Self.KMOD_LCTRL.value | Self.KMOD_RCTRL.value)
+    comptime KMOD_CTRL = Self(Self.KMOD_LCTRL.value | Self.KMOD_RCTRL.value)
     """Any Ctrl key is down."""
-    alias KMOD_SHIFT = Self(Self.KMOD_LSHIFT.value | Self.KMOD_RSHIFT.value)
+    comptime KMOD_SHIFT = Self(Self.KMOD_LSHIFT.value | Self.KMOD_RSHIFT.value)
     """Any Shift key is down."""
-    alias KMOD_ALT = Self(Self.KMOD_LALT.value | Self.KMOD_RALT.value)
+    comptime KMOD_ALT = Self(Self.KMOD_LALT.value | Self.KMOD_RALT.value)
     """Any Alt key is down."""
-    alias KMOD_GUI = Self(Self.KMOD_LGUI.value | Self.KMOD_RGUI.value)
+    comptime KMOD_GUI = Self(Self.KMOD_LGUI.value | Self.KMOD_RGUI.value)
     """Any GUI key is down."""

@@ -72,19 +72,19 @@ struct InitFlags(Intable):
     fn __or__(lhs, rhs: Self) -> Self:
         return Self(lhs.value | rhs.value)
 
-    alias INIT_AUDIO = Self(0x00000010)
+    comptime INIT_AUDIO = Self(0x00000010)
     """`SDL_INIT_AUDIO` implies `SDL_INIT_EVENTS`."""
-    alias INIT_VIDEO = Self(0x00000020)
+    comptime INIT_VIDEO = Self(0x00000020)
     """`SDL_INIT_VIDEO` implies `SDL_INIT_EVENTS`, should be initialized on the main thread."""
-    alias INIT_JOYSTICK = Self(0x00000200)
+    comptime INIT_JOYSTICK = Self(0x00000200)
     """`SDL_INIT_JOYSTICK` implies `SDL_INIT_EVENTS`."""
-    alias INIT_HAPTIC = Self(0x00001000)
-    alias INIT_GAMEPAD = Self(0x00002000)
+    comptime INIT_HAPTIC = Self(0x00001000)
+    comptime INIT_GAMEPAD = Self(0x00002000)
     """`SDL_INIT_GAMEPAD` implies `SDL_INIT_JOYSTICK`."""
-    alias INIT_EVENTS = Self(0x00004000)
-    alias INIT_SENSOR = Self(0x00008000)
+    comptime INIT_EVENTS = Self(0x00004000)
+    comptime INIT_SENSOR = Self(0x00008000)
     """`SDL_INIT_SENSOR` implies `SDL_INIT_EVENTS`."""
-    alias INIT_CAMERA = Self(0x00010000)
+    comptime INIT_CAMERA = Self(0x00010000)
     """`SDL_INIT_CAMERA` implies `SDL_INIT_EVENTS`."""
 
 
@@ -125,18 +125,18 @@ struct AppResult(Indexer, Intable):
         return lhs.value == rhs.value
 
     @always_inline("nodebug")
-    fn __index__(self) -> __mlir_type.index:
-        return Int(self).value
+    fn __mlir_index__(self) -> __mlir_type.index:
+        return Int(self)._mlir_value
 
-    alias APP_CONTINUE = Self(0)
+    comptime APP_CONTINUE = Self(0)
     """Value that requests that the app continue from the main callbacks."""
-    alias APP_SUCCESS = Self(1)
+    comptime APP_SUCCESS = Self(1)
     """Value that requests termination with success from the main callbacks."""
-    alias APP_FAILURE = Self(2)
+    comptime APP_FAILURE = Self(2)
     """Value that requests termination with error from the main callbacks."""
 
 
-alias AppInit_func = fn (appstate: Ptr[Ptr[NoneType, mut=True], mut=True], argc: c_int, argv: Ptr[c_char, mut=True]) -> AppResult
+comptime AppInit_func = fn (appstate: Ptr[Ptr[NoneType, AnyOrigin[True]], AnyOrigin[True]], argc: c_int, argv: Ptr[c_char, AnyOrigin[True]]) -> AppResult
 """Function pointer typedef for SDL_AppInit.
     
     These are used by SDL_EnterAppMainCallbacks. This mechanism operates behind
@@ -158,7 +158,7 @@ Docs: https://wiki.libsdl.org/SDL3/SDL_AppInit_func.
 """
 
 
-alias AppIterate_func = fn (appstate: Ptr[NoneType, mut=True]) -> AppResult
+comptime AppIterate_func = fn (appstate: Ptr[NoneType, AnyOrigin[True]]) -> AppResult
 """Function pointer typedef for SDL_AppIterate.
     
     These are used by SDL_EnterAppMainCallbacks. This mechanism operates behind
@@ -176,7 +176,7 @@ Docs: https://wiki.libsdl.org/SDL3/SDL_AppIterate_func.
 """
 
 
-alias AppEvent_func = fn (appstate: Ptr[NoneType, mut=True], event: Ptr[Event, mut=True]) -> AppResult
+comptime AppEvent_func = fn (appstate: Ptr[NoneType, AnyOrigin[True]], event: Ptr[Event, AnyOrigin[True]]) -> AppResult
 """Function pointer typedef for SDL_AppEvent.
     
     These are used by SDL_EnterAppMainCallbacks. This mechanism operates behind
@@ -195,7 +195,7 @@ Docs: https://wiki.libsdl.org/SDL3/SDL_AppEvent_func.
 """
 
 
-alias AppQuit_func = fn (appstate: Ptr[NoneType, mut=True], result: AppResult) -> None
+comptime AppQuit_func = fn (appstate: Ptr[NoneType, AnyOrigin[True]], result: AppResult) -> None
 """Function pointer typedef for SDL_AppQuit.
     
     These are used by SDL_EnterAppMainCallbacks. This mechanism operates behind
@@ -264,7 +264,7 @@ fn init(flags: InitFlags) raises:
 
     ret = _get_dylib_function[lib, "SDL_Init", fn (flags: InitFlags) -> Bool]()(flags)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
 fn init_sub_system(flags: InitFlags) raises:
@@ -284,10 +284,10 @@ fn init_sub_system(flags: InitFlags) raises:
 
     ret = _get_dylib_function[lib, "SDL_InitSubSystem", fn (flags: InitFlags) -> Bool]()(flags)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn quit_sub_system(flags: InitFlags) -> None:
+fn quit_sub_system(flags: InitFlags) raises -> None:
     """Shut down specific SDL subsystems.
 
     You still need to call SDL_Quit() even if you close all open subsystems
@@ -302,7 +302,7 @@ fn quit_sub_system(flags: InitFlags) -> None:
     return _get_dylib_function[lib, "SDL_QuitSubSystem", fn (flags: InitFlags) -> None]()(flags)
 
 
-fn was_init(flags: InitFlags) -> InitFlags:
+fn was_init(flags: InitFlags) raises -> InitFlags:
     """Get a mask of the specified subsystems which are currently initialized.
 
     Args:
@@ -318,7 +318,7 @@ fn was_init(flags: InitFlags) -> InitFlags:
     return _get_dylib_function[lib, "SDL_WasInit", fn (flags: InitFlags) -> InitFlags]()(flags)
 
 
-fn quit() -> None:
+fn quit() raises -> None:
     """Clean up all initialized subsystems.
 
     You should call this function even if you have already shutdown each
@@ -335,7 +335,7 @@ fn quit() -> None:
     return _get_dylib_function[lib, "SDL_Quit", fn () -> None]()()
 
 
-fn is_main_thread() -> Bool:
+fn is_main_thread() raises -> Bool:
     """Return whether this is the main thread.
 
     On Apple platforms, the main thread is the thread that runs your program's
@@ -357,7 +357,7 @@ fn is_main_thread() -> Bool:
     return _get_dylib_function[lib, "SDL_IsMainThread", fn () -> Bool]()()
 
 
-alias MainThreadCallback = fn (userdata: Ptr[NoneType, mut=True]) -> None
+comptime MainThreadCallback = fn (userdata: Ptr[NoneType, AnyOrigin[True]]) -> None
 """Callback run on the main thread.
     
     Args:
@@ -367,7 +367,7 @@ Docs: https://wiki.libsdl.org/SDL3/SDL_MainThreadCallback.
 """
 
 
-fn run_on_main_thread(callback: MainThreadCallback, userdata: Ptr[NoneType, mut=True], wait_complete: Bool) raises:
+fn run_on_main_thread(callback: MainThreadCallback, userdata: Ptr[NoneType, AnyOrigin[True]], wait_complete: Bool) raises:
     """Call a function on the main thread during event processing.
 
     If this is called on the main thread, the callback is executed immediately.
@@ -394,12 +394,12 @@ fn run_on_main_thread(callback: MainThreadCallback, userdata: Ptr[NoneType, mut=
     Docs: https://wiki.libsdl.org/SDL3/SDL_RunOnMainThread.
     """
 
-    ret = _get_dylib_function[lib, "SDL_RunOnMainThread", fn (callback: MainThreadCallback, userdata: Ptr[NoneType, mut=True], wait_complete: Bool) -> Bool]()(callback, userdata, wait_complete)
+    ret = _get_dylib_function[lib, "SDL_RunOnMainThread", fn (callback: MainThreadCallback, userdata: Ptr[NoneType, AnyOrigin[True]], wait_complete: Bool) -> Bool]()(callback, userdata, wait_complete)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn set_app_metadata(owned appname: String, owned appversion: String, owned appidentifier: String) raises:
+fn set_app_metadata(var appname: String, var appversion: String, var appidentifier: String) raises:
     """Specify basic metadata about your app.
 
     You can optionally provide metadata about your app to SDL. This is not
@@ -438,12 +438,12 @@ fn set_app_metadata(owned appname: String, owned appversion: String, owned appid
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetAppMetadata.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetAppMetadata", fn (appname: Ptr[c_char, mut=False], appversion: Ptr[c_char, mut=False], appidentifier: Ptr[c_char, mut=False]) -> Bool]()(appname.unsafe_cstr_ptr(), appversion.unsafe_cstr_ptr(), appidentifier.unsafe_cstr_ptr())
+    ret = _get_dylib_function[lib, "SDL_SetAppMetadata", fn (appname: Ptr[c_char, AnyOrigin[False]], appversion: Ptr[c_char, AnyOrigin[False]], appidentifier: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(appname.unsafe_cstr_ptr(), appversion.unsafe_cstr_ptr(), appidentifier.unsafe_cstr_ptr())
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn set_app_metadata_property(owned name: String, owned value: String) raises:
+fn set_app_metadata_property(var name: String, var value: String) raises:
     """Specify metadata about your app through a set of properties.
 
     You can optionally provide metadata about your app to SDL. This is not
@@ -506,12 +506,12 @@ fn set_app_metadata_property(owned name: String, owned value: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetAppMetadataProperty.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetAppMetadataProperty", fn (name: Ptr[c_char, mut=False], value: Ptr[c_char, mut=False]) -> Bool]()(name.unsafe_cstr_ptr(), value.unsafe_cstr_ptr())
+    ret = _get_dylib_function[lib, "SDL_SetAppMetadataProperty", fn (name: Ptr[c_char, AnyOrigin[False]], value: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(name.unsafe_cstr_ptr(), value.unsafe_cstr_ptr())
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn get_app_metadata_property(owned name: String) -> Ptr[c_char, mut=False]:
+fn get_app_metadata_property(var name: String) raises -> Ptr[c_char, AnyOrigin[False]]:
     """Get metadata about your app.
 
     This returns metadata previously set using SDL_SetAppMetadata() or
@@ -534,4 +534,4 @@ fn get_app_metadata_property(owned name: String) -> Ptr[c_char, mut=False]:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetAppMetadataProperty.
     """
 
-    return _get_dylib_function[lib, "SDL_GetAppMetadataProperty", fn (name: Ptr[c_char, mut=False]) -> Ptr[c_char, mut=False]]()(name.unsafe_cstr_ptr())
+    return _get_dylib_function[lib, "SDL_GetAppMetadataProperty", fn (name: Ptr[c_char, AnyOrigin[False]]) -> Ptr[c_char, AnyOrigin[False]]]()(name.unsafe_cstr_ptr())

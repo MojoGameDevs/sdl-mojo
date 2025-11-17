@@ -54,21 +54,21 @@ struct BlendMode(Intable):
     fn __or__(lhs, rhs: Self) -> Self:
         return Self(lhs.value | rhs.value)
 
-    alias BLENDMODE_NONE = Self(0x00000000)
+    comptime BLENDMODE_NONE = Self(0x00000000)
     """No blending: dstRGBA = srcRGBA."""
-    alias BLENDMODE_BLEND = Self(0x00000001)
+    comptime BLENDMODE_BLEND = Self(0x00000001)
     """Alpha blending: dstRGB = (srcRGB * srcA) + (dstRGB * (1-srcA)), dstA = srcA + (dstA * (1-srcA))."""
-    alias BLENDMODE_BLEND_PREMULTIPLIED = Self(0x00000010)
+    comptime BLENDMODE_BLEND_PREMULTIPLIED = Self(0x00000010)
     """Pre-multiplied alpha blending: dstRGBA = srcRGBA + (dstRGBA * (1-srcA))."""
-    alias BLENDMODE_ADD = Self(0x00000002)
+    comptime BLENDMODE_ADD = Self(0x00000002)
     """Additive blending: dstRGB = (srcRGB * srcA) + dstRGB, dstA = dstA."""
-    alias BLENDMODE_ADD_PREMULTIPLIED = Self(0x00000020)
+    comptime BLENDMODE_ADD_PREMULTIPLIED = Self(0x00000020)
     """Pre-multiplied additive blending: dstRGB = srcRGB + dstRGB, dstA = dstA."""
-    alias BLENDMODE_MOD = Self(0x00000004)
+    comptime BLENDMODE_MOD = Self(0x00000004)
     """Color modulate: dstRGB = srcRGB * dstRGB, dstA = dstA."""
-    alias BLENDMODE_MUL = Self(0x00000008)
+    comptime BLENDMODE_MUL = Self(0x00000008)
     """Color multiply: dstRGB = (srcRGB * dstRGB) + (dstRGB * (1-srcA)), dstA = dstA."""
-    alias BLENDMODE_INVALID = Self(0x7FFFFFFF)
+    comptime BLENDMODE_INVALID = Self(0x7FFFFFFF)
 
 
 @register_passable("trivial")
@@ -94,18 +94,18 @@ struct BlendOperation(Indexer, Intable):
         return lhs.value == rhs.value
 
     @always_inline("nodebug")
-    fn __index__(self) -> __mlir_type.index:
-        return Int(self).value
+    fn __mlir_index__(self) -> __mlir_type.index:
+        return Int(self)._mlir_value
 
-    alias BLENDOPERATION_ADD = Self(0x1)
+    comptime BLENDOPERATION_ADD = Self(0x1)
     """Dst + src: supported by all renderers."""
-    alias BLENDOPERATION_SUBTRACT = Self(0x2)
+    comptime BLENDOPERATION_SUBTRACT = Self(0x2)
     """Src - dst : supported by D3D, OpenGL, OpenGLES, and Vulkan."""
-    alias BLENDOPERATION_REV_SUBTRACT = Self(0x3)
+    comptime BLENDOPERATION_REV_SUBTRACT = Self(0x3)
     """Dst - src : supported by D3D, OpenGL, OpenGLES, and Vulkan."""
-    alias BLENDOPERATION_MINIMUM = Self(0x4)
+    comptime BLENDOPERATION_MINIMUM = Self(0x4)
     """Min(dst, src) : supported by D3D, OpenGL, OpenGLES, and Vulkan."""
-    alias BLENDOPERATION_MAXIMUM = Self(0x5)
+    comptime BLENDOPERATION_MAXIMUM = Self(0x5)
     """Max(dst, src) : supported by D3D, OpenGL, OpenGLES, and Vulkan."""
 
 
@@ -136,32 +136,32 @@ struct BlendFactor(Indexer, Intable):
         return lhs.value == rhs.value
 
     @always_inline("nodebug")
-    fn __index__(self) -> __mlir_type.index:
-        return Int(self).value
+    fn __mlir_index__(self) -> __mlir_type.index:
+        return Int(self)._mlir_value
 
-    alias BLENDFACTOR_ZERO = Self(0x1)
+    comptime BLENDFACTOR_ZERO = Self(0x1)
     """0, 0, 0, 0."""
-    alias BLENDFACTOR_ONE = Self(0x2)
+    comptime BLENDFACTOR_ONE = Self(0x2)
     """1, 1, 1, 1."""
-    alias BLENDFACTOR_SRC_COLOR = Self(0x3)
+    comptime BLENDFACTOR_SRC_COLOR = Self(0x3)
     """SrcR, srcG, srcB, srcA."""
-    alias BLENDFACTOR_ONE_MINUS_SRC_COLOR = Self(0x4)
+    comptime BLENDFACTOR_ONE_MINUS_SRC_COLOR = Self(0x4)
     """1-srcR, 1-srcG, 1-srcB, 1-srcA."""
-    alias BLENDFACTOR_SRC_ALPHA = Self(0x5)
+    comptime BLENDFACTOR_SRC_ALPHA = Self(0x5)
     """SrcA, srcA, srcA, srcA."""
-    alias BLENDFACTOR_ONE_MINUS_SRC_ALPHA = Self(0x6)
+    comptime BLENDFACTOR_ONE_MINUS_SRC_ALPHA = Self(0x6)
     """1-srcA, 1-srcA, 1-srcA, 1-srcA."""
-    alias BLENDFACTOR_DST_COLOR = Self(0x7)
+    comptime BLENDFACTOR_DST_COLOR = Self(0x7)
     """DstR, dstG, dstB, dstA."""
-    alias BLENDFACTOR_ONE_MINUS_DST_COLOR = Self(0x8)
+    comptime BLENDFACTOR_ONE_MINUS_DST_COLOR = Self(0x8)
     """1-dstR, 1-dstG, 1-dstB, 1-dstA."""
-    alias BLENDFACTOR_DST_ALPHA = Self(0x9)
+    comptime BLENDFACTOR_DST_ALPHA = Self(0x9)
     """DstA, dstA, dstA, dstA."""
-    alias BLENDFACTOR_ONE_MINUS_DST_ALPHA = Self(0xA)
+    comptime BLENDFACTOR_ONE_MINUS_DST_ALPHA = Self(0xA)
     """1-dstA, 1-dstA, 1-dstA, 1-dstA."""
 
 
-fn compose_custom_blend_mode(src_color_factor: BlendFactor, dst_color_factor: BlendFactor, color_operation: BlendOperation, src_alpha_factor: BlendFactor, dst_alpha_factor: BlendFactor, alpha_operation: BlendOperation) -> BlendMode:
+fn compose_custom_blend_mode(src_color_factor: BlendFactor, dst_color_factor: BlendFactor, color_operation: BlendOperation, src_alpha_factor: BlendFactor, dst_alpha_factor: BlendFactor, alpha_operation: BlendOperation) raises -> BlendMode:
     """Compose a custom blend mode for renderers.
 
     The functions SDL_SetRenderDrawBlendMode and SDL_SetTextureBlendMode accept

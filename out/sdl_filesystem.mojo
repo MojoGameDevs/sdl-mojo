@@ -43,7 +43,7 @@ removing, copying files.
 """
 
 
-fn get_base_path() -> Ptr[c_char, mut=False]:
+fn get_base_path() raises -> Ptr[c_char, AnyOrigin[False]]:
     """Get the directory where the application was run from.
 
     SDL caches the result of this call internally, but the first call to this
@@ -82,10 +82,10 @@ fn get_base_path() -> Ptr[c_char, mut=False]:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetBasePath.
     """
 
-    return _get_dylib_function[lib, "SDL_GetBasePath", fn () -> Ptr[c_char, mut=False]]()()
+    return _get_dylib_function[lib, "SDL_GetBasePath", fn () -> Ptr[c_char, AnyOrigin[False]]]()()
 
 
-fn get_pref_path(owned org: String, owned app: String) -> Ptr[c_char, mut=True]:
+fn get_pref_path(var org: String, var app: String) raises -> Ptr[c_char, AnyOrigin[True]]:
     """Get the user-and-app-specific path where files can be written.
 
     Get the "pref dir". This is meant to be where users can write personal
@@ -140,7 +140,7 @@ fn get_pref_path(owned org: String, owned app: String) -> Ptr[c_char, mut=True]:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetPrefPath.
     """
 
-    return _get_dylib_function[lib, "SDL_GetPrefPath", fn (org: Ptr[c_char, mut=False], app: Ptr[c_char, mut=False]) -> Ptr[c_char, mut=True]]()(org.unsafe_cstr_ptr(), app.unsafe_cstr_ptr())
+    return _get_dylib_function[lib, "SDL_GetPrefPath", fn (org: Ptr[c_char, AnyOrigin[False]], app: Ptr[c_char, AnyOrigin[False]]) -> Ptr[c_char, AnyOrigin[True]]]()(org.unsafe_cstr_ptr(), app.unsafe_cstr_ptr())
 
 
 @register_passable("trivial")
@@ -187,36 +187,36 @@ struct Folder(Indexer, Intable):
         return lhs.value == rhs.value
 
     @always_inline("nodebug")
-    fn __index__(self) -> __mlir_type.index:
-        return Int(self).value
+    fn __mlir_index__(self) -> __mlir_type.index:
+        return Int(self)._mlir_value
 
-    alias FOLDER_HOME = Self(0x0)
+    comptime FOLDER_HOME = Self(0x0)
     """The folder which contains all of the current user's data, preferences, and documents. It usually contains most of the other folders. If a requested folder does not exist, the home folder can be considered a safe fallback to store a user's documents."""
-    alias FOLDER_DESKTOP = Self(0x1)
+    comptime FOLDER_DESKTOP = Self(0x1)
     """The folder of files that are displayed on the desktop. Note that the existence of a desktop folder does not guarantee that the system does show icons on its desktop; certain GNU/Linux distros with a graphical environment may not have desktop icons."""
-    alias FOLDER_DOCUMENTS = Self(0x2)
+    comptime FOLDER_DOCUMENTS = Self(0x2)
     """User document files, possibly application-specific. This is a good place to save a user's projects."""
-    alias FOLDER_DOWNLOADS = Self(0x3)
+    comptime FOLDER_DOWNLOADS = Self(0x3)
     """Standard folder for user files downloaded from the internet."""
-    alias FOLDER_MUSIC = Self(0x4)
+    comptime FOLDER_MUSIC = Self(0x4)
     """Music files that can be played using a standard music player (mp3, ogg...)."""
-    alias FOLDER_PICTURES = Self(0x5)
+    comptime FOLDER_PICTURES = Self(0x5)
     """Image files that can be displayed using a standard viewer (png, jpg...)."""
-    alias FOLDER_PUBLICSHARE = Self(0x6)
+    comptime FOLDER_PUBLICSHARE = Self(0x6)
     """Files that are meant to be shared with other users on the same computer."""
-    alias FOLDER_SAVEDGAMES = Self(0x7)
+    comptime FOLDER_SAVEDGAMES = Self(0x7)
     """Save files for games."""
-    alias FOLDER_SCREENSHOTS = Self(0x8)
+    comptime FOLDER_SCREENSHOTS = Self(0x8)
     """Application screenshots."""
-    alias FOLDER_TEMPLATES = Self(0x9)
+    comptime FOLDER_TEMPLATES = Self(0x9)
     """Template files to be used when the user requests the desktop environment to create a new file in a certain folder, such as "New Text File.txt".  Any file in the Templates folder can be used as a starting point for a new file."""
-    alias FOLDER_VIDEOS = Self(0xA)
+    comptime FOLDER_VIDEOS = Self(0xA)
     """Video files that can be played using a standard video player (mp4, webm...)."""
-    alias FOLDER_COUNT = Self(0xB)
+    comptime FOLDER_COUNT = Self(0xB)
     """Total number of types in this enum, not a folder type by itself."""
 
 
-fn get_user_folder(folder: Folder) -> Ptr[c_char, mut=False]:
+fn get_user_folder(folder: Folder) raises -> Ptr[c_char, AnyOrigin[False]]:
     """Finds the most suitable user folder for a specific purpose.
 
     Many OSes provide certain standard folders for certain purposes, such as
@@ -243,7 +243,7 @@ fn get_user_folder(folder: Folder) -> Ptr[c_char, mut=False]:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetUserFolder.
     """
 
-    return _get_dylib_function[lib, "SDL_GetUserFolder", fn (folder: Folder) -> Ptr[c_char, mut=False]]()(folder)
+    return _get_dylib_function[lib, "SDL_GetUserFolder", fn (folder: Folder) -> Ptr[c_char, AnyOrigin[False]]]()(folder)
 
 
 @register_passable("trivial")
@@ -272,21 +272,21 @@ struct PathType(Indexer, Intable):
         return lhs.value == rhs.value
 
     @always_inline("nodebug")
-    fn __index__(self) -> __mlir_type.index:
-        return Int(self).value
+    fn __mlir_index__(self) -> __mlir_type.index:
+        return Int(self)._mlir_value
 
-    alias PATHTYPE_NONE = Self(0x0)
+    comptime PATHTYPE_NONE = Self(0x0)
     """Path does not exist."""
-    alias PATHTYPE_FILE = Self(0x1)
+    comptime PATHTYPE_FILE = Self(0x1)
     """A normal file."""
-    alias PATHTYPE_DIRECTORY = Self(0x2)
+    comptime PATHTYPE_DIRECTORY = Self(0x2)
     """A directory."""
-    alias PATHTYPE_OTHER = Self(0x3)
+    comptime PATHTYPE_OTHER = Self(0x3)
     """Something completely different like a device node (not a symlink, those are always followed)."""
 
 
 @fieldwise_init
-struct PathInfo(Copyable, Movable):
+struct PathInfo(ImplicitlyCopyable, Movable):
     """Information about a path on the filesystem.
 
     Docs: https://wiki.libsdl.org/SDL3/PathInfo.
@@ -325,10 +325,10 @@ struct GlobFlags(Intable):
     fn __or__(lhs, rhs: Self) -> Self:
         return Self(lhs.value | rhs.value)
 
-    alias GLOB_CASEINSENSITIVE = Self(1 << 0)
+    comptime GLOB_CASEINSENSITIVE = Self(1 << 0)
 
 
-fn create_directory(owned path: String) raises:
+fn create_directory(var path: String) raises:
     """Create a directory, and any missing parent directories.
 
     This reports success if `path` already exists as a directory.
@@ -346,9 +346,9 @@ fn create_directory(owned path: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateDirectory.
     """
 
-    ret = _get_dylib_function[lib, "SDL_CreateDirectory", fn (path: Ptr[c_char, mut=False]) -> Bool]()(path.unsafe_cstr_ptr())
+    ret = _get_dylib_function[lib, "SDL_CreateDirectory", fn (path: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(path.unsafe_cstr_ptr())
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
 @register_passable("trivial")
@@ -373,18 +373,18 @@ struct EnumerationResult(Indexer, Intable):
         return lhs.value == rhs.value
 
     @always_inline("nodebug")
-    fn __index__(self) -> __mlir_type.index:
-        return Int(self).value
+    fn __mlir_index__(self) -> __mlir_type.index:
+        return Int(self)._mlir_value
 
-    alias ENUM_CONTINUE = Self(0x0)
+    comptime ENUM_CONTINUE = Self(0x0)
     """Value that requests that enumeration continue."""
-    alias ENUM_SUCCESS = Self(0x1)
+    comptime ENUM_SUCCESS = Self(0x1)
     """Value that requests that enumeration stop, successfully."""
-    alias ENUM_FAILURE = Self(0x2)
+    comptime ENUM_FAILURE = Self(0x2)
     """Value that requests that enumeration stop, as a failure."""
 
 
-alias EnumerateDirectoryCallback = fn (userdata: Ptr[NoneType, mut=True], dirname: Ptr[c_char, mut=False], fname: Ptr[c_char, mut=False]) -> EnumerationResult
+comptime EnumerateDirectoryCallback = fn (userdata: Ptr[NoneType, AnyOrigin[True]], dirname: Ptr[c_char, AnyOrigin[False]], fname: Ptr[c_char, AnyOrigin[False]]) -> EnumerationResult
 """Callback for directory enumeration.
     
     Enumeration of directory entries will continue until either all entries
@@ -411,7 +411,7 @@ Docs: https://wiki.libsdl.org/SDL3/SDL_EnumerateDirectoryCallback.
 """
 
 
-fn enumerate_directory(owned path: String, callback: EnumerateDirectoryCallback, userdata: Ptr[NoneType, mut=True]) raises:
+fn enumerate_directory(var path: String, callback: EnumerateDirectoryCallback, userdata: Ptr[NoneType, AnyOrigin[True]]) raises:
     """Enumerate a directory through a callback function.
 
     This function provides every directory entry through an app-provided
@@ -436,12 +436,12 @@ fn enumerate_directory(owned path: String, callback: EnumerateDirectoryCallback,
     Docs: https://wiki.libsdl.org/SDL3/SDL_EnumerateDirectory.
     """
 
-    ret = _get_dylib_function[lib, "SDL_EnumerateDirectory", fn (path: Ptr[c_char, mut=False], callback: EnumerateDirectoryCallback, userdata: Ptr[NoneType, mut=True]) -> Bool]()(path.unsafe_cstr_ptr(), callback, userdata)
+    ret = _get_dylib_function[lib, "SDL_EnumerateDirectory", fn (path: Ptr[c_char, AnyOrigin[False]], callback: EnumerateDirectoryCallback, userdata: Ptr[NoneType, AnyOrigin[True]]) -> Bool]()(path.unsafe_cstr_ptr(), callback, userdata)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn remove_path(owned path: String) raises:
+fn remove_path(var path: String) raises:
     """Remove a file or an empty directory.
 
     Directories that are not empty will fail; this function will not recursely
@@ -457,12 +457,12 @@ fn remove_path(owned path: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_RemovePath.
     """
 
-    ret = _get_dylib_function[lib, "SDL_RemovePath", fn (path: Ptr[c_char, mut=False]) -> Bool]()(path.unsafe_cstr_ptr())
+    ret = _get_dylib_function[lib, "SDL_RemovePath", fn (path: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(path.unsafe_cstr_ptr())
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn rename_path(owned oldpath: String, owned newpath: String) raises:
+fn rename_path(var oldpath: String, var newpath: String) raises:
     """Rename a file or directory.
 
     If the file at `newpath` already exists, it will replaced.
@@ -487,12 +487,12 @@ fn rename_path(owned oldpath: String, owned newpath: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_RenamePath.
     """
 
-    ret = _get_dylib_function[lib, "SDL_RenamePath", fn (oldpath: Ptr[c_char, mut=False], newpath: Ptr[c_char, mut=False]) -> Bool]()(oldpath.unsafe_cstr_ptr(), newpath.unsafe_cstr_ptr())
+    ret = _get_dylib_function[lib, "SDL_RenamePath", fn (oldpath: Ptr[c_char, AnyOrigin[False]], newpath: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(oldpath.unsafe_cstr_ptr(), newpath.unsafe_cstr_ptr())
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn copy_file(owned oldpath: String, owned newpath: String) raises:
+fn copy_file(var oldpath: String, var newpath: String) raises:
     """Copy a file.
 
     If the file at `newpath` already exists, it will be overwritten with the
@@ -534,12 +534,12 @@ fn copy_file(owned oldpath: String, owned newpath: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_CopyFile.
     """
 
-    ret = _get_dylib_function[lib, "SDL_CopyFile", fn (oldpath: Ptr[c_char, mut=False], newpath: Ptr[c_char, mut=False]) -> Bool]()(oldpath.unsafe_cstr_ptr(), newpath.unsafe_cstr_ptr())
+    ret = _get_dylib_function[lib, "SDL_CopyFile", fn (oldpath: Ptr[c_char, AnyOrigin[False]], newpath: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(oldpath.unsafe_cstr_ptr(), newpath.unsafe_cstr_ptr())
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn get_path_info(owned path: String, info: Ptr[PathInfo, mut=True]) raises:
+fn get_path_info(var path: String, info: Ptr[PathInfo, AnyOrigin[True]]) raises:
     """Get information about a filesystem path.
 
     Args:
@@ -554,12 +554,12 @@ fn get_path_info(owned path: String, info: Ptr[PathInfo, mut=True]) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetPathInfo.
     """
 
-    ret = _get_dylib_function[lib, "SDL_GetPathInfo", fn (path: Ptr[c_char, mut=False], info: Ptr[PathInfo, mut=True]) -> Bool]()(path.unsafe_cstr_ptr(), info)
+    ret = _get_dylib_function[lib, "SDL_GetPathInfo", fn (path: Ptr[c_char, AnyOrigin[False]], info: Ptr[PathInfo, AnyOrigin[True]]) -> Bool]()(path.unsafe_cstr_ptr(), info)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn glob_directory(owned path: String, owned pattern: String, flags: GlobFlags, count: Ptr[c_int, mut=True], out ret: Ptr[Ptr[c_char, mut=True], mut=True]) raises:
+fn glob_directory(var path: String, var pattern: String, flags: GlobFlags, count: Ptr[c_int, AnyOrigin[True]], out ret: Ptr[Ptr[c_char, AnyOrigin[True]], AnyOrigin[True]]) raises:
     """Enumerate a directory tree, filtered by pattern, and return a list.
 
     Files are filtered out if they don't match the string in `pattern`, which
@@ -595,12 +595,12 @@ fn glob_directory(owned path: String, owned pattern: String, flags: GlobFlags, c
     Docs: https://wiki.libsdl.org/SDL3/SDL_GlobDirectory.
     """
 
-    ret = _get_dylib_function[lib, "SDL_GlobDirectory", fn (path: Ptr[c_char, mut=False], pattern: Ptr[c_char, mut=False], flags: GlobFlags, count: Ptr[c_int, mut=True]) -> Ptr[Ptr[c_char, mut=True], mut=True]]()(path.unsafe_cstr_ptr(), pattern.unsafe_cstr_ptr(), flags, count)
+    ret = _get_dylib_function[lib, "SDL_GlobDirectory", fn (path: Ptr[c_char, AnyOrigin[False]], pattern: Ptr[c_char, AnyOrigin[False]], flags: GlobFlags, count: Ptr[c_int, AnyOrigin[True]]) -> Ptr[Ptr[c_char, AnyOrigin[True]], AnyOrigin[True]]]()(path.unsafe_cstr_ptr(), pattern.unsafe_cstr_ptr(), flags, count)
     if not ret:
-        raise String(unsafe_from_utf8_ptr=get_error())
+        raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
 
-fn get_current_directory() -> Ptr[c_char, mut=True]:
+fn get_current_directory() raises -> Ptr[c_char, AnyOrigin[True]]:
     """Get what the system believes is the "current working directory.".
 
     For systems without a concept of a current working directory, this will
@@ -621,4 +621,4 @@ fn get_current_directory() -> Ptr[c_char, mut=True]:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetCurrentDirectory.
     """
 
-    return _get_dylib_function[lib, "SDL_GetCurrentDirectory", fn () -> Ptr[c_char, mut=True]]()()
+    return _get_dylib_function[lib, "SDL_GetCurrentDirectory", fn () -> Ptr[c_char, AnyOrigin[True]]]()()
