@@ -46,7 +46,7 @@ includes = [
     "SDL_keycode.h",
     # "SDL_loadso.h",
     # "SDL_locale.h",
-    # "SDL_log.h",
+    "SDL_log.h",
     # "SDL_messagebox.h",
     # "SDL_metal.h",
     # "SDL_misc.h",
@@ -793,9 +793,9 @@ def translate_src(src_url: str, out_path: Path):
                 _ = out.write(patterns[str(match.lastgroup)][1](match))
 
 
-out_dir = Path("out/")
+out_dir = Path('src/')
 rmtree(out_dir, ignore_errors=True)
-out_dir.mkdir()
+out_dir.mkdir(exist_ok=True)
 
 imports = ""
 for include in includes:

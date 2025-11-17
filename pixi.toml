@@ -1,18 +1,40 @@
 [workspace]
+preview = ["pixi-build"]
 authors = ["helehex <helehex@gmail.com>"]
-channels = ["conda-forge", "https://conda.modular.com/max-nightly"]
+channels = ["conda-forge","https://conda.modular.com/max-nightly"]
 description = "Bindings for SDL3 in Mojo"
 name = "sdl-mojo"
 platforms = ["linux-64", "linux-aarch64", "osx-arm64"]
 version = "0.1.0"
 
 [tasks]
-fmt = "mojo format -l 1000 out"
+fmt = "mojo format -l 1000 src"
 gen = "python3 gen.py"
-pkg = "mojo package out -o test/sdl.📦"
+pkg = "mojo package src -o test/sdl.📦"
 build = {depends-on = ["gen", "fmt", "pkg"]}
 test = { cmd = "mojo test/test.mojo", depends-on = ["pkg"] }
 temp = "mojo temp.mojo"
+
+[package]
+name = "sdl-mojo"
+version = "0.1.0"
+
+[package.build.config.pkg]
+name = "sdl"
+
+[package.build.backend]
+name="pixi-build-mojo"
+version = "0.1.*"
+
+[package.host-dependencies]
+mojo-compiler = ">=0.26.1.0.dev2025111705,<0.27"
+
+[package.build-dependencies]
+mojo-compiler = ">=0.26.1.0.dev2025111705,<0.27"
+
+[package.run-dependencies]
+mojo-compiler = ">=0.26.1.0.dev2025111705,<0.27"
+sdl3 = ">=3.2.26,<4"
 
 [dependencies]
 mojo = ">=0.26.1.0.dev2025111705,<0.27"

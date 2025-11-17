@@ -21,6 +21,7 @@ from .sdl_iostream import *
 from .sdl_joystick import *
 from .sdl_keyboard import *
 from .sdl_keycode import *
+from .sdl_log import *
 from .sdl_mouse import *
 from .sdl_pen import *
 from .sdl_pixels import *
