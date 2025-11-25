@@ -1,13 +1,7 @@
-# ignore assets
-assets/
-
-# ignore code
-**/temp.**
-**/temp/
+# ignore dot files
+**/.**
+!.git*
 
 # ignore packages
 *.mojopkg
 *.📦
-
-# ignore environments
-.magic

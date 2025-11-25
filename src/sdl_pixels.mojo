@@ -920,7 +920,7 @@ struct PixelFormatDetails(ImplicitlyCopyable, Movable):
     var format: PixelFormat
     var bits_per_pixel: UInt8
     var bytes_per_pixel: UInt8
-    var padding: ArrayHelper[UInt8, 2, AnyOrigin[True]].result
+    var padding: ArrayHelper[UInt8, 2, AnyOrigin[True]]
     var rmask: UInt32
     var gmask: UInt32
     var bmask: UInt32

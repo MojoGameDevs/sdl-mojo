@@ -223,7 +223,7 @@ struct HapticDirection(ImplicitlyCopyable, Movable):
 
     var type: UInt8
     """The type of encoding."""
-    var dir: ArrayHelper[Int32, 3, AnyOrigin[True]].result
+    var dir: ArrayHelper[Int32, 3, AnyOrigin[True]]
     """The encoded direction."""
 
 
@@ -395,17 +395,17 @@ struct HapticCondition(ImplicitlyCopyable, Movable):
     var interval: UInt16
     """How soon it can be triggered again after button."""
 
-    var right_sat: ArrayHelper[UInt16, 3, AnyOrigin[True]].result
+    var right_sat: ArrayHelper[UInt16, 3, AnyOrigin[True]]
     """Condition."""
-    var left_sat: ArrayHelper[UInt16, 3, AnyOrigin[True]].result
+    var left_sat: ArrayHelper[UInt16, 3, AnyOrigin[True]]
     """Level when joystick is to the negative side; max 0xFFFF."""
-    var right_coeff: ArrayHelper[Int16, 3, AnyOrigin[True]].result
+    var right_coeff: ArrayHelper[Int16, 3, AnyOrigin[True]]
     """How fast to increase the force towards the positive side."""
-    var left_coeff: ArrayHelper[Int16, 3, AnyOrigin[True]].result
+    var left_coeff: ArrayHelper[Int16, 3, AnyOrigin[True]]
     """How fast to increase the force towards the negative side."""
-    var deadband: ArrayHelper[UInt16, 3, AnyOrigin[True]].result
+    var deadband: ArrayHelper[UInt16, 3, AnyOrigin[True]]
     """Size of the dead zone; max 0xFFFF: whole axis-range when 0-centered."""
-    var center: ArrayHelper[Int16, 3, AnyOrigin[True]].result
+    var center: ArrayHelper[Int16, 3, AnyOrigin[True]]
     """Position of the dead zone."""
 
 

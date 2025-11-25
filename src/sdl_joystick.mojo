@@ -435,7 +435,7 @@ struct VirtualJoystickTouchpadDesc(ImplicitlyCopyable, Movable):
 
     var nfingers: UInt16
     """The number of simultaneous fingers on this touchpad."""
-    var padding: ArrayHelper[UInt16, 3, AnyOrigin[True]].result
+    var padding: ArrayHelper[UInt16, 3, AnyOrigin[True]]
 
 
 @fieldwise_init
@@ -483,7 +483,7 @@ struct VirtualJoystickDesc(ImplicitlyCopyable, Movable):
     """The number of touchpads on this joystick, requires `touchpads` to point at valid descriptions."""
     var nsensors: UInt16
     """The number of sensors on this joystick, requires `sensors` to point at valid descriptions."""
-    var padding2: ArrayHelper[UInt16, 2, AnyOrigin[True]].result
+    var padding2: ArrayHelper[UInt16, 2, AnyOrigin[True]]
     """Unused."""
     var button_mask: UInt32
     """A mask of which buttons are valid for this controller

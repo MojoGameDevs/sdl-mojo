@@ -72,5 +72,4 @@ fn _uninit[T: AnyType](out value: T):
     __mlir_op.`lit.ownership.mark_initialized`(__get_mvalue_as_litref(value))
 
 
-struct ArrayHelper[type: ImplicitlyCopyable & Movable, size: Int, origin: Origin]:
-    comptime result = Ptr[InlineArray[type, size], origin]
+comptime ArrayHelper[type: ImplicitlyCopyable & Movable, size: Int, origin: Origin] = Ptr[InlineArray[type, size], origin]

@@ -49,7 +49,7 @@ struct GUID(ImplicitlyCopyable, Movable):
     Docs: https://wiki.libsdl.org/SDL3/GUID.
     """
 
-    var data: ArrayHelper[UInt8, 16, AnyOrigin[True]].result
+    var data: ArrayHelper[UInt8, 16, AnyOrigin[True]]
 
 
 fn guid_to_string(guid: GUID, psz_guid: Ptr[c_char, AnyOrigin[True]], cb_guid: c_int) raises -> None:

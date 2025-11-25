@@ -898,7 +898,7 @@ struct GamepadSensorEvent(ImplicitlyCopyable, Movable):
     """The joystick instance id."""
     var sensor: Int32
     """The type of the sensor, one of the values of SDL_SensorType."""
-    var data: ArrayHelper[c_float, 3, AnyOrigin[True]].result
+    var data: ArrayHelper[c_float, 3, AnyOrigin[True]]
     """Up to 3 values from the sensor, as defined in SDL_sensor.h."""
     var sensor_timestamp: UInt64
     """The timestamp of the sensor reading in nanoseconds, not necessarily synchronized with the system clock."""
@@ -1211,7 +1211,7 @@ struct SensorEvent(ImplicitlyCopyable, Movable):
     """In nanoseconds, populated using SDL_GetTicksNS()."""
     var which: SensorID
     """The instance ID of the sensor."""
-    var data: ArrayHelper[c_float, 6, AnyOrigin[True]].result
+    var data: ArrayHelper[c_float, 6, AnyOrigin[True]]
     """Up to 6 values from the sensor - additional values can be queried using SDL_GetSensorData()."""
     var sensor_timestamp: UInt64
     """The timestamp of the sensor reading in nanoseconds, not necessarily synchronized with the system clock."""

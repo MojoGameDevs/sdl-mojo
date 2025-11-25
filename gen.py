@@ -172,7 +172,7 @@ def translate_type(m: re.Match) -> str:
             result = f"Ptr[{result}, AnyOrigin[{not bool(m['mut'])}]]"
 
     if m.groupdict().get("vecs"):
-        result = f"ArrayHelper[{result}, {m['vecs']}, AnyOrigin[{not bool(m['mut'])}]].result"
+        result = f"ArrayHelper[{result}, {m['vecs']}, AnyOrigin[{not bool(m['mut'])}]]"
 
     if m.groupdict().get("amnt"):
         result = f"InlineArray[{result}, {m['amnt']}]"
@@ -793,7 +793,7 @@ def translate_src(src_url: str, out_path: Path):
                 _ = out.write(patterns[str(match.lastgroup)][1](match))
 
 
-out_dir = Path('src/')
+out_dir = Path("src/")
 rmtree(out_dir, ignore_errors=True)
 out_dir.mkdir(exist_ok=True)
 
@@ -844,6 +844,5 @@ fn _uninit[T: AnyType](out value: T):
     __mlir_op.`lit.ownership.mark_initialized`(__get_mvalue_as_litref(value))
 
 
-struct ArrayHelper[type: ImplicitlyCopyable & Movable, size: Int, origin: Origin]:
-    comptime result = Ptr[InlineArray[type, size], origin]
+comptime ArrayHelper[type: ImplicitlyCopyable & Movable, size: Int, origin: Origin] = Ptr[InlineArray[type, size], origin]
 ''')
