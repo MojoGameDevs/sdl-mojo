@@ -626,7 +626,7 @@ def translate_function(m: re.Match):
     pass_args = re.sub(match_argument_names, r"\1\2", sdl_args)
     for arg_name in re.finditer(r"\w+(?=: String)", mojo_args):
         pass_args = re.sub(
-            r"\b" + arg_name[0] + r"\b", arg_name[0] + ".unsafe_cstr_ptr()", pass_args
+            r"\b" + arg_name[0] + r"\b", arg_name[0] + ".as_c_string_slice().unsafe_ptr()", pass_args
         )
     call = f'_get_dylib_function[lib, "{m["f_name"]}", fn ({sdl_args}) -> {sdl_ret}]()({pass_args})'
     if mojo_ret == "String":
@@ -811,11 +811,11 @@ with open(out_dir / "__init__.mojo", "w") as imp:
 # +--------------------------------------------------------------------------+ #
 
 """SDL3 Bindings in Mojo"""
-
+from memory import UnsafePointer
 {imports}
 
 comptime AnyOrigin[mut: Bool] = __mlir_attr[`#lit.any.origin<`, mut._mlir_value, `>: !lit.origin<`, mut._mlir_value, `>`]
-comptime Ptr = stdlib.memory.UnsafePointer
+comptime Ptr = UnsafePointer
 
 
 from sys import CompilationTarget, is_little_endian, is_big_endian

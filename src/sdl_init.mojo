@@ -438,7 +438,7 @@ fn set_app_metadata(var appname: String, var appversion: String, var appidentifi
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetAppMetadata.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetAppMetadata", fn (appname: Ptr[c_char, AnyOrigin[False]], appversion: Ptr[c_char, AnyOrigin[False]], appidentifier: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(appname.unsafe_cstr_ptr(), appversion.unsafe_cstr_ptr(), appidentifier.unsafe_cstr_ptr())
+    ret = _get_dylib_function[lib, "SDL_SetAppMetadata", fn (appname: Ptr[c_char, AnyOrigin[False]], appversion: Ptr[c_char, AnyOrigin[False]], appidentifier: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(appname.as_c_string_slice().unsafe_ptr(), appversion.as_c_string_slice().unsafe_ptr(), appidentifier.as_c_string_slice().unsafe_ptr())
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -506,7 +506,7 @@ fn set_app_metadata_property(var name: String, var value: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetAppMetadataProperty.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetAppMetadataProperty", fn (name: Ptr[c_char, AnyOrigin[False]], value: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(name.unsafe_cstr_ptr(), value.unsafe_cstr_ptr())
+    ret = _get_dylib_function[lib, "SDL_SetAppMetadataProperty", fn (name: Ptr[c_char, AnyOrigin[False]], value: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(name.as_c_string_slice().unsafe_ptr(), value.as_c_string_slice().unsafe_ptr())
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -534,4 +534,4 @@ fn get_app_metadata_property(var name: String) raises -> Ptr[c_char, AnyOrigin[F
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetAppMetadataProperty.
     """
 
-    return _get_dylib_function[lib, "SDL_GetAppMetadataProperty", fn (name: Ptr[c_char, AnyOrigin[False]]) -> Ptr[c_char, AnyOrigin[False]]]()(name.unsafe_cstr_ptr())
+    return _get_dylib_function[lib, "SDL_GetAppMetadataProperty", fn (name: Ptr[c_char, AnyOrigin[False]]) -> Ptr[c_char, AnyOrigin[False]]]()(name.as_c_string_slice().unsafe_ptr())

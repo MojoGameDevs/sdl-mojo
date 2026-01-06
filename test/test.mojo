@@ -13,8 +13,8 @@ from math import sqrt
 
 def main():
     print("press WASD to move box")
-    alias screen_width = 640
-    alias screen_height = 480
+    comptime screen_width = 640
+    comptime screen_height = 480
     sdl.init(InitFlags.INIT_VIDEO | InitFlags.INIT_AUDIO | InitFlags.INIT_EVENTS | InitFlags.INIT_JOYSTICK | InitFlags.INIT_GAMEPAD)
 
     var window = Ptr[sdl.Window, MutAnyOrigin]()

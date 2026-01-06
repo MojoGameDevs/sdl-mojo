@@ -450,7 +450,7 @@ fn add_gamepad_mapping(var mapping: String) raises -> c_int:
     Docs: https://wiki.libsdl.org/SDL3/SDL_AddGamepadMapping.
     """
 
-    return _get_dylib_function[lib, "SDL_AddGamepadMapping", fn (mapping: Ptr[c_char, AnyOrigin[False]]) -> c_int]()(mapping.unsafe_cstr_ptr())
+    return _get_dylib_function[lib, "SDL_AddGamepadMapping", fn (mapping: Ptr[c_char, AnyOrigin[False]]) -> c_int]()(mapping.as_c_string_slice().unsafe_ptr())
 
 
 fn add_gamepad_mappings_from_io(src: Ptr[IOStream, AnyOrigin[True]], closeio: Bool) raises -> c_int:
@@ -520,7 +520,7 @@ fn add_gamepad_mappings_from_file(var file: String) raises -> c_int:
     Docs: https://wiki.libsdl.org/SDL3/SDL_AddGamepadMappingsFromFile.
     """
 
-    return _get_dylib_function[lib, "SDL_AddGamepadMappingsFromFile", fn (file: Ptr[c_char, AnyOrigin[False]]) -> c_int]()(file.unsafe_cstr_ptr())
+    return _get_dylib_function[lib, "SDL_AddGamepadMappingsFromFile", fn (file: Ptr[c_char, AnyOrigin[False]]) -> c_int]()(file.as_c_string_slice().unsafe_ptr())
 
 
 fn reload_gamepad_mappings() raises:
@@ -614,7 +614,7 @@ fn set_gamepad_mapping(instance_id: JoystickID, var mapping: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetGamepadMapping.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetGamepadMapping", fn (instance_id: JoystickID, mapping: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(instance_id, mapping.unsafe_cstr_ptr())
+    ret = _get_dylib_function[lib, "SDL_SetGamepadMapping", fn (instance_id: JoystickID, mapping: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(instance_id, mapping.as_c_string_slice().unsafe_ptr())
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -1316,7 +1316,7 @@ fn get_gamepad_type_from_string(var str: String) raises -> GamepadType:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetGamepadTypeFromString.
     """
 
-    return _get_dylib_function[lib, "SDL_GetGamepadTypeFromString", fn (str: Ptr[c_char, AnyOrigin[False]]) -> GamepadType]()(str.unsafe_cstr_ptr())
+    return _get_dylib_function[lib, "SDL_GetGamepadTypeFromString", fn (str: Ptr[c_char, AnyOrigin[False]]) -> GamepadType]()(str.as_c_string_slice().unsafe_ptr())
 
 
 fn get_gamepad_string_for_type(type: GamepadType) raises -> Ptr[c_char, AnyOrigin[False]]:
@@ -1358,7 +1358,7 @@ fn get_gamepad_axis_from_string(var str: String) raises -> GamepadAxis:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetGamepadAxisFromString.
     """
 
-    return _get_dylib_function[lib, "SDL_GetGamepadAxisFromString", fn (str: Ptr[c_char, AnyOrigin[False]]) -> GamepadAxis]()(str.unsafe_cstr_ptr())
+    return _get_dylib_function[lib, "SDL_GetGamepadAxisFromString", fn (str: Ptr[c_char, AnyOrigin[False]]) -> GamepadAxis]()(str.as_c_string_slice().unsafe_ptr())
 
 
 fn get_gamepad_string_for_axis(axis: GamepadAxis) raises -> Ptr[c_char, AnyOrigin[False]]:
@@ -1441,7 +1441,7 @@ fn get_gamepad_button_from_string(var str: String) raises -> GamepadButton:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetGamepadButtonFromString.
     """
 
-    return _get_dylib_function[lib, "SDL_GetGamepadButtonFromString", fn (str: Ptr[c_char, AnyOrigin[False]]) -> GamepadButton]()(str.unsafe_cstr_ptr())
+    return _get_dylib_function[lib, "SDL_GetGamepadButtonFromString", fn (str: Ptr[c_char, AnyOrigin[False]]) -> GamepadButton]()(str.as_c_string_slice().unsafe_ptr())
 
 
 fn get_gamepad_string_for_button(button: GamepadButton) raises -> Ptr[c_char, AnyOrigin[False]]:

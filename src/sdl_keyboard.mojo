@@ -299,7 +299,7 @@ fn set_scancode_name(scancode: Scancode, var name: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetScancodeName.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetScancodeName", fn (scancode: Scancode, name: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(scancode, name.unsafe_cstr_ptr())
+    ret = _get_dylib_function[lib, "SDL_SetScancodeName", fn (scancode: Scancode, name: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(scancode, name.as_c_string_slice().unsafe_ptr())
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -348,7 +348,7 @@ fn get_scancode_from_name(var name: String) raises -> Scancode:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetScancodeFromName.
     """
 
-    return _get_dylib_function[lib, "SDL_GetScancodeFromName", fn (name: Ptr[c_char, AnyOrigin[False]]) -> Scancode]()(name.unsafe_cstr_ptr())
+    return _get_dylib_function[lib, "SDL_GetScancodeFromName", fn (name: Ptr[c_char, AnyOrigin[False]]) -> Scancode]()(name.as_c_string_slice().unsafe_ptr())
 
 
 fn get_key_name(key: Keycode) raises -> Ptr[c_char, AnyOrigin[False]]:
@@ -389,7 +389,7 @@ fn get_key_from_name(var name: String) raises -> Keycode:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetKeyFromName.
     """
 
-    return _get_dylib_function[lib, "SDL_GetKeyFromName", fn (name: Ptr[c_char, AnyOrigin[False]]) -> Keycode]()(name.unsafe_cstr_ptr())
+    return _get_dylib_function[lib, "SDL_GetKeyFromName", fn (name: Ptr[c_char, AnyOrigin[False]]) -> Keycode]()(name.as_c_string_slice().unsafe_ptr())
 
 
 fn start_text_input(window: Ptr[Window, AnyOrigin[True]]) raises:

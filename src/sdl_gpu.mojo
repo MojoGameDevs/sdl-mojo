@@ -2657,7 +2657,7 @@ fn gpu_supports_shader_formats(format_flags: GPUShaderFormat, var name: String) 
     Docs: https://wiki.libsdl.org/SDL3/SDL_GPUSupportsShaderFormats.
     """
 
-    return _get_dylib_function[lib, "SDL_GPUSupportsShaderFormats", fn (format_flags: GPUShaderFormat, name: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(format_flags, name.unsafe_cstr_ptr())
+    return _get_dylib_function[lib, "SDL_GPUSupportsShaderFormats", fn (format_flags: GPUShaderFormat, name: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(format_flags, name.as_c_string_slice().unsafe_ptr())
 
 
 fn gpu_supports_properties(props: PropertiesID) raises -> Bool:
@@ -2692,7 +2692,7 @@ fn create_gpu_device(format_flags: GPUShaderFormat, debug_mode: Bool, var name: 
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateGPUDevice.
     """
 
-    ret = _get_dylib_function[lib, "SDL_CreateGPUDevice", fn (format_flags: GPUShaderFormat, debug_mode: Bool, name: Ptr[c_char, AnyOrigin[False]]) -> Ptr[GPUDevice, AnyOrigin[True]]]()(format_flags, debug_mode, name.unsafe_cstr_ptr())
+    ret = _get_dylib_function[lib, "SDL_CreateGPUDevice", fn (format_flags: GPUShaderFormat, debug_mode: Bool, name: Ptr[c_char, AnyOrigin[False]]) -> Ptr[GPUDevice, AnyOrigin[True]]]()(format_flags, debug_mode, name.as_c_string_slice().unsafe_ptr())
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -3144,7 +3144,7 @@ fn set_gpu_buffer_name(device: Ptr[GPUDevice, AnyOrigin[True]], buffer: Ptr[GPUB
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetGPUBufferName.
     """
 
-    return _get_dylib_function[lib, "SDL_SetGPUBufferName", fn (device: Ptr[GPUDevice, AnyOrigin[True]], buffer: Ptr[GPUBuffer, AnyOrigin[True]], text: Ptr[c_char, AnyOrigin[False]]) -> None]()(device, buffer, text.unsafe_cstr_ptr())
+    return _get_dylib_function[lib, "SDL_SetGPUBufferName", fn (device: Ptr[GPUDevice, AnyOrigin[True]], buffer: Ptr[GPUBuffer, AnyOrigin[True]], text: Ptr[c_char, AnyOrigin[False]]) -> None]()(device, buffer, text.as_c_string_slice().unsafe_ptr())
 
 
 fn set_gpu_texture_name(device: Ptr[GPUDevice, AnyOrigin[True]], texture: Ptr[GPUTexture, AnyOrigin[True]], var text: String) raises -> None:
@@ -3166,7 +3166,7 @@ fn set_gpu_texture_name(device: Ptr[GPUDevice, AnyOrigin[True]], texture: Ptr[GP
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetGPUTextureName.
     """
 
-    return _get_dylib_function[lib, "SDL_SetGPUTextureName", fn (device: Ptr[GPUDevice, AnyOrigin[True]], texture: Ptr[GPUTexture, AnyOrigin[True]], text: Ptr[c_char, AnyOrigin[False]]) -> None]()(device, texture, text.unsafe_cstr_ptr())
+    return _get_dylib_function[lib, "SDL_SetGPUTextureName", fn (device: Ptr[GPUDevice, AnyOrigin[True]], texture: Ptr[GPUTexture, AnyOrigin[True]], text: Ptr[c_char, AnyOrigin[False]]) -> None]()(device, texture, text.as_c_string_slice().unsafe_ptr())
 
 
 fn insert_gpu_debug_label(command_buffer: Ptr[GPUCommandBuffer, AnyOrigin[True]], var text: String) raises -> None:
@@ -3181,7 +3181,7 @@ fn insert_gpu_debug_label(command_buffer: Ptr[GPUCommandBuffer, AnyOrigin[True]]
     Docs: https://wiki.libsdl.org/SDL3/SDL_InsertGPUDebugLabel.
     """
 
-    return _get_dylib_function[lib, "SDL_InsertGPUDebugLabel", fn (command_buffer: Ptr[GPUCommandBuffer, AnyOrigin[True]], text: Ptr[c_char, AnyOrigin[False]]) -> None]()(command_buffer, text.unsafe_cstr_ptr())
+    return _get_dylib_function[lib, "SDL_InsertGPUDebugLabel", fn (command_buffer: Ptr[GPUCommandBuffer, AnyOrigin[True]], text: Ptr[c_char, AnyOrigin[False]]) -> None]()(command_buffer, text.as_c_string_slice().unsafe_ptr())
 
 
 fn push_gpu_debug_group(command_buffer: Ptr[GPUCommandBuffer, AnyOrigin[True]], var name: String) raises -> None:
@@ -3205,7 +3205,7 @@ fn push_gpu_debug_group(command_buffer: Ptr[GPUCommandBuffer, AnyOrigin[True]], 
     Docs: https://wiki.libsdl.org/SDL3/SDL_PushGPUDebugGroup.
     """
 
-    return _get_dylib_function[lib, "SDL_PushGPUDebugGroup", fn (command_buffer: Ptr[GPUCommandBuffer, AnyOrigin[True]], name: Ptr[c_char, AnyOrigin[False]]) -> None]()(command_buffer, name.unsafe_cstr_ptr())
+    return _get_dylib_function[lib, "SDL_PushGPUDebugGroup", fn (command_buffer: Ptr[GPUCommandBuffer, AnyOrigin[True]], name: Ptr[c_char, AnyOrigin[False]]) -> None]()(command_buffer, name.as_c_string_slice().unsafe_ptr())
 
 
 fn pop_gpu_debug_group(command_buffer: Ptr[GPUCommandBuffer, AnyOrigin[True]]) raises -> None:

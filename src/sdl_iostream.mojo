@@ -271,7 +271,7 @@ fn io_from_file(var file: String, var mode: String) raises -> Ptr[IOStream, AnyO
     Docs: https://wiki.libsdl.org/SDL3/SDL_IOFromFile.
     """
 
-    return _get_dylib_function[lib, "SDL_IOFromFile", fn (file: Ptr[c_char, AnyOrigin[False]], mode: Ptr[c_char, AnyOrigin[False]]) -> Ptr[IOStream, AnyOrigin[True]]]()(file.unsafe_cstr_ptr(), mode.unsafe_cstr_ptr())
+    return _get_dylib_function[lib, "SDL_IOFromFile", fn (file: Ptr[c_char, AnyOrigin[False]], mode: Ptr[c_char, AnyOrigin[False]]) -> Ptr[IOStream, AnyOrigin[True]]]()(file.as_c_string_slice().unsafe_ptr(), mode.as_c_string_slice().unsafe_ptr())
 
 
 fn io_from_mem(mem: Ptr[NoneType, AnyOrigin[True]], size: c_size_t, out ret: Ptr[IOStream, AnyOrigin[True]]) raises:
@@ -719,7 +719,7 @@ fn load_file(var file: String, datasize: Ptr[c_size_t, AnyOrigin[True]], out ret
     Docs: https://wiki.libsdl.org/SDL3/SDL_LoadFile.
     """
 
-    ret = _get_dylib_function[lib, "SDL_LoadFile", fn (file: Ptr[c_char, AnyOrigin[False]], datasize: Ptr[c_size_t, AnyOrigin[True]]) -> Ptr[NoneType, AnyOrigin[True]]]()(file.unsafe_cstr_ptr(), datasize)
+    ret = _get_dylib_function[lib, "SDL_LoadFile", fn (file: Ptr[c_char, AnyOrigin[False]], datasize: Ptr[c_size_t, AnyOrigin[True]]) -> Ptr[NoneType, AnyOrigin[True]]]()(file.as_c_string_slice().unsafe_ptr(), datasize)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -769,7 +769,7 @@ fn save_file(var file: String, data: Ptr[NoneType, AnyOrigin[False]], datasize: 
     Docs: https://wiki.libsdl.org/SDL3/SDL_SaveFile.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SaveFile", fn (file: Ptr[c_char, AnyOrigin[False]], data: Ptr[NoneType, AnyOrigin[False]], datasize: c_size_t) -> Bool]()(file.unsafe_cstr_ptr(), data, datasize)
+    ret = _get_dylib_function[lib, "SDL_SaveFile", fn (file: Ptr[c_char, AnyOrigin[False]], data: Ptr[NoneType, AnyOrigin[False]], datasize: c_size_t) -> Bool]()(file.as_c_string_slice().unsafe_ptr(), data, datasize)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 

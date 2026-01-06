@@ -3,7 +3,7 @@
 # +--------------------------------------------------------------------------+ #
 
 """SDL3 Bindings in Mojo"""
-
+from memory import UnsafePointer
 from .sdl_audio import *
 from .sdl_blendmode import *
 from .sdl_camera import *
@@ -41,7 +41,7 @@ from .sdl_video import *
 
 
 comptime AnyOrigin[mut: Bool] = __mlir_attr[`#lit.any.origin<`, mut._mlir_value, `>: !lit.origin<`, mut._mlir_value, `>`]
-comptime Ptr = stdlib.memory.UnsafePointer
+comptime Ptr = UnsafePointer
 
 
 from sys import CompilationTarget, is_little_endian, is_big_endian

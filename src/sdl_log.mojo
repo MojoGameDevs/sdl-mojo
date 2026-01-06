@@ -251,7 +251,7 @@ fn set_log_priority_prefix(priority: LogPriority, var prefix: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetLogPriorityPrefix.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetLogPriorityPrefix", fn (priority: LogPriority, prefix: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(priority, prefix.unsafe_cstr_ptr())
+    ret = _get_dylib_function[lib, "SDL_SetLogPriorityPrefix", fn (priority: LogPriority, prefix: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(priority, prefix.as_c_string_slice().unsafe_ptr())
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 

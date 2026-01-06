@@ -140,7 +140,7 @@ fn get_pref_path(var org: String, var app: String) raises -> Ptr[c_char, AnyOrig
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetPrefPath.
     """
 
-    return _get_dylib_function[lib, "SDL_GetPrefPath", fn (org: Ptr[c_char, AnyOrigin[False]], app: Ptr[c_char, AnyOrigin[False]]) -> Ptr[c_char, AnyOrigin[True]]]()(org.unsafe_cstr_ptr(), app.unsafe_cstr_ptr())
+    return _get_dylib_function[lib, "SDL_GetPrefPath", fn (org: Ptr[c_char, AnyOrigin[False]], app: Ptr[c_char, AnyOrigin[False]]) -> Ptr[c_char, AnyOrigin[True]]]()(org.as_c_string_slice().unsafe_ptr(), app.as_c_string_slice().unsafe_ptr())
 
 
 @register_passable("trivial")
@@ -346,7 +346,7 @@ fn create_directory(var path: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateDirectory.
     """
 
-    ret = _get_dylib_function[lib, "SDL_CreateDirectory", fn (path: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(path.unsafe_cstr_ptr())
+    ret = _get_dylib_function[lib, "SDL_CreateDirectory", fn (path: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(path.as_c_string_slice().unsafe_ptr())
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -436,7 +436,7 @@ fn enumerate_directory(var path: String, callback: EnumerateDirectoryCallback, u
     Docs: https://wiki.libsdl.org/SDL3/SDL_EnumerateDirectory.
     """
 
-    ret = _get_dylib_function[lib, "SDL_EnumerateDirectory", fn (path: Ptr[c_char, AnyOrigin[False]], callback: EnumerateDirectoryCallback, userdata: Ptr[NoneType, AnyOrigin[True]]) -> Bool]()(path.unsafe_cstr_ptr(), callback, userdata)
+    ret = _get_dylib_function[lib, "SDL_EnumerateDirectory", fn (path: Ptr[c_char, AnyOrigin[False]], callback: EnumerateDirectoryCallback, userdata: Ptr[NoneType, AnyOrigin[True]]) -> Bool]()(path.as_c_string_slice().unsafe_ptr(), callback, userdata)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -457,7 +457,7 @@ fn remove_path(var path: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_RemovePath.
     """
 
-    ret = _get_dylib_function[lib, "SDL_RemovePath", fn (path: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(path.unsafe_cstr_ptr())
+    ret = _get_dylib_function[lib, "SDL_RemovePath", fn (path: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(path.as_c_string_slice().unsafe_ptr())
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -487,7 +487,7 @@ fn rename_path(var oldpath: String, var newpath: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_RenamePath.
     """
 
-    ret = _get_dylib_function[lib, "SDL_RenamePath", fn (oldpath: Ptr[c_char, AnyOrigin[False]], newpath: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(oldpath.unsafe_cstr_ptr(), newpath.unsafe_cstr_ptr())
+    ret = _get_dylib_function[lib, "SDL_RenamePath", fn (oldpath: Ptr[c_char, AnyOrigin[False]], newpath: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(oldpath.as_c_string_slice().unsafe_ptr(), newpath.as_c_string_slice().unsafe_ptr())
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -534,7 +534,7 @@ fn copy_file(var oldpath: String, var newpath: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_CopyFile.
     """
 
-    ret = _get_dylib_function[lib, "SDL_CopyFile", fn (oldpath: Ptr[c_char, AnyOrigin[False]], newpath: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(oldpath.unsafe_cstr_ptr(), newpath.unsafe_cstr_ptr())
+    ret = _get_dylib_function[lib, "SDL_CopyFile", fn (oldpath: Ptr[c_char, AnyOrigin[False]], newpath: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(oldpath.as_c_string_slice().unsafe_ptr(), newpath.as_c_string_slice().unsafe_ptr())
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -554,7 +554,7 @@ fn get_path_info(var path: String, info: Ptr[PathInfo, AnyOrigin[True]]) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetPathInfo.
     """
 
-    ret = _get_dylib_function[lib, "SDL_GetPathInfo", fn (path: Ptr[c_char, AnyOrigin[False]], info: Ptr[PathInfo, AnyOrigin[True]]) -> Bool]()(path.unsafe_cstr_ptr(), info)
+    ret = _get_dylib_function[lib, "SDL_GetPathInfo", fn (path: Ptr[c_char, AnyOrigin[False]], info: Ptr[PathInfo, AnyOrigin[True]]) -> Bool]()(path.as_c_string_slice().unsafe_ptr(), info)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -595,7 +595,7 @@ fn glob_directory(var path: String, var pattern: String, flags: GlobFlags, count
     Docs: https://wiki.libsdl.org/SDL3/SDL_GlobDirectory.
     """
 
-    ret = _get_dylib_function[lib, "SDL_GlobDirectory", fn (path: Ptr[c_char, AnyOrigin[False]], pattern: Ptr[c_char, AnyOrigin[False]], flags: GlobFlags, count: Ptr[c_int, AnyOrigin[True]]) -> Ptr[Ptr[c_char, AnyOrigin[True]], AnyOrigin[True]]]()(path.unsafe_cstr_ptr(), pattern.unsafe_cstr_ptr(), flags, count)
+    ret = _get_dylib_function[lib, "SDL_GlobDirectory", fn (path: Ptr[c_char, AnyOrigin[False]], pattern: Ptr[c_char, AnyOrigin[False]], flags: GlobFlags, count: Ptr[c_int, AnyOrigin[True]]) -> Ptr[Ptr[c_char, AnyOrigin[True]], AnyOrigin[True]]]()(path.as_c_string_slice().unsafe_ptr(), pattern.as_c_string_slice().unsafe_ptr(), flags, count)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 

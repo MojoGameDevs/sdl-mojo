@@ -88,7 +88,7 @@ fn set_hint_with_priority(var name: String, var value: String, priority: HintPri
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetHintWithPriority.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetHintWithPriority", fn (name: Ptr[c_char, AnyOrigin[False]], value: Ptr[c_char, AnyOrigin[False]], priority: HintPriority) -> Bool]()(name.unsafe_cstr_ptr(), value.unsafe_cstr_ptr(), priority)
+    ret = _get_dylib_function[lib, "SDL_SetHintWithPriority", fn (name: Ptr[c_char, AnyOrigin[False]], value: Ptr[c_char, AnyOrigin[False]], priority: HintPriority) -> Bool]()(name.as_c_string_slice().unsafe_ptr(), value.as_c_string_slice().unsafe_ptr(), priority)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -114,7 +114,7 @@ fn set_hint(var name: String, var value: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetHint.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetHint", fn (name: Ptr[c_char, AnyOrigin[False]], value: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(name.unsafe_cstr_ptr(), value.unsafe_cstr_ptr())
+    ret = _get_dylib_function[lib, "SDL_SetHint", fn (name: Ptr[c_char, AnyOrigin[False]], value: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(name.as_c_string_slice().unsafe_ptr(), value.as_c_string_slice().unsafe_ptr())
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -139,7 +139,7 @@ fn reset_hint(var name: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_ResetHint.
     """
 
-    ret = _get_dylib_function[lib, "SDL_ResetHint", fn (name: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(name.unsafe_cstr_ptr())
+    ret = _get_dylib_function[lib, "SDL_ResetHint", fn (name: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(name.as_c_string_slice().unsafe_ptr())
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -180,7 +180,7 @@ fn get_hint(var name: String) raises -> Ptr[c_char, AnyOrigin[False]]:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetHint.
     """
 
-    return _get_dylib_function[lib, "SDL_GetHint", fn (name: Ptr[c_char, AnyOrigin[False]]) -> Ptr[c_char, AnyOrigin[False]]]()(name.unsafe_cstr_ptr())
+    return _get_dylib_function[lib, "SDL_GetHint", fn (name: Ptr[c_char, AnyOrigin[False]]) -> Ptr[c_char, AnyOrigin[False]]]()(name.as_c_string_slice().unsafe_ptr())
 
 
 fn get_hint_boolean(var name: String, default_value: Bool) raises -> Bool:
@@ -200,7 +200,7 @@ fn get_hint_boolean(var name: String, default_value: Bool) raises -> Bool:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetHintBoolean.
     """
 
-    return _get_dylib_function[lib, "SDL_GetHintBoolean", fn (name: Ptr[c_char, AnyOrigin[False]], default_value: Bool) -> Bool]()(name.unsafe_cstr_ptr(), default_value)
+    return _get_dylib_function[lib, "SDL_GetHintBoolean", fn (name: Ptr[c_char, AnyOrigin[False]], default_value: Bool) -> Bool]()(name.as_c_string_slice().unsafe_ptr(), default_value)
 
 
 comptime HintCallback = fn (userdata: Ptr[NoneType, AnyOrigin[True]], name: Ptr[c_char, AnyOrigin[False]], old_value: Ptr[c_char, AnyOrigin[False]], new_value: Ptr[c_char, AnyOrigin[False]]) -> None
@@ -246,7 +246,7 @@ fn add_hint_callback(var name: String, callback: HintCallback, userdata: Ptr[Non
     Docs: https://wiki.libsdl.org/SDL3/SDL_AddHintCallback.
     """
 
-    ret = _get_dylib_function[lib, "SDL_AddHintCallback", fn (name: Ptr[c_char, AnyOrigin[False]], callback: HintCallback, userdata: Ptr[NoneType, AnyOrigin[True]]) -> Bool]()(name.unsafe_cstr_ptr(), callback, userdata)
+    ret = _get_dylib_function[lib, "SDL_AddHintCallback", fn (name: Ptr[c_char, AnyOrigin[False]], callback: HintCallback, userdata: Ptr[NoneType, AnyOrigin[True]]) -> Bool]()(name.as_c_string_slice().unsafe_ptr(), callback, userdata)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -266,4 +266,4 @@ fn remove_hint_callback(var name: String, callback: HintCallback, userdata: Ptr[
     Docs: https://wiki.libsdl.org/SDL3/SDL_RemoveHintCallback.
     """
 
-    return _get_dylib_function[lib, "SDL_RemoveHintCallback", fn (name: Ptr[c_char, AnyOrigin[False]], callback: HintCallback, userdata: Ptr[NoneType, AnyOrigin[True]]) -> None]()(name.unsafe_cstr_ptr(), callback, userdata)
+    return _get_dylib_function[lib, "SDL_RemoveHintCallback", fn (name: Ptr[c_char, AnyOrigin[False]], callback: HintCallback, userdata: Ptr[NoneType, AnyOrigin[True]]) -> None]()(name.as_c_string_slice().unsafe_ptr(), callback, userdata)

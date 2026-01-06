@@ -259,7 +259,7 @@ fn set_pointer_property_with_cleanup(props: PropertiesID, var name: String, valu
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetPointerPropertyWithCleanup.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetPointerPropertyWithCleanup", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]], value: Ptr[NoneType, AnyOrigin[True]], cleanup: CleanupPropertyCallback, userdata: Ptr[NoneType, AnyOrigin[True]]) -> Bool]()(props, name.unsafe_cstr_ptr(), value, cleanup, userdata)
+    ret = _get_dylib_function[lib, "SDL_SetPointerPropertyWithCleanup", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]], value: Ptr[NoneType, AnyOrigin[True]], cleanup: CleanupPropertyCallback, userdata: Ptr[NoneType, AnyOrigin[True]]) -> Bool]()(props, name.as_c_string_slice().unsafe_ptr(), value, cleanup, userdata)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -282,7 +282,7 @@ fn set_pointer_property(props: PropertiesID, var name: String, value: Ptr[NoneTy
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetPointerProperty.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetPointerProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]], value: Ptr[NoneType, AnyOrigin[True]]) -> Bool]()(props, name.unsafe_cstr_ptr(), value)
+    ret = _get_dylib_function[lib, "SDL_SetPointerProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]], value: Ptr[NoneType, AnyOrigin[True]]) -> Bool]()(props, name.as_c_string_slice().unsafe_ptr(), value)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -308,7 +308,7 @@ fn set_string_property(props: PropertiesID, var name: String, var value: String)
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetStringProperty.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetStringProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]], value: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(props, name.unsafe_cstr_ptr(), value.unsafe_cstr_ptr())
+    ret = _get_dylib_function[lib, "SDL_SetStringProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]], value: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(props, name.as_c_string_slice().unsafe_ptr(), value.as_c_string_slice().unsafe_ptr())
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -331,7 +331,7 @@ fn set_number_property(props: PropertiesID, var name: String, value: Int64) rais
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetNumberProperty.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetNumberProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]], value: Int64) -> Bool]()(props, name.unsafe_cstr_ptr(), value)
+    ret = _get_dylib_function[lib, "SDL_SetNumberProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]], value: Int64) -> Bool]()(props, name.as_c_string_slice().unsafe_ptr(), value)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -354,7 +354,7 @@ fn set_float_property(props: PropertiesID, var name: String, value: c_float) rai
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetFloatProperty.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetFloatProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]], value: c_float) -> Bool]()(props, name.unsafe_cstr_ptr(), value)
+    ret = _get_dylib_function[lib, "SDL_SetFloatProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]], value: c_float) -> Bool]()(props, name.as_c_string_slice().unsafe_ptr(), value)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -377,7 +377,7 @@ fn set_boolean_property(props: PropertiesID, var name: String, value: Bool) rais
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetBooleanProperty.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetBooleanProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]], value: Bool) -> Bool]()(props, name.unsafe_cstr_ptr(), value)
+    ret = _get_dylib_function[lib, "SDL_SetBooleanProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]], value: Bool) -> Bool]()(props, name.as_c_string_slice().unsafe_ptr(), value)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -398,7 +398,7 @@ fn has_property(props: PropertiesID, var name: String) raises -> Bool:
     Docs: https://wiki.libsdl.org/SDL3/SDL_HasProperty.
     """
 
-    return _get_dylib_function[lib, "SDL_HasProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(props, name.unsafe_cstr_ptr())
+    return _get_dylib_function[lib, "SDL_HasProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(props, name.as_c_string_slice().unsafe_ptr())
 
 
 fn get_property_type(props: PropertiesID, var name: String) raises -> PropertyType:
@@ -418,7 +418,7 @@ fn get_property_type(props: PropertiesID, var name: String) raises -> PropertyTy
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetPropertyType.
     """
 
-    return _get_dylib_function[lib, "SDL_GetPropertyType", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]]) -> PropertyType]()(props, name.unsafe_cstr_ptr())
+    return _get_dylib_function[lib, "SDL_GetPropertyType", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]]) -> PropertyType]()(props, name.as_c_string_slice().unsafe_ptr())
 
 
 fn get_pointer_property(props: PropertiesID, var name: String, default_value: Ptr[NoneType, AnyOrigin[True]]) raises -> Ptr[NoneType, AnyOrigin[True]]:
@@ -449,7 +449,7 @@ fn get_pointer_property(props: PropertiesID, var name: String, default_value: Pt
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetPointerProperty.
     """
 
-    return _get_dylib_function[lib, "SDL_GetPointerProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]], default_value: Ptr[NoneType, AnyOrigin[True]]) -> Ptr[NoneType, AnyOrigin[True]]]()(props, name.unsafe_cstr_ptr(), default_value)
+    return _get_dylib_function[lib, "SDL_GetPointerProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]], default_value: Ptr[NoneType, AnyOrigin[True]]) -> Ptr[NoneType, AnyOrigin[True]]]()(props, name.as_c_string_slice().unsafe_ptr(), default_value)
 
 
 fn get_string_property(props: PropertiesID, var name: String, var default_value: String) raises -> Ptr[c_char, AnyOrigin[False]]:
@@ -475,7 +475,7 @@ fn get_string_property(props: PropertiesID, var name: String, var default_value:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetStringProperty.
     """
 
-    return _get_dylib_function[lib, "SDL_GetStringProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]], default_value: Ptr[c_char, AnyOrigin[False]]) -> Ptr[c_char, AnyOrigin[False]]]()(props, name.unsafe_cstr_ptr(), default_value.unsafe_cstr_ptr())
+    return _get_dylib_function[lib, "SDL_GetStringProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]], default_value: Ptr[c_char, AnyOrigin[False]]) -> Ptr[c_char, AnyOrigin[False]]]()(props, name.as_c_string_slice().unsafe_ptr(), default_value.as_c_string_slice().unsafe_ptr())
 
 
 fn get_number_property(props: PropertiesID, var name: String, default_value: Int64) raises -> Int64:
@@ -499,7 +499,7 @@ fn get_number_property(props: PropertiesID, var name: String, default_value: Int
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetNumberProperty.
     """
 
-    return _get_dylib_function[lib, "SDL_GetNumberProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]], default_value: Int64) -> Int64]()(props, name.unsafe_cstr_ptr(), default_value)
+    return _get_dylib_function[lib, "SDL_GetNumberProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]], default_value: Int64) -> Int64]()(props, name.as_c_string_slice().unsafe_ptr(), default_value)
 
 
 fn get_float_property(props: PropertiesID, var name: String, default_value: c_float) raises -> c_float:
@@ -523,7 +523,7 @@ fn get_float_property(props: PropertiesID, var name: String, default_value: c_fl
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetFloatProperty.
     """
 
-    return _get_dylib_function[lib, "SDL_GetFloatProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]], default_value: c_float) -> c_float]()(props, name.unsafe_cstr_ptr(), default_value)
+    return _get_dylib_function[lib, "SDL_GetFloatProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]], default_value: c_float) -> c_float]()(props, name.as_c_string_slice().unsafe_ptr(), default_value)
 
 
 fn get_boolean_property(props: PropertiesID, var name: String, default_value: Bool) raises -> Bool:
@@ -547,7 +547,7 @@ fn get_boolean_property(props: PropertiesID, var name: String, default_value: Bo
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetBooleanProperty.
     """
 
-    return _get_dylib_function[lib, "SDL_GetBooleanProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]], default_value: Bool) -> Bool]()(props, name.unsafe_cstr_ptr(), default_value)
+    return _get_dylib_function[lib, "SDL_GetBooleanProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]], default_value: Bool) -> Bool]()(props, name.as_c_string_slice().unsafe_ptr(), default_value)
 
 
 fn clear_property(props: PropertiesID, var name: String) raises:
@@ -567,7 +567,7 @@ fn clear_property(props: PropertiesID, var name: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_ClearProperty.
     """
 
-    ret = _get_dylib_function[lib, "SDL_ClearProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(props, name.unsafe_cstr_ptr())
+    ret = _get_dylib_function[lib, "SDL_ClearProperty", fn (props: PropertiesID, name: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(props, name.as_c_string_slice().unsafe_ptr())
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 

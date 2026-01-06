@@ -233,7 +233,7 @@ fn create_window_and_renderer(var title: String, width: c_int, height: c_int, wi
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateWindowAndRenderer.
     """
 
-    ret = _get_dylib_function[lib, "SDL_CreateWindowAndRenderer", fn (title: Ptr[c_char, AnyOrigin[False]], width: c_int, height: c_int, window_flags: WindowFlags, window: Ptr[Ptr[Window, AnyOrigin[True]], AnyOrigin[True]], renderer: Ptr[Ptr[Renderer, AnyOrigin[True]], AnyOrigin[True]]) -> Bool]()(title.unsafe_cstr_ptr(), width, height, window_flags, window, renderer)
+    ret = _get_dylib_function[lib, "SDL_CreateWindowAndRenderer", fn (title: Ptr[c_char, AnyOrigin[False]], width: c_int, height: c_int, window_flags: WindowFlags, window: Ptr[Ptr[Window, AnyOrigin[True]], AnyOrigin[True]], renderer: Ptr[Ptr[Renderer, AnyOrigin[True]], AnyOrigin[True]]) -> Bool]()(title.as_c_string_slice().unsafe_ptr(), width, height, window_flags, window, renderer)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -269,7 +269,7 @@ fn create_renderer(window: Ptr[Window, AnyOrigin[True]], var name: String) raise
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateRenderer.
     """
 
-    return _get_dylib_function[lib, "SDL_CreateRenderer", fn (window: Ptr[Window, AnyOrigin[True]], name: Ptr[c_char, AnyOrigin[False]]) -> Ptr[Renderer, AnyOrigin[True]]]()(window, name.unsafe_cstr_ptr())
+    return _get_dylib_function[lib, "SDL_CreateRenderer", fn (window: Ptr[Window, AnyOrigin[True]], name: Ptr[c_char, AnyOrigin[False]]) -> Ptr[Renderer, AnyOrigin[True]]]()(window, name.as_c_string_slice().unsafe_ptr())
 
 
 fn create_renderer_with_properties(props: PropertiesID) raises -> Ptr[Renderer, AnyOrigin[True]]:
@@ -2926,6 +2926,6 @@ fn render_debug_text(renderer: Ptr[Renderer, AnyOrigin[True]], x: c_float, y: c_
     Docs: https://wiki.libsdl.org/SDL3/SDL_RenderDebugText.
     """
 
-    ret = _get_dylib_function[lib, "SDL_RenderDebugText", fn (renderer: Ptr[Renderer, AnyOrigin[True]], x: c_float, y: c_float, str: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(renderer, x, y, str.unsafe_cstr_ptr())
+    ret = _get_dylib_function[lib, "SDL_RenderDebugText", fn (renderer: Ptr[Renderer, AnyOrigin[True]], x: c_float, y: c_float, str: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(renderer, x, y, str.as_c_string_slice().unsafe_ptr())
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))

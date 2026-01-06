@@ -617,7 +617,7 @@ fn load_bmp(var file: String, out ret: Ptr[Surface, AnyOrigin[True]]) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_LoadBMP.
     """
 
-    ret = _get_dylib_function[lib, "SDL_LoadBMP", fn (file: Ptr[c_char, AnyOrigin[False]]) -> Ptr[Surface, AnyOrigin[True]]]()(file.unsafe_cstr_ptr())
+    ret = _get_dylib_function[lib, "SDL_LoadBMP", fn (file: Ptr[c_char, AnyOrigin[False]]) -> Ptr[Surface, AnyOrigin[True]]]()(file.as_c_string_slice().unsafe_ptr())
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -675,7 +675,7 @@ fn save_bmp(surface: Ptr[Surface, AnyOrigin[True]], var file: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_SaveBMP.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SaveBMP", fn (surface: Ptr[Surface, AnyOrigin[True]], file: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(surface, file.unsafe_cstr_ptr())
+    ret = _get_dylib_function[lib, "SDL_SaveBMP", fn (surface: Ptr[Surface, AnyOrigin[True]], file: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(surface, file.as_c_string_slice().unsafe_ptr())
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 

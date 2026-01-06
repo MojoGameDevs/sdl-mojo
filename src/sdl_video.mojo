@@ -1392,7 +1392,7 @@ fn create_window(var title: String, w: c_int, h: c_int, flags: WindowFlags, out 
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateWindow.
     """
 
-    ret = _get_dylib_function[lib, "SDL_CreateWindow", fn (title: Ptr[c_char, AnyOrigin[False]], w: c_int, h: c_int, flags: WindowFlags) -> Ptr[Window, AnyOrigin[True]]]()(title.unsafe_cstr_ptr(), w, h, flags)
+    ret = _get_dylib_function[lib, "SDL_CreateWindow", fn (title: Ptr[c_char, AnyOrigin[False]], w: c_int, h: c_int, flags: WindowFlags) -> Ptr[Window, AnyOrigin[True]]]()(title.as_c_string_slice().unsafe_ptr(), w, h, flags)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -1835,7 +1835,7 @@ fn set_window_title(window: Ptr[Window, AnyOrigin[True]], var title: String) rai
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetWindowTitle.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetWindowTitle", fn (window: Ptr[Window, AnyOrigin[True]], title: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(window, title.unsafe_cstr_ptr())
+    ret = _get_dylib_function[lib, "SDL_SetWindowTitle", fn (window: Ptr[Window, AnyOrigin[True]], title: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(window, title.as_c_string_slice().unsafe_ptr())
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -3419,7 +3419,7 @@ fn gl_load_library(var path: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GL_LoadLibrary.
     """
 
-    ret = _get_dylib_function[lib, "SDL_GL_LoadLibrary", fn (path: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(path.unsafe_cstr_ptr())
+    ret = _get_dylib_function[lib, "SDL_GL_LoadLibrary", fn (path: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(path.as_c_string_slice().unsafe_ptr())
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -3478,7 +3478,7 @@ fn gl_get_proc_address(var proc: String) raises -> fn () -> None:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GL_GetProcAddress.
     """
 
-    return _get_dylib_function[lib, "SDL_GL_GetProcAddress", fn (proc: Ptr[c_char, AnyOrigin[False]]) -> fn () -> None]()(proc.unsafe_cstr_ptr())
+    return _get_dylib_function[lib, "SDL_GL_GetProcAddress", fn (proc: Ptr[c_char, AnyOrigin[False]]) -> fn () -> None]()(proc.as_c_string_slice().unsafe_ptr())
 
 
 fn egl_get_proc_address(var proc: String) raises -> fn () -> None:
@@ -3501,7 +3501,7 @@ fn egl_get_proc_address(var proc: String) raises -> fn () -> None:
     Docs: https://wiki.libsdl.org/SDL3/SDL_EGL_GetProcAddress.
     """
 
-    return _get_dylib_function[lib, "SDL_EGL_GetProcAddress", fn (proc: Ptr[c_char, AnyOrigin[False]]) -> fn () -> None]()(proc.unsafe_cstr_ptr())
+    return _get_dylib_function[lib, "SDL_EGL_GetProcAddress", fn (proc: Ptr[c_char, AnyOrigin[False]]) -> fn () -> None]()(proc.as_c_string_slice().unsafe_ptr())
 
 
 fn gl_unload_library() raises -> None:
@@ -3542,7 +3542,7 @@ fn gl_extension_supported(var extension: String) raises -> Bool:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GL_ExtensionSupported.
     """
 
-    return _get_dylib_function[lib, "SDL_GL_ExtensionSupported", fn (extension: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(extension.unsafe_cstr_ptr())
+    return _get_dylib_function[lib, "SDL_GL_ExtensionSupported", fn (extension: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(extension.as_c_string_slice().unsafe_ptr())
 
 
 fn gl_reset_attributes() raises -> None:

@@ -323,7 +323,7 @@ fn open_title_storage(var override: String, props: PropertiesID, out ret: Ptr[St
     Docs: https://wiki.libsdl.org/SDL3/SDL_OpenTitleStorage.
     """
 
-    ret = _get_dylib_function[lib, "SDL_OpenTitleStorage", fn (override: Ptr[c_char, AnyOrigin[False]], props: PropertiesID) -> Ptr[Storage, AnyOrigin[True]]]()(override.unsafe_cstr_ptr(), props)
+    ret = _get_dylib_function[lib, "SDL_OpenTitleStorage", fn (override: Ptr[c_char, AnyOrigin[False]], props: PropertiesID) -> Ptr[Storage, AnyOrigin[True]]]()(override.as_c_string_slice().unsafe_ptr(), props)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -348,7 +348,7 @@ fn open_user_storage(var org: String, var app: String, props: PropertiesID, out 
     Docs: https://wiki.libsdl.org/SDL3/SDL_OpenUserStorage.
     """
 
-    ret = _get_dylib_function[lib, "SDL_OpenUserStorage", fn (org: Ptr[c_char, AnyOrigin[False]], app: Ptr[c_char, AnyOrigin[False]], props: PropertiesID) -> Ptr[Storage, AnyOrigin[True]]]()(org.unsafe_cstr_ptr(), app.unsafe_cstr_ptr(), props)
+    ret = _get_dylib_function[lib, "SDL_OpenUserStorage", fn (org: Ptr[c_char, AnyOrigin[False]], app: Ptr[c_char, AnyOrigin[False]], props: PropertiesID) -> Ptr[Storage, AnyOrigin[True]]]()(org.as_c_string_slice().unsafe_ptr(), app.as_c_string_slice().unsafe_ptr(), props)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -371,7 +371,7 @@ fn open_file_storage(var path: String, out ret: Ptr[Storage, AnyOrigin[True]]) r
     Docs: https://wiki.libsdl.org/SDL3/SDL_OpenFileStorage.
     """
 
-    ret = _get_dylib_function[lib, "SDL_OpenFileStorage", fn (path: Ptr[c_char, AnyOrigin[False]]) -> Ptr[Storage, AnyOrigin[True]]]()(path.unsafe_cstr_ptr())
+    ret = _get_dylib_function[lib, "SDL_OpenFileStorage", fn (path: Ptr[c_char, AnyOrigin[False]]) -> Ptr[Storage, AnyOrigin[True]]]()(path.as_c_string_slice().unsafe_ptr())
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -457,7 +457,7 @@ fn get_storage_file_size(storage: Ptr[Storage, AnyOrigin[True]], var path: Strin
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetStorageFileSize.
     """
 
-    return _get_dylib_function[lib, "SDL_GetStorageFileSize", fn (storage: Ptr[Storage, AnyOrigin[True]], path: Ptr[c_char, AnyOrigin[False]], length: Ptr[UInt64, AnyOrigin[True]]) -> Bool]()(storage, path.unsafe_cstr_ptr(), length)
+    return _get_dylib_function[lib, "SDL_GetStorageFileSize", fn (storage: Ptr[Storage, AnyOrigin[True]], path: Ptr[c_char, AnyOrigin[False]], length: Ptr[UInt64, AnyOrigin[True]]) -> Bool]()(storage, path.as_c_string_slice().unsafe_ptr(), length)
 
 
 fn read_storage_file(storage: Ptr[Storage, AnyOrigin[True]], var path: String, destination: Ptr[NoneType, AnyOrigin[True]], length: UInt64) raises -> Bool:
@@ -481,7 +481,7 @@ fn read_storage_file(storage: Ptr[Storage, AnyOrigin[True]], var path: String, d
     Docs: https://wiki.libsdl.org/SDL3/SDL_ReadStorageFile.
     """
 
-    return _get_dylib_function[lib, "SDL_ReadStorageFile", fn (storage: Ptr[Storage, AnyOrigin[True]], path: Ptr[c_char, AnyOrigin[False]], destination: Ptr[NoneType, AnyOrigin[True]], length: UInt64) -> Bool]()(storage, path.unsafe_cstr_ptr(), destination, length)
+    return _get_dylib_function[lib, "SDL_ReadStorageFile", fn (storage: Ptr[Storage, AnyOrigin[True]], path: Ptr[c_char, AnyOrigin[False]], destination: Ptr[NoneType, AnyOrigin[True]], length: UInt64) -> Bool]()(storage, path.as_c_string_slice().unsafe_ptr(), destination, length)
 
 
 fn write_storage_file(storage: Ptr[Storage, AnyOrigin[True]], var path: String, source: Ptr[NoneType, AnyOrigin[False]], length: UInt64) raises -> Bool:
@@ -500,7 +500,7 @@ fn write_storage_file(storage: Ptr[Storage, AnyOrigin[True]], var path: String, 
     Docs: https://wiki.libsdl.org/SDL3/SDL_WriteStorageFile.
     """
 
-    return _get_dylib_function[lib, "SDL_WriteStorageFile", fn (storage: Ptr[Storage, AnyOrigin[True]], path: Ptr[c_char, AnyOrigin[False]], source: Ptr[NoneType, AnyOrigin[False]], length: UInt64) -> Bool]()(storage, path.unsafe_cstr_ptr(), source, length)
+    return _get_dylib_function[lib, "SDL_WriteStorageFile", fn (storage: Ptr[Storage, AnyOrigin[True]], path: Ptr[c_char, AnyOrigin[False]], source: Ptr[NoneType, AnyOrigin[False]], length: UInt64) -> Bool]()(storage, path.as_c_string_slice().unsafe_ptr(), source, length)
 
 
 fn create_storage_directory(storage: Ptr[Storage, AnyOrigin[True]], var path: String) raises:
@@ -517,7 +517,7 @@ fn create_storage_directory(storage: Ptr[Storage, AnyOrigin[True]], var path: St
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateStorageDirectory.
     """
 
-    ret = _get_dylib_function[lib, "SDL_CreateStorageDirectory", fn (storage: Ptr[Storage, AnyOrigin[True]], path: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(storage, path.unsafe_cstr_ptr())
+    ret = _get_dylib_function[lib, "SDL_CreateStorageDirectory", fn (storage: Ptr[Storage, AnyOrigin[True]], path: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(storage, path.as_c_string_slice().unsafe_ptr())
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -551,7 +551,7 @@ fn enumerate_storage_directory(storage: Ptr[Storage, AnyOrigin[True]], var path:
     Docs: https://wiki.libsdl.org/SDL3/SDL_EnumerateStorageDirectory.
     """
 
-    ret = _get_dylib_function[lib, "SDL_EnumerateStorageDirectory", fn (storage: Ptr[Storage, AnyOrigin[True]], path: Ptr[c_char, AnyOrigin[False]], callback: EnumerateDirectoryCallback, userdata: Ptr[NoneType, AnyOrigin[True]]) -> Bool]()(storage, path.unsafe_cstr_ptr(), callback, userdata)
+    ret = _get_dylib_function[lib, "SDL_EnumerateStorageDirectory", fn (storage: Ptr[Storage, AnyOrigin[True]], path: Ptr[c_char, AnyOrigin[False]], callback: EnumerateDirectoryCallback, userdata: Ptr[NoneType, AnyOrigin[True]]) -> Bool]()(storage, path.as_c_string_slice().unsafe_ptr(), callback, userdata)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -570,7 +570,7 @@ fn remove_storage_path(storage: Ptr[Storage, AnyOrigin[True]], var path: String)
     Docs: https://wiki.libsdl.org/SDL3/SDL_RemoveStoragePath.
     """
 
-    ret = _get_dylib_function[lib, "SDL_RemoveStoragePath", fn (storage: Ptr[Storage, AnyOrigin[True]], path: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(storage, path.unsafe_cstr_ptr())
+    ret = _get_dylib_function[lib, "SDL_RemoveStoragePath", fn (storage: Ptr[Storage, AnyOrigin[True]], path: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(storage, path.as_c_string_slice().unsafe_ptr())
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -590,7 +590,7 @@ fn rename_storage_path(storage: Ptr[Storage, AnyOrigin[True]], var oldpath: Stri
     Docs: https://wiki.libsdl.org/SDL3/SDL_RenameStoragePath.
     """
 
-    ret = _get_dylib_function[lib, "SDL_RenameStoragePath", fn (storage: Ptr[Storage, AnyOrigin[True]], oldpath: Ptr[c_char, AnyOrigin[False]], newpath: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(storage, oldpath.unsafe_cstr_ptr(), newpath.unsafe_cstr_ptr())
+    ret = _get_dylib_function[lib, "SDL_RenameStoragePath", fn (storage: Ptr[Storage, AnyOrigin[True]], oldpath: Ptr[c_char, AnyOrigin[False]], newpath: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(storage, oldpath.as_c_string_slice().unsafe_ptr(), newpath.as_c_string_slice().unsafe_ptr())
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -610,7 +610,7 @@ fn copy_storage_file(storage: Ptr[Storage, AnyOrigin[True]], var oldpath: String
     Docs: https://wiki.libsdl.org/SDL3/SDL_CopyStorageFile.
     """
 
-    ret = _get_dylib_function[lib, "SDL_CopyStorageFile", fn (storage: Ptr[Storage, AnyOrigin[True]], oldpath: Ptr[c_char, AnyOrigin[False]], newpath: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(storage, oldpath.unsafe_cstr_ptr(), newpath.unsafe_cstr_ptr())
+    ret = _get_dylib_function[lib, "SDL_CopyStorageFile", fn (storage: Ptr[Storage, AnyOrigin[True]], oldpath: Ptr[c_char, AnyOrigin[False]], newpath: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(storage, oldpath.as_c_string_slice().unsafe_ptr(), newpath.as_c_string_slice().unsafe_ptr())
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -631,7 +631,7 @@ fn get_storage_path_info(storage: Ptr[Storage, AnyOrigin[True]], var path: Strin
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetStoragePathInfo.
     """
 
-    ret = _get_dylib_function[lib, "SDL_GetStoragePathInfo", fn (storage: Ptr[Storage, AnyOrigin[True]], path: Ptr[c_char, AnyOrigin[False]], info: Ptr[PathInfo, AnyOrigin[True]]) -> Bool]()(storage, path.unsafe_cstr_ptr(), info)
+    ret = _get_dylib_function[lib, "SDL_GetStoragePathInfo", fn (storage: Ptr[Storage, AnyOrigin[True]], path: Ptr[c_char, AnyOrigin[False]], info: Ptr[PathInfo, AnyOrigin[True]]) -> Bool]()(storage, path.as_c_string_slice().unsafe_ptr(), info)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 
@@ -694,6 +694,6 @@ fn glob_storage_directory(storage: Ptr[Storage, AnyOrigin[True]], var path: Stri
     Docs: https://wiki.libsdl.org/SDL3/SDL_GlobStorageDirectory.
     """
 
-    ret = _get_dylib_function[lib, "SDL_GlobStorageDirectory", fn (storage: Ptr[Storage, AnyOrigin[True]], path: Ptr[c_char, AnyOrigin[False]], pattern: Ptr[c_char, AnyOrigin[False]], flags: GlobFlags, count: Ptr[c_int, AnyOrigin[True]]) -> Ptr[Ptr[c_char, AnyOrigin[True]], AnyOrigin[True]]]()(storage, path.unsafe_cstr_ptr(), pattern.unsafe_cstr_ptr(), flags, count)
+    ret = _get_dylib_function[lib, "SDL_GlobStorageDirectory", fn (storage: Ptr[Storage, AnyOrigin[True]], path: Ptr[c_char, AnyOrigin[False]], pattern: Ptr[c_char, AnyOrigin[False]], flags: GlobFlags, count: Ptr[c_int, AnyOrigin[True]]) -> Ptr[Ptr[c_char, AnyOrigin[True]], AnyOrigin[True]]]()(storage, path.as_c_string_slice().unsafe_ptr(), pattern.as_c_string_slice().unsafe_ptr(), flags, count)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))

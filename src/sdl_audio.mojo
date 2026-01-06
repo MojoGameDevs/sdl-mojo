@@ -2113,7 +2113,7 @@ fn load_wav(var path: String, spec: Ptr[AudioSpec, AnyOrigin[True]], audio_buf: 
     Docs: https://wiki.libsdl.org/SDL3/SDL_LoadWAV.
     """
 
-    ret = _get_dylib_function[lib, "SDL_LoadWAV", fn (path: Ptr[c_char, AnyOrigin[False]], spec: Ptr[AudioSpec, AnyOrigin[True]], audio_buf: Ptr[Ptr[UInt8, AnyOrigin[True]], AnyOrigin[True]], audio_len: Ptr[UInt32, AnyOrigin[True]]) -> Bool]()(path.unsafe_cstr_ptr(), spec, audio_buf, audio_len)
+    ret = _get_dylib_function[lib, "SDL_LoadWAV", fn (path: Ptr[c_char, AnyOrigin[False]], spec: Ptr[AudioSpec, AnyOrigin[True]], audio_buf: Ptr[Ptr[UInt8, AnyOrigin[True]], AnyOrigin[True]], audio_len: Ptr[UInt32, AnyOrigin[True]]) -> Bool]()(path.as_c_string_slice().unsafe_ptr(), spec, audio_buf, audio_len)
     if not ret:
         raise Error(String(unsafe_from_utf8_ptr=get_error()))
 

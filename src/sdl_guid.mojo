@@ -88,4 +88,4 @@ fn string_to_guid(var pch_guid: String) raises -> GUID:
     Docs: https://wiki.libsdl.org/SDL3/SDL_StringToGUID.
     """
 
-    return _get_dylib_function[lib, "SDL_StringToGUID", fn (pch_guid: Ptr[c_char, AnyOrigin[False]]) -> GUID]()(pch_guid.unsafe_cstr_ptr())
+    return _get_dylib_function[lib, "SDL_StringToGUID", fn (pch_guid: Ptr[c_char, AnyOrigin[False]]) -> GUID]()(pch_guid.as_c_string_slice().unsafe_ptr())
