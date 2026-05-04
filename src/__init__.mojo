@@ -2,8 +2,8 @@
 # | SDL3 Bindings in Mojo
 # +--------------------------------------------------------------------------+ #
 
-"""SDL3 Bindings in Mojo"""
-from memory import UnsafePointer
+"""SDL3 Bindings in Mojo."""
+from std.memory import UnsafePointer, OptionalUnsafePointer
 from .sdl_audio import *
 from .sdl_blendmode import *
 from .sdl_camera import *
@@ -40,34 +40,31 @@ from .sdl_version import *
 from .sdl_video import *
 
 
-comptime AnyOrigin[mut: Bool] = __mlir_attr[`#lit.any.origin<`, mut._mlir_value, `>: !lit.origin<`, mut._mlir_value, `>`]
 comptime Ptr = UnsafePointer
+comptime OptPtr = OptionalUnsafePointer
 
-
-from sys import CompilationTarget, is_little_endian, is_big_endian
-from sys.ffi import _Global, OwnedDLHandle, _get_dylib_function, c_char, c_uchar, c_int, c_uint, c_short, c_ushort, c_long, c_long_long, c_size_t, c_ssize_t, c_float, c_double
+from std.builtin.globals import global_constant
+from std.sys import CompilationTarget, is_little_endian, is_big_endian
+from std.ffi import _Global, OwnedDLHandle, _get_dylib_function, c_char, c_uchar, c_int, c_uint, c_short, c_ushort, c_long, c_long_long, c_size_t, c_ssize_t, c_float, c_double, UnsafeUnion
 
 comptime lib = _Global["SDL", _init_sdl_handle]()
 
 
-fn _init_sdl_handle() -> OwnedDLHandle:
+def _init_sdl_handle() -> OwnedDLHandle:
     try:
-
-        @parameter
-        if CompilationTarget.is_macos():
+        comptime if CompilationTarget.is_macos():
             return OwnedDLHandle(".pixi/envs/default/lib/libSDL3.dylib")
         elif CompilationTarget.is_linux():
             return OwnedDLHandle(".pixi/envs/default/lib/libSDL3.so")
         else:
-            constrained[False, "OS is not supported"]()
-            return _uninit[OwnedDLHandle]()
+            comptime assert False, "OS is not supported"
     except:
         print("libSDL3 not found at .pixi/envs/default/lib/")
         return _uninit[OwnedDLHandle]()
 
 
 @always_inline
-fn _uninit[T: AnyType](out value: T):
+def _uninit[T: AnyType](out value: T):
     """Returns uninitialized data."""
     __mlir_op.`lit.ownership.mark_initialized`(__get_mvalue_as_litref(value))
 

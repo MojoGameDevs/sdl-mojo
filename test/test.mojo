@@ -7,19 +7,20 @@
 # Please add more test cases and open issues if anything breaks!
 #
 import sdl
-from sdl import Ptr, InitFlags
-from time import monotonic
-from math import sqrt
+from sdl import Ptr, OptPtr, InitFlags
+from std.time import monotonic
+from std.math import sqrt
 
-def main():
+def main() raises:
     print("press WASD to move box")
     comptime screen_width = 640
     comptime screen_height = 480
     sdl.init(InitFlags.INIT_VIDEO | InitFlags.INIT_AUDIO | InitFlags.INIT_EVENTS | InitFlags.INIT_JOYSTICK | InitFlags.INIT_GAMEPAD)
 
-    var window = Ptr[sdl.Window, MutAnyOrigin]()
-    var renderer = Ptr[sdl.Renderer, MutAnyOrigin]()
-    sdl.create_window_and_renderer("sdl3 test", screen_width, screen_height, sdl.WindowFlags(0), Ptr(to=window), Ptr(to=renderer))
+    var window = OptPtr[sdl.Window, MutExternalOrigin]()
+    var renderer_empty = OptPtr[sdl.Renderer, MutExternalOrigin]()
+    sdl.create_window_and_renderer("sdl3 test", screen_width, screen_height, sdl.WindowFlags(0), Ptr(to=window), Ptr(to=renderer_empty))
+    renderer = renderer_empty.value()
 
     var running = True
     var numkeys = Int32()
@@ -31,12 +32,12 @@ def main():
 
     while running:
         var event = sdl.Event(UInt32(0))
-        while sdl.poll_event(Ptr(to=event)):
-            event_type = sdl.EventType(Int(event[sdl.CommonEvent].type))
+        while sdl.poll_event(UnsafePointer(to=event)):
+            event_type = sdl.EventType(Int(event.unsafe_get[sdl.CommonEvent]().type))
             if event_type == sdl.EventType.EVENT_QUIT:
                 running = False
             elif event_type == sdl.EventType.EVENT_MOUSE_MOTION:
-                var event_ = event[sdl.MouseMotionEvent]
+                var event_ = event.unsafe_get[sdl.MouseMotionEvent]()
                 rect.x = event_.x - 50
                 rect.y = event_.y - 50
             elif event_type == sdl.EventType.EVENT_JOYSTICK_AXIS_MOTION:
@@ -72,10 +73,11 @@ def main():
         thing.x += (acc.x / mag) * delta_time
         thing.y += (acc.y / mag) * delta_time
 
-        thing.x = min(max(0, thing.x), screen_width - thing.w)
-        thing.y = min(max(0, thing.y), screen_height - thing.h)
-        rect.x = min(max(0, rect.x), screen_width - rect.w)
-        rect.y = min(max(0, rect.y), screen_height - rect.h)
+        zero = Float32(0.0)
+        thing.x = min(max(zero, thing.x), screen_width - thing.w)
+        thing.y = min(max(zero, thing.y), screen_height - thing.h)
+        rect.x = min(max(zero, rect.x), screen_width - rect.w)
+        rect.y = min(max(zero, rect.y), screen_height - rect.h)
 
         sdl.set_render_draw_color(renderer, 4, 8, 16, 100)
         sdl.render_clear(renderer)

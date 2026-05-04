@@ -21,7 +21,7 @@
 # | 3. This notice may not be removed or altered from any source distribution.
 # x--------------------------------------------------------------------------x #
 
-"""Joystick
+"""Joystick.
 
 SDL joystick support.
 
@@ -64,8 +64,7 @@ struct Joystick(ImplicitlyCopyable, Movable):
     pass
 
 
-@register_passable("trivial")
-struct JoystickID(Intable):
+struct JoystickID(Intable, TrivialRegisterPassable):
     """This is a unique ID for a joystick for the time it is connected to the
     system, and is never reused for the lifetime of the application.
 
@@ -79,20 +78,19 @@ struct JoystickID(Intable):
     var value: UInt32
 
     @always_inline
-    fn __init__(out self, value: UInt32):
+    def __init__(out self, value: UInt32):
         self.value = value
 
     @always_inline
-    fn __int__(self) -> Int:
+    def __int__(self) -> Int:
         return Int(self.value)
 
     @always_inline
-    fn __or__(lhs, rhs: Self) -> Self:
+    def __or__(lhs, rhs: Self) -> Self:
         return Self(lhs.value | rhs.value)
 
 
-@register_passable("trivial")
-struct JoystickType(Indexer, Intable):
+struct JoystickType(Indexer, Intable, TrivialRegisterPassable):
     """An enum of some common joystick types.
 
     In some cases, SDL can identify a low-level joystick as being a certain
@@ -108,19 +106,19 @@ struct JoystickType(Indexer, Intable):
     var value: UInt32
 
     @always_inline
-    fn __init__(out self, value: Int):
-        self.value = value
+    def __init__(out self, value: Int):
+        self.value = UInt32(value)
 
     @always_inline
-    fn __int__(self) -> Int:
+    def __int__(self) -> Int:
         return Int(self.value)
 
     @always_inline
-    fn __eq__(lhs, rhs: Self) -> Bool:
+    def __eq__(lhs, rhs: Self) -> Bool:
         return lhs.value == rhs.value
 
     @always_inline("nodebug")
-    fn __mlir_index__(self) -> __mlir_type.index:
+    def __mlir_index__(self) -> __mlir_type.index:
         return Int(self)._mlir_value
 
     comptime JOYSTICK_TYPE_UNKNOWN = Self(0)
@@ -136,8 +134,7 @@ struct JoystickType(Indexer, Intable):
     comptime JOYSTICK_TYPE_COUNT = Self(10)
 
 
-@register_passable("trivial")
-struct JoystickConnectionState(Indexer, Intable):
+struct JoystickConnectionState(Indexer, Intable, TrivialRegisterPassable):
     """Possible connection states for a joystick device.
 
     This is used by SDL_GetJoystickConnectionState to report how a device is
@@ -149,19 +146,19 @@ struct JoystickConnectionState(Indexer, Intable):
     var value: UInt32
 
     @always_inline
-    fn __init__(out self, value: Int):
-        self.value = value
+    def __init__(out self, value: Int):
+        self.value = UInt32(value)
 
     @always_inline
-    fn __int__(self) -> Int:
+    def __int__(self) -> Int:
         return Int(self.value)
 
     @always_inline
-    fn __eq__(lhs, rhs: Self) -> Bool:
+    def __eq__(lhs, rhs: Self) -> Bool:
         return lhs.value == rhs.value
 
     @always_inline("nodebug")
-    fn __mlir_index__(self) -> __mlir_type.index:
+    def __mlir_index__(self) -> __mlir_type.index:
         return Int(self)._mlir_value
 
     comptime JOYSTICK_CONNECTION_INVALID = Self(-1)
@@ -170,7 +167,7 @@ struct JoystickConnectionState(Indexer, Intable):
     comptime JOYSTICK_CONNECTION_WIRELESS = Self(2)
 
 
-fn lock_joysticks() raises -> None:
+def lock_joysticks() raises -> None:
     """Locking for atomic access to the joystick API.
 
     The SDL joystick functions are thread-safe, however you can lock the
@@ -180,19 +177,19 @@ fn lock_joysticks() raises -> None:
     Docs: https://wiki.libsdl.org/SDL3/SDL_LockJoysticks.
     """
 
-    return _get_dylib_function[lib, "SDL_LockJoysticks", fn () -> None]()()
+    return _get_dylib_function[lib, "SDL_LockJoysticks", def() thin abi("C") -> None]()()
 
 
-fn unlock_joysticks() raises -> None:
+def unlock_joysticks() raises -> None:
     """Unlocking for atomic access to the joystick API.
 
     Docs: https://wiki.libsdl.org/SDL3/SDL_UnlockJoysticks.
     """
 
-    return _get_dylib_function[lib, "SDL_UnlockJoysticks", fn () -> None]()()
+    return _get_dylib_function[lib, "SDL_UnlockJoysticks", def() thin abi("C") -> None]()()
 
 
-fn has_joystick() raises -> Bool:
+def has_joystick() raises -> Bool:
     """Return whether a joystick is currently connected.
 
     Returns:
@@ -201,10 +198,10 @@ fn has_joystick() raises -> Bool:
     Docs: https://wiki.libsdl.org/SDL3/SDL_HasJoystick.
     """
 
-    return _get_dylib_function[lib, "SDL_HasJoystick", fn () -> Bool]()()
+    return _get_dylib_function[lib, "SDL_HasJoystick", def() thin abi("C") -> Bool]()()
 
 
-fn get_joysticks(count: Ptr[c_int, AnyOrigin[True]], out ret: Ptr[JoystickID, AnyOrigin[True]]) raises:
+def get_joysticks[O_count: Origin, //](count: Ptr[c_int, O_count], out ret: Ptr[JoystickID, ExternalOrigin[mut=True]]) raises:
     """Get a list of currently connected joysticks.
 
     Args:
@@ -219,12 +216,13 @@ fn get_joysticks(count: Ptr[c_int, AnyOrigin[True]], out ret: Ptr[JoystickID, An
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoysticks.
     """
 
-    ret = _get_dylib_function[lib, "SDL_GetJoysticks", fn (count: Ptr[c_int, AnyOrigin[True]]) -> Ptr[JoystickID, AnyOrigin[True]]]()(count)
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    _ffi_ret = _get_dylib_function[lib, "SDL_GetJoysticks", def(count: Ptr[c_int, O_count]) thin abi("C") -> OptPtr[JoystickID, ExternalOrigin[mut=True]]]()(count)
+    if not _ffi_ret:
+        raise Error(get_error())
+    ret = _ffi_ret.value()
 
 
-fn get_joystick_name_for_id(instance_id: JoystickID) raises -> Ptr[c_char, AnyOrigin[False]]:
+def get_joystick_name_for_id(instance_id: JoystickID) raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
     """Get the implementation dependent name of a joystick.
 
     This can be called before any joysticks are opened.
@@ -239,10 +237,10 @@ fn get_joystick_name_for_id(instance_id: JoystickID) raises -> Ptr[c_char, AnyOr
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickNameForID.
     """
 
-    return _get_dylib_function[lib, "SDL_GetJoystickNameForID", fn (instance_id: JoystickID) -> Ptr[c_char, AnyOrigin[False]]]()(instance_id)
+    return _get_dylib_function[lib, "SDL_GetJoystickNameForID", def(instance_id: JoystickID) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(instance_id).value()
 
 
-fn get_joystick_path_for_id(instance_id: JoystickID) raises -> Ptr[c_char, AnyOrigin[False]]:
+def get_joystick_path_for_id(instance_id: JoystickID) raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
     """Get the implementation dependent path of a joystick.
 
     This can be called before any joysticks are opened.
@@ -257,10 +255,10 @@ fn get_joystick_path_for_id(instance_id: JoystickID) raises -> Ptr[c_char, AnyOr
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickPathForID.
     """
 
-    return _get_dylib_function[lib, "SDL_GetJoystickPathForID", fn (instance_id: JoystickID) -> Ptr[c_char, AnyOrigin[False]]]()(instance_id)
+    return _get_dylib_function[lib, "SDL_GetJoystickPathForID", def(instance_id: JoystickID) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(instance_id).value()
 
 
-fn get_joystick_player_index_for_id(instance_id: JoystickID) raises -> c_int:
+def get_joystick_player_index_for_id(instance_id: JoystickID) raises -> c_int:
     """Get the player index of a joystick.
 
     This can be called before any joysticks are opened.
@@ -274,10 +272,10 @@ fn get_joystick_player_index_for_id(instance_id: JoystickID) raises -> c_int:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickPlayerIndexForID.
     """
 
-    return _get_dylib_function[lib, "SDL_GetJoystickPlayerIndexForID", fn (instance_id: JoystickID) -> c_int]()(instance_id)
+    return _get_dylib_function[lib, "SDL_GetJoystickPlayerIndexForID", def(instance_id: JoystickID) thin abi("C") -> c_int]()(instance_id)
 
 
-fn get_joystick_guid_for_id(instance_id: JoystickID) raises -> GUID:
+def get_joystick_guid_for_id(instance_id: JoystickID) raises -> GUID:
     """Get the implementation-dependent GUID of a joystick.
 
     This can be called before any joysticks are opened.
@@ -292,10 +290,10 @@ fn get_joystick_guid_for_id(instance_id: JoystickID) raises -> GUID:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickGUIDForID.
     """
 
-    return _get_dylib_function[lib, "SDL_GetJoystickGUIDForID", fn (instance_id: JoystickID) -> GUID]()(instance_id)
+    return _get_dylib_function[lib, "SDL_GetJoystickGUIDForID", def(instance_id: JoystickID) thin abi("C") -> GUID]()(instance_id)
 
 
-fn get_joystick_vendor_for_id(instance_id: JoystickID) raises -> UInt16:
+def get_joystick_vendor_for_id(instance_id: JoystickID) raises -> UInt16:
     """Get the USB vendor ID of a joystick, if available.
 
     This can be called before any joysticks are opened. If the vendor ID isn't
@@ -311,10 +309,10 @@ fn get_joystick_vendor_for_id(instance_id: JoystickID) raises -> UInt16:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickVendorForID.
     """
 
-    return _get_dylib_function[lib, "SDL_GetJoystickVendorForID", fn (instance_id: JoystickID) -> UInt16]()(instance_id)
+    return _get_dylib_function[lib, "SDL_GetJoystickVendorForID", def(instance_id: JoystickID) thin abi("C") -> UInt16]()(instance_id)
 
 
-fn get_joystick_product_for_id(instance_id: JoystickID) raises -> UInt16:
+def get_joystick_product_for_id(instance_id: JoystickID) raises -> UInt16:
     """Get the USB product ID of a joystick, if available.
 
     This can be called before any joysticks are opened. If the product ID isn't
@@ -330,10 +328,10 @@ fn get_joystick_product_for_id(instance_id: JoystickID) raises -> UInt16:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickProductForID.
     """
 
-    return _get_dylib_function[lib, "SDL_GetJoystickProductForID", fn (instance_id: JoystickID) -> UInt16]()(instance_id)
+    return _get_dylib_function[lib, "SDL_GetJoystickProductForID", def(instance_id: JoystickID) thin abi("C") -> UInt16]()(instance_id)
 
 
-fn get_joystick_product_version_for_id(instance_id: JoystickID) raises -> UInt16:
+def get_joystick_product_version_for_id(instance_id: JoystickID) raises -> UInt16:
     """Get the product version of a joystick, if available.
 
     This can be called before any joysticks are opened. If the product version
@@ -349,10 +347,10 @@ fn get_joystick_product_version_for_id(instance_id: JoystickID) raises -> UInt16
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickProductVersionForID.
     """
 
-    return _get_dylib_function[lib, "SDL_GetJoystickProductVersionForID", fn (instance_id: JoystickID) -> UInt16]()(instance_id)
+    return _get_dylib_function[lib, "SDL_GetJoystickProductVersionForID", def(instance_id: JoystickID) thin abi("C") -> UInt16]()(instance_id)
 
 
-fn get_joystick_type_for_id(instance_id: JoystickID) raises -> JoystickType:
+def get_joystick_type_for_id(instance_id: JoystickID) raises -> JoystickType:
     """Get the type of a joystick, if available.
 
     This can be called before any joysticks are opened.
@@ -368,10 +366,10 @@ fn get_joystick_type_for_id(instance_id: JoystickID) raises -> JoystickType:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickTypeForID.
     """
 
-    return _get_dylib_function[lib, "SDL_GetJoystickTypeForID", fn (instance_id: JoystickID) -> JoystickType]()(instance_id)
+    return _get_dylib_function[lib, "SDL_GetJoystickTypeForID", def(instance_id: JoystickID) thin abi("C") -> JoystickType]()(instance_id)
 
 
-fn open_joystick(instance_id: JoystickID, out ret: Ptr[Joystick, AnyOrigin[True]]) raises:
+def open_joystick(instance_id: JoystickID, out ret: Ptr[Joystick, ExternalOrigin[mut=True]]) raises:
     """Open a joystick for use.
 
     The joystick subsystem must be initialized before a joystick can be opened
@@ -387,12 +385,13 @@ fn open_joystick(instance_id: JoystickID, out ret: Ptr[Joystick, AnyOrigin[True]
     Docs: https://wiki.libsdl.org/SDL3/SDL_OpenJoystick.
     """
 
-    ret = _get_dylib_function[lib, "SDL_OpenJoystick", fn (instance_id: JoystickID) -> Ptr[Joystick, AnyOrigin[True]]]()(instance_id)
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    _ffi_ret = _get_dylib_function[lib, "SDL_OpenJoystick", def(instance_id: JoystickID) thin abi("C") -> OptPtr[Joystick, ExternalOrigin[mut=True]]]()(instance_id)
+    if not _ffi_ret:
+        raise Error(get_error())
+    ret = _ffi_ret.value()
 
 
-fn get_joystick_from_id(instance_id: JoystickID) raises -> Ptr[Joystick, AnyOrigin[True]]:
+def get_joystick_from_id(instance_id: JoystickID) raises -> Ptr[Joystick, ExternalOrigin[mut=True]]:
     """Get the SDL_Joystick associated with an instance ID, if it has been opened.
 
     Args:
@@ -405,10 +404,10 @@ fn get_joystick_from_id(instance_id: JoystickID) raises -> Ptr[Joystick, AnyOrig
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickFromID.
     """
 
-    return _get_dylib_function[lib, "SDL_GetJoystickFromID", fn (instance_id: JoystickID) -> Ptr[Joystick, AnyOrigin[True]]]()(instance_id)
+    return _get_dylib_function[lib, "SDL_GetJoystickFromID", def(instance_id: JoystickID) thin abi("C") -> OptPtr[Joystick, ExternalOrigin[mut=True]]]()(instance_id).value()
 
 
-fn get_joystick_from_player_index(player_index: c_int, out ret: Ptr[Joystick, AnyOrigin[True]]) raises:
+def get_joystick_from_player_index(player_index: c_int, out ret: Ptr[Joystick, ExternalOrigin[mut=True]]) raises:
     """Get the SDL_Joystick associated with a player index.
 
     Args:
@@ -421,9 +420,10 @@ fn get_joystick_from_player_index(player_index: c_int, out ret: Ptr[Joystick, An
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickFromPlayerIndex.
     """
 
-    ret = _get_dylib_function[lib, "SDL_GetJoystickFromPlayerIndex", fn (player_index: c_int) -> Ptr[Joystick, AnyOrigin[True]]]()(player_index)
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    _ffi_ret = _get_dylib_function[lib, "SDL_GetJoystickFromPlayerIndex", def(player_index: c_int) thin abi("C") -> OptPtr[Joystick, ExternalOrigin[mut=True]]]()(player_index)
+    if not _ffi_ret:
+        raise Error(get_error())
+    ret = _ffi_ret.value()
 
 
 @fieldwise_init
@@ -435,7 +435,7 @@ struct VirtualJoystickTouchpadDesc(ImplicitlyCopyable, Movable):
 
     var nfingers: UInt16
     """The number of simultaneous fingers on this touchpad."""
-    var padding: ArrayHelper[UInt16, 3, AnyOrigin[True]]
+    var padding: ArrayHelper[UInt16, 3, ExternalOrigin[mut=True]]
 
 
 @fieldwise_init
@@ -483,7 +483,7 @@ struct VirtualJoystickDesc(ImplicitlyCopyable, Movable):
     """The number of touchpads on this joystick, requires `touchpads` to point at valid descriptions."""
     var nsensors: UInt16
     """The number of sensors on this joystick, requires `sensors` to point at valid descriptions."""
-    var padding2: ArrayHelper[UInt16, 2, AnyOrigin[True]]
+    var padding2: ArrayHelper[UInt16, 2, ExternalOrigin[mut=True]]
     """Unused."""
     var button_mask: UInt32
     """A mask of which buttons are valid for this controller
@@ -491,34 +491,34 @@ struct VirtualJoystickDesc(ImplicitlyCopyable, Movable):
     var axis_mask: UInt32
     """A mask of which axes are valid for this controller
                                  e.g. (1 << SDL_GAMEPAD_AXIS_LEFTX)."""
-    var name: Ptr[c_char, AnyOrigin[False]]
+    var name: OptPtr[c_char, ExternalOrigin[mut=False]]
     """The name of the joystick."""
-    var touchpads: Ptr[VirtualJoystickTouchpadDesc, AnyOrigin[False]]
+    var touchpads: OptPtr[VirtualJoystickTouchpadDesc, ExternalOrigin[mut=False]]
     """A pointer to an array of touchpad descriptions, required if `ntouchpads` is > 0."""
-    var sensors: Ptr[VirtualJoystickSensorDesc, AnyOrigin[False]]
+    var sensors: OptPtr[VirtualJoystickSensorDesc, ExternalOrigin[mut=False]]
     """A pointer to an array of sensor descriptions, required if `nsensors` is > 0."""
 
-    var userdata: Ptr[NoneType, AnyOrigin[True]]
+    var userdata: OptPtr[NoneType, ExternalOrigin[mut=True]]
     """User data pointer passed to callbacks."""
-    var update: fn (userdata: Ptr[NoneType, AnyOrigin[True]]) -> None
+    var update: def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]]) thin -> None
     """Called when the joystick state should be updated."""
-    var set_player_index: fn (userdata: Ptr[NoneType, AnyOrigin[True]], player_index: c_int) -> None
+    var set_player_index: def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]], player_index: c_int) thin -> None
     """Called when the player index is set."""
-    var rumble: fn (userdata: Ptr[NoneType, AnyOrigin[True]], low_frequency_rumble: UInt16, high_frequency_rumble: UInt16) -> Bool
+    var rumble: def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]], low_frequency_rumble: UInt16, high_frequency_rumble: UInt16) thin -> Bool
     """Implements SDL_RumbleJoystick()."""
-    var rumble_triggers: fn (userdata: Ptr[NoneType, AnyOrigin[True]], left_rumble: UInt16, right_rumble: UInt16) -> Bool
+    var rumble_triggers: def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]], left_rumble: UInt16, right_rumble: UInt16) thin -> Bool
     """Implements SDL_RumbleJoystickTriggers()."""
-    var set_led: fn (userdata: Ptr[NoneType, AnyOrigin[True]], red: UInt8, green: UInt8, blue: UInt8) -> Bool
+    var set_led: def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]], red: UInt8, green: UInt8, blue: UInt8) thin -> Bool
     """Implements SDL_SetJoystickLED()."""
-    var send_effect: fn (userdata: Ptr[NoneType, AnyOrigin[True]], data: Ptr[NoneType, AnyOrigin[False]], size: c_int) -> Bool
+    var send_effect: def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]], data: OptPtr[NoneType, ExternalOrigin[mut=False]], size: c_int) thin -> Bool
     """Implements SDL_SendJoystickEffect()."""
-    var set_sensors_enabled: fn (userdata: Ptr[NoneType, AnyOrigin[True]], enabled: Bool) -> Bool
+    var set_sensors_enabled: def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]], enabled: Bool) thin -> Bool
     """Implements SDL_SetGamepadSensorEnabled()."""
-    var cleanup: fn (userdata: Ptr[NoneType, AnyOrigin[True]]) -> None
+    var cleanup: def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]]) thin -> None
     """Cleans up the userdata when the joystick is detached."""
 
 
-fn attach_virtual_joystick(desc: Ptr[VirtualJoystickDesc, AnyOrigin[False]]) raises -> JoystickID:
+def attach_virtual_joystick[O_desc: Origin, //](desc: Ptr[VirtualJoystickDesc, O_desc]) raises -> JoystickID:
     """Attach a new virtual joystick.
 
     Args:
@@ -531,10 +531,10 @@ fn attach_virtual_joystick(desc: Ptr[VirtualJoystickDesc, AnyOrigin[False]]) rai
     Docs: https://wiki.libsdl.org/SDL3/SDL_AttachVirtualJoystick.
     """
 
-    return _get_dylib_function[lib, "SDL_AttachVirtualJoystick", fn (desc: Ptr[VirtualJoystickDesc, AnyOrigin[False]]) -> JoystickID]()(desc)
+    return _get_dylib_function[lib, "SDL_AttachVirtualJoystick", def(desc: Ptr[VirtualJoystickDesc, O_desc]) thin abi("C") -> JoystickID]()(desc)
 
 
-fn detach_virtual_joystick(instance_id: JoystickID) raises:
+def detach_virtual_joystick(instance_id: JoystickID) raises:
     """Detach a virtual joystick.
 
     Args:
@@ -548,12 +548,12 @@ fn detach_virtual_joystick(instance_id: JoystickID) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_DetachVirtualJoystick.
     """
 
-    ret = _get_dylib_function[lib, "SDL_DetachVirtualJoystick", fn (instance_id: JoystickID) -> Bool]()(instance_id)
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    var _ffi_ret = _get_dylib_function[lib, "SDL_DetachVirtualJoystick", def(instance_id: JoystickID) thin abi("C") -> Bool]()(instance_id)
+    if not _ffi_ret:
+        raise Error(get_error())
 
 
-fn is_joystick_virtual(instance_id: JoystickID) raises -> Bool:
+def is_joystick_virtual(instance_id: JoystickID) raises -> Bool:
     """Query whether or not a joystick is virtual.
 
     Args:
@@ -565,10 +565,10 @@ fn is_joystick_virtual(instance_id: JoystickID) raises -> Bool:
     Docs: https://wiki.libsdl.org/SDL3/SDL_IsJoystickVirtual.
     """
 
-    return _get_dylib_function[lib, "SDL_IsJoystickVirtual", fn (instance_id: JoystickID) -> Bool]()(instance_id)
+    return _get_dylib_function[lib, "SDL_IsJoystickVirtual", def(instance_id: JoystickID) thin abi("C") -> Bool]()(instance_id)
 
 
-fn set_joystick_virtual_axis(joystick: Ptr[Joystick, AnyOrigin[True]], axis: c_int, value: Int16) raises:
+def set_joystick_virtual_axis[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick], axis: c_int, value: Int16) raises:
     """Set the state of an axis on an opened virtual joystick.
 
     Please note that values set here will not be applied until the next call to
@@ -593,12 +593,12 @@ fn set_joystick_virtual_axis(joystick: Ptr[Joystick, AnyOrigin[True]], axis: c_i
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetJoystickVirtualAxis.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetJoystickVirtualAxis", fn (joystick: Ptr[Joystick, AnyOrigin[True]], axis: c_int, value: Int16) -> Bool]()(joystick, axis, value)
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    var _ffi_ret = _get_dylib_function[lib, "SDL_SetJoystickVirtualAxis", def(joystick: Ptr[Joystick, O_joystick], axis: c_int, value: Int16) thin abi("C") -> Bool]()(joystick, axis, value)
+    if not _ffi_ret:
+        raise Error(get_error())
 
 
-fn set_joystick_virtual_ball(joystick: Ptr[Joystick, AnyOrigin[True]], ball: c_int, xrel: Int16, yrel: Int16) raises:
+def set_joystick_virtual_ball[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick], ball: c_int, xrel: Int16, yrel: Int16) raises:
     """Generate ball motion on an opened virtual joystick.
 
     Please note that values set here will not be applied until the next call to
@@ -620,12 +620,12 @@ fn set_joystick_virtual_ball(joystick: Ptr[Joystick, AnyOrigin[True]], ball: c_i
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetJoystickVirtualBall.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetJoystickVirtualBall", fn (joystick: Ptr[Joystick, AnyOrigin[True]], ball: c_int, xrel: Int16, yrel: Int16) -> Bool]()(joystick, ball, xrel, yrel)
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    var _ffi_ret = _get_dylib_function[lib, "SDL_SetJoystickVirtualBall", def(joystick: Ptr[Joystick, O_joystick], ball: c_int, xrel: Int16, yrel: Int16) thin abi("C") -> Bool]()(joystick, ball, xrel, yrel)
+    if not _ffi_ret:
+        raise Error(get_error())
 
 
-fn set_joystick_virtual_button(joystick: Ptr[Joystick, AnyOrigin[True]], button: c_int, down: Bool) raises:
+def set_joystick_virtual_button[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick], button: c_int, down: Bool) raises:
     """Set the state of a button on an opened virtual joystick.
 
     Please note that values set here will not be applied until the next call to
@@ -646,12 +646,12 @@ fn set_joystick_virtual_button(joystick: Ptr[Joystick, AnyOrigin[True]], button:
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetJoystickVirtualButton.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetJoystickVirtualButton", fn (joystick: Ptr[Joystick, AnyOrigin[True]], button: c_int, down: Bool) -> Bool]()(joystick, button, down)
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    var _ffi_ret = _get_dylib_function[lib, "SDL_SetJoystickVirtualButton", def(joystick: Ptr[Joystick, O_joystick], button: c_int, down: Bool) thin abi("C") -> Bool]()(joystick, button, down)
+    if not _ffi_ret:
+        raise Error(get_error())
 
 
-fn set_joystick_virtual_hat(joystick: Ptr[Joystick, AnyOrigin[True]], hat: c_int, value: UInt8) raises:
+def set_joystick_virtual_hat[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick], hat: c_int, value: UInt8) raises:
     """Set the state of a hat on an opened virtual joystick.
 
     Please note that values set here will not be applied until the next call to
@@ -672,12 +672,12 @@ fn set_joystick_virtual_hat(joystick: Ptr[Joystick, AnyOrigin[True]], hat: c_int
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetJoystickVirtualHat.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetJoystickVirtualHat", fn (joystick: Ptr[Joystick, AnyOrigin[True]], hat: c_int, value: UInt8) -> Bool]()(joystick, hat, value)
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    var _ffi_ret = _get_dylib_function[lib, "SDL_SetJoystickVirtualHat", def(joystick: Ptr[Joystick, O_joystick], hat: c_int, value: UInt8) thin abi("C") -> Bool]()(joystick, hat, value)
+    if not _ffi_ret:
+        raise Error(get_error())
 
 
-fn set_joystick_virtual_touchpad(joystick: Ptr[Joystick, AnyOrigin[True]], touchpad: c_int, finger: c_int, down: Bool, x: c_float, y: c_float, pressure: c_float) raises:
+def set_joystick_virtual_touchpad[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick], touchpad: c_int, finger: c_int, down: Bool, x: c_float, y: c_float, pressure: c_float) raises:
     """Set touchpad finger state on an opened virtual joystick.
 
     Please note that values set here will not be applied until the next call to
@@ -705,12 +705,12 @@ fn set_joystick_virtual_touchpad(joystick: Ptr[Joystick, AnyOrigin[True]], touch
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetJoystickVirtualTouchpad.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetJoystickVirtualTouchpad", fn (joystick: Ptr[Joystick, AnyOrigin[True]], touchpad: c_int, finger: c_int, down: Bool, x: c_float, y: c_float, pressure: c_float) -> Bool]()(joystick, touchpad, finger, down, x, y, pressure)
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    var _ffi_ret = _get_dylib_function[lib, "SDL_SetJoystickVirtualTouchpad", def(joystick: Ptr[Joystick, O_joystick], touchpad: c_int, finger: c_int, down: Bool, x: c_float, y: c_float, pressure: c_float) thin abi("C") -> Bool]()(joystick, touchpad, finger, down, x, y, pressure)
+    if not _ffi_ret:
+        raise Error(get_error())
 
 
-fn send_joystick_virtual_sensor_data(joystick: Ptr[Joystick, AnyOrigin[True]], type: SensorType, sensor_timestamp: UInt64, data: Ptr[c_float, AnyOrigin[False]], num_values: c_int) raises:
+def send_joystick_virtual_sensor_data[O_joystick: Origin, O_data: Origin, //](joystick: Ptr[Joystick, O_joystick], type: SensorType, sensor_timestamp: UInt64, data: Ptr[c_float, O_data], num_values: c_int) raises:
     """Send a sensor update for an opened virtual joystick.
 
     Please note that values set here will not be applied until the next call to
@@ -734,12 +734,12 @@ fn send_joystick_virtual_sensor_data(joystick: Ptr[Joystick, AnyOrigin[True]], t
     Docs: https://wiki.libsdl.org/SDL3/SDL_SendJoystickVirtualSensorData.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SendJoystickVirtualSensorData", fn (joystick: Ptr[Joystick, AnyOrigin[True]], type: SensorType, sensor_timestamp: UInt64, data: Ptr[c_float, AnyOrigin[False]], num_values: c_int) -> Bool]()(joystick, type, sensor_timestamp, data, num_values)
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    var _ffi_ret = _get_dylib_function[lib, "SDL_SendJoystickVirtualSensorData", def(joystick: Ptr[Joystick, O_joystick], type: SensorType, sensor_timestamp: UInt64, data: Ptr[c_float, O_data], num_values: c_int) thin abi("C") -> Bool]()(joystick, type, sensor_timestamp, data, num_values)
+    if not _ffi_ret:
+        raise Error(get_error())
 
 
-fn get_joystick_properties(joystick: Ptr[Joystick, AnyOrigin[True]]) raises -> PropertiesID:
+def get_joystick_properties[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick]) raises -> PropertiesID:
     """Get the properties associated with a joystick.
 
     The following read-only properties are provided by SDL:
@@ -765,10 +765,10 @@ fn get_joystick_properties(joystick: Ptr[Joystick, AnyOrigin[True]]) raises -> P
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickProperties.
     """
 
-    return _get_dylib_function[lib, "SDL_GetJoystickProperties", fn (joystick: Ptr[Joystick, AnyOrigin[True]]) -> PropertiesID]()(joystick)
+    return _get_dylib_function[lib, "SDL_GetJoystickProperties", def(joystick: Ptr[Joystick, O_joystick]) thin abi("C") -> PropertiesID]()(joystick)
 
 
-fn get_joystick_name(joystick: Ptr[Joystick, AnyOrigin[True]]) raises -> Ptr[c_char, AnyOrigin[False]]:
+def get_joystick_name[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick]) raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
     """Get the implementation dependent name of a joystick.
 
     Args:
@@ -781,10 +781,10 @@ fn get_joystick_name(joystick: Ptr[Joystick, AnyOrigin[True]]) raises -> Ptr[c_c
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickName.
     """
 
-    return _get_dylib_function[lib, "SDL_GetJoystickName", fn (joystick: Ptr[Joystick, AnyOrigin[True]]) -> Ptr[c_char, AnyOrigin[False]]]()(joystick)
+    return _get_dylib_function[lib, "SDL_GetJoystickName", def(joystick: Ptr[Joystick, O_joystick]) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(joystick).value()
 
 
-fn get_joystick_path(joystick: Ptr[Joystick, AnyOrigin[True]]) raises -> Ptr[c_char, AnyOrigin[False]]:
+def get_joystick_path[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick]) raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
     """Get the implementation dependent path of a joystick.
 
     Args:
@@ -797,10 +797,10 @@ fn get_joystick_path(joystick: Ptr[Joystick, AnyOrigin[True]]) raises -> Ptr[c_c
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickPath.
     """
 
-    return _get_dylib_function[lib, "SDL_GetJoystickPath", fn (joystick: Ptr[Joystick, AnyOrigin[True]]) -> Ptr[c_char, AnyOrigin[False]]]()(joystick)
+    return _get_dylib_function[lib, "SDL_GetJoystickPath", def(joystick: Ptr[Joystick, O_joystick]) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(joystick).value()
 
 
-fn get_joystick_player_index(joystick: Ptr[Joystick, AnyOrigin[True]]) raises -> c_int:
+def get_joystick_player_index[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick]) raises -> c_int:
     """Get the player index of an opened joystick.
 
     For XInput controllers this returns the XInput user index. Many joysticks
@@ -815,10 +815,10 @@ fn get_joystick_player_index(joystick: Ptr[Joystick, AnyOrigin[True]]) raises ->
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickPlayerIndex.
     """
 
-    return _get_dylib_function[lib, "SDL_GetJoystickPlayerIndex", fn (joystick: Ptr[Joystick, AnyOrigin[True]]) -> c_int]()(joystick)
+    return _get_dylib_function[lib, "SDL_GetJoystickPlayerIndex", def(joystick: Ptr[Joystick, O_joystick]) thin abi("C") -> c_int]()(joystick)
 
 
-fn set_joystick_player_index(joystick: Ptr[Joystick, AnyOrigin[True]], player_index: c_int) raises:
+def set_joystick_player_index[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick], player_index: c_int) raises:
     """Set the player index of an opened joystick.
 
     Args:
@@ -833,12 +833,12 @@ fn set_joystick_player_index(joystick: Ptr[Joystick, AnyOrigin[True]], player_in
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetJoystickPlayerIndex.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetJoystickPlayerIndex", fn (joystick: Ptr[Joystick, AnyOrigin[True]], player_index: c_int) -> Bool]()(joystick, player_index)
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    var _ffi_ret = _get_dylib_function[lib, "SDL_SetJoystickPlayerIndex", def(joystick: Ptr[Joystick, O_joystick], player_index: c_int) thin abi("C") -> Bool]()(joystick, player_index)
+    if not _ffi_ret:
+        raise Error(get_error())
 
 
-fn get_joystick_guid(joystick: Ptr[Joystick, AnyOrigin[True]]) raises -> GUID:
+def get_joystick_guid[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick]) raises -> GUID:
     """Get the implementation-dependent GUID for the joystick.
 
     This function requires an open joystick.
@@ -854,10 +854,10 @@ fn get_joystick_guid(joystick: Ptr[Joystick, AnyOrigin[True]]) raises -> GUID:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickGUID.
     """
 
-    return _get_dylib_function[lib, "SDL_GetJoystickGUID", fn (joystick: Ptr[Joystick, AnyOrigin[True]]) -> GUID]()(joystick)
+    return _get_dylib_function[lib, "SDL_GetJoystickGUID", def(joystick: Ptr[Joystick, O_joystick]) thin abi("C") -> GUID]()(joystick)
 
 
-fn get_joystick_vendor(joystick: Ptr[Joystick, AnyOrigin[True]]) raises -> UInt16:
+def get_joystick_vendor[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick]) raises -> UInt16:
     """Get the USB vendor ID of an opened joystick, if available.
 
     If the vendor ID isn't available this function returns 0.
@@ -871,10 +871,10 @@ fn get_joystick_vendor(joystick: Ptr[Joystick, AnyOrigin[True]]) raises -> UInt1
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickVendor.
     """
 
-    return _get_dylib_function[lib, "SDL_GetJoystickVendor", fn (joystick: Ptr[Joystick, AnyOrigin[True]]) -> UInt16]()(joystick)
+    return _get_dylib_function[lib, "SDL_GetJoystickVendor", def(joystick: Ptr[Joystick, O_joystick]) thin abi("C") -> UInt16]()(joystick)
 
 
-fn get_joystick_product(joystick: Ptr[Joystick, AnyOrigin[True]]) raises -> UInt16:
+def get_joystick_product[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick]) raises -> UInt16:
     """Get the USB product ID of an opened joystick, if available.
 
     If the product ID isn't available this function returns 0.
@@ -888,10 +888,10 @@ fn get_joystick_product(joystick: Ptr[Joystick, AnyOrigin[True]]) raises -> UInt
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickProduct.
     """
 
-    return _get_dylib_function[lib, "SDL_GetJoystickProduct", fn (joystick: Ptr[Joystick, AnyOrigin[True]]) -> UInt16]()(joystick)
+    return _get_dylib_function[lib, "SDL_GetJoystickProduct", def(joystick: Ptr[Joystick, O_joystick]) thin abi("C") -> UInt16]()(joystick)
 
 
-fn get_joystick_product_version(joystick: Ptr[Joystick, AnyOrigin[True]]) raises -> UInt16:
+def get_joystick_product_version[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick]) raises -> UInt16:
     """Get the product version of an opened joystick, if available.
 
     If the product version isn't available this function returns 0.
@@ -905,10 +905,10 @@ fn get_joystick_product_version(joystick: Ptr[Joystick, AnyOrigin[True]]) raises
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickProductVersion.
     """
 
-    return _get_dylib_function[lib, "SDL_GetJoystickProductVersion", fn (joystick: Ptr[Joystick, AnyOrigin[True]]) -> UInt16]()(joystick)
+    return _get_dylib_function[lib, "SDL_GetJoystickProductVersion", def(joystick: Ptr[Joystick, O_joystick]) thin abi("C") -> UInt16]()(joystick)
 
 
-fn get_joystick_firmware_version(joystick: Ptr[Joystick, AnyOrigin[True]]) raises -> UInt16:
+def get_joystick_firmware_version[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick]) raises -> UInt16:
     """Get the firmware version of an opened joystick, if available.
 
     If the firmware version isn't available this function returns 0.
@@ -923,10 +923,10 @@ fn get_joystick_firmware_version(joystick: Ptr[Joystick, AnyOrigin[True]]) raise
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickFirmwareVersion.
     """
 
-    return _get_dylib_function[lib, "SDL_GetJoystickFirmwareVersion", fn (joystick: Ptr[Joystick, AnyOrigin[True]]) -> UInt16]()(joystick)
+    return _get_dylib_function[lib, "SDL_GetJoystickFirmwareVersion", def(joystick: Ptr[Joystick, O_joystick]) thin abi("C") -> UInt16]()(joystick)
 
 
-fn get_joystick_serial(joystick: Ptr[Joystick, AnyOrigin[True]]) raises -> Ptr[c_char, AnyOrigin[False]]:
+def get_joystick_serial[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick]) raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
     """Get the serial number of an opened joystick, if available.
 
     Returns the serial number of the joystick, or NULL if it is not available.
@@ -941,10 +941,10 @@ fn get_joystick_serial(joystick: Ptr[Joystick, AnyOrigin[True]]) raises -> Ptr[c
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickSerial.
     """
 
-    return _get_dylib_function[lib, "SDL_GetJoystickSerial", fn (joystick: Ptr[Joystick, AnyOrigin[True]]) -> Ptr[c_char, AnyOrigin[False]]]()(joystick)
+    return _get_dylib_function[lib, "SDL_GetJoystickSerial", def(joystick: Ptr[Joystick, O_joystick]) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(joystick).value()
 
 
-fn get_joystick_type(joystick: Ptr[Joystick, AnyOrigin[True]]) raises -> JoystickType:
+def get_joystick_type[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick]) raises -> JoystickType:
     """Get the type of an opened joystick.
 
     Args:
@@ -956,10 +956,10 @@ fn get_joystick_type(joystick: Ptr[Joystick, AnyOrigin[True]]) raises -> Joystic
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickType.
     """
 
-    return _get_dylib_function[lib, "SDL_GetJoystickType", fn (joystick: Ptr[Joystick, AnyOrigin[True]]) -> JoystickType]()(joystick)
+    return _get_dylib_function[lib, "SDL_GetJoystickType", def(joystick: Ptr[Joystick, O_joystick]) thin abi("C") -> JoystickType]()(joystick)
 
 
-fn get_joystick_guid_info(guid: GUID, vendor: Ptr[UInt16, AnyOrigin[True]], product: Ptr[UInt16, AnyOrigin[True]], version: Ptr[UInt16, AnyOrigin[True]], crc16: Ptr[UInt16, AnyOrigin[True]]) raises -> None:
+def get_joystick_guid_info[O_vendor: Origin, O_product: Origin, O_version: Origin, O_crc16: Origin, //](guid: GUID, vendor: Ptr[UInt16, O_vendor], product: Ptr[UInt16, O_product], version: Ptr[UInt16, O_version], crc16: Ptr[UInt16, O_crc16]) raises -> None:
     """Get the device information encoded in a SDL_GUID structure.
 
     Args:
@@ -976,10 +976,10 @@ fn get_joystick_guid_info(guid: GUID, vendor: Ptr[UInt16, AnyOrigin[True]], prod
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickGUIDInfo.
     """
 
-    return _get_dylib_function[lib, "SDL_GetJoystickGUIDInfo", fn (guid: GUID, vendor: Ptr[UInt16, AnyOrigin[True]], product: Ptr[UInt16, AnyOrigin[True]], version: Ptr[UInt16, AnyOrigin[True]], crc16: Ptr[UInt16, AnyOrigin[True]]) -> None]()(guid, vendor, product, version, crc16)
+    return _get_dylib_function[lib, "SDL_GetJoystickGUIDInfo", def(guid: GUID, vendor: Ptr[UInt16, O_vendor], product: Ptr[UInt16, O_product], version: Ptr[UInt16, O_version], crc16: Ptr[UInt16, O_crc16]) thin abi("C") -> None]()(guid, vendor, product, version, crc16)
 
 
-fn joystick_connected(joystick: Ptr[Joystick, AnyOrigin[True]]) raises -> Bool:
+def joystick_connected[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick]) raises -> Bool:
     """Get the status of a specified joystick.
 
     Args:
@@ -992,10 +992,10 @@ fn joystick_connected(joystick: Ptr[Joystick, AnyOrigin[True]]) raises -> Bool:
     Docs: https://wiki.libsdl.org/SDL3/SDL_JoystickConnected.
     """
 
-    return _get_dylib_function[lib, "SDL_JoystickConnected", fn (joystick: Ptr[Joystick, AnyOrigin[True]]) -> Bool]()(joystick)
+    return _get_dylib_function[lib, "SDL_JoystickConnected", def(joystick: Ptr[Joystick, O_joystick]) thin abi("C") -> Bool]()(joystick)
 
 
-fn get_joystick_id(joystick: Ptr[Joystick, AnyOrigin[True]]) raises -> JoystickID:
+def get_joystick_id[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick]) raises -> JoystickID:
     """Get the instance ID of an opened joystick.
 
     Args:
@@ -1008,10 +1008,10 @@ fn get_joystick_id(joystick: Ptr[Joystick, AnyOrigin[True]]) raises -> JoystickI
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickID.
     """
 
-    return _get_dylib_function[lib, "SDL_GetJoystickID", fn (joystick: Ptr[Joystick, AnyOrigin[True]]) -> JoystickID]()(joystick)
+    return _get_dylib_function[lib, "SDL_GetJoystickID", def(joystick: Ptr[Joystick, O_joystick]) thin abi("C") -> JoystickID]()(joystick)
 
 
-fn get_num_joystick_axes(joystick: Ptr[Joystick, AnyOrigin[True]]) raises -> c_int:
+def get_num_joystick_axes[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick]) raises -> c_int:
     """Get the number of general axis controls on a joystick.
 
     Often, the directional pad on a game controller will either look like 4
@@ -1028,10 +1028,10 @@ fn get_num_joystick_axes(joystick: Ptr[Joystick, AnyOrigin[True]]) raises -> c_i
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetNumJoystickAxes.
     """
 
-    return _get_dylib_function[lib, "SDL_GetNumJoystickAxes", fn (joystick: Ptr[Joystick, AnyOrigin[True]]) -> c_int]()(joystick)
+    return _get_dylib_function[lib, "SDL_GetNumJoystickAxes", def(joystick: Ptr[Joystick, O_joystick]) thin abi("C") -> c_int]()(joystick)
 
 
-fn get_num_joystick_balls(joystick: Ptr[Joystick, AnyOrigin[True]]) raises -> c_int:
+def get_num_joystick_balls[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick]) raises -> c_int:
     """Get the number of trackballs on a joystick.
 
     Joystick trackballs have only relative motion events associated with them
@@ -1049,10 +1049,10 @@ fn get_num_joystick_balls(joystick: Ptr[Joystick, AnyOrigin[True]]) raises -> c_
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetNumJoystickBalls.
     """
 
-    return _get_dylib_function[lib, "SDL_GetNumJoystickBalls", fn (joystick: Ptr[Joystick, AnyOrigin[True]]) -> c_int]()(joystick)
+    return _get_dylib_function[lib, "SDL_GetNumJoystickBalls", def(joystick: Ptr[Joystick, O_joystick]) thin abi("C") -> c_int]()(joystick)
 
 
-fn get_num_joystick_hats(joystick: Ptr[Joystick, AnyOrigin[True]]) raises -> c_int:
+def get_num_joystick_hats[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick]) raises -> c_int:
     """Get the number of POV hats on a joystick.
 
     Args:
@@ -1065,10 +1065,10 @@ fn get_num_joystick_hats(joystick: Ptr[Joystick, AnyOrigin[True]]) raises -> c_i
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetNumJoystickHats.
     """
 
-    return _get_dylib_function[lib, "SDL_GetNumJoystickHats", fn (joystick: Ptr[Joystick, AnyOrigin[True]]) -> c_int]()(joystick)
+    return _get_dylib_function[lib, "SDL_GetNumJoystickHats", def(joystick: Ptr[Joystick, O_joystick]) thin abi("C") -> c_int]()(joystick)
 
 
-fn get_num_joystick_buttons(joystick: Ptr[Joystick, AnyOrigin[True]]) raises -> c_int:
+def get_num_joystick_buttons[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick]) raises -> c_int:
     """Get the number of buttons on a joystick.
 
     Args:
@@ -1081,10 +1081,10 @@ fn get_num_joystick_buttons(joystick: Ptr[Joystick, AnyOrigin[True]]) raises -> 
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetNumJoystickButtons.
     """
 
-    return _get_dylib_function[lib, "SDL_GetNumJoystickButtons", fn (joystick: Ptr[Joystick, AnyOrigin[True]]) -> c_int]()(joystick)
+    return _get_dylib_function[lib, "SDL_GetNumJoystickButtons", def(joystick: Ptr[Joystick, O_joystick]) thin abi("C") -> c_int]()(joystick)
 
 
-fn set_joystick_events_enabled(enabled: Bool) raises -> None:
+def set_joystick_events_enabled(enabled: Bool) raises -> None:
     """Set the state of joystick event processing.
 
     If joystick events are disabled, you must call SDL_UpdateJoysticks()
@@ -1097,10 +1097,10 @@ fn set_joystick_events_enabled(enabled: Bool) raises -> None:
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetJoystickEventsEnabled.
     """
 
-    return _get_dylib_function[lib, "SDL_SetJoystickEventsEnabled", fn (enabled: Bool) -> None]()(enabled)
+    return _get_dylib_function[lib, "SDL_SetJoystickEventsEnabled", def(enabled: Bool) thin abi("C") -> None]()(enabled)
 
 
-fn joystick_events_enabled() raises -> Bool:
+def joystick_events_enabled() raises -> Bool:
     """Query the state of joystick event processing.
 
     If joystick events are disabled, you must call SDL_UpdateJoysticks()
@@ -1113,10 +1113,10 @@ fn joystick_events_enabled() raises -> Bool:
     Docs: https://wiki.libsdl.org/SDL3/SDL_JoystickEventsEnabled.
     """
 
-    return _get_dylib_function[lib, "SDL_JoystickEventsEnabled", fn () -> Bool]()()
+    return _get_dylib_function[lib, "SDL_JoystickEventsEnabled", def() thin abi("C") -> Bool]()()
 
 
-fn update_joysticks() raises -> None:
+def update_joysticks() raises -> None:
     """Update the current state of the open joysticks.
 
     This is called automatically by the event loop if any joystick events are
@@ -1125,10 +1125,10 @@ fn update_joysticks() raises -> None:
     Docs: https://wiki.libsdl.org/SDL3/SDL_UpdateJoysticks.
     """
 
-    return _get_dylib_function[lib, "SDL_UpdateJoysticks", fn () -> None]()()
+    return _get_dylib_function[lib, "SDL_UpdateJoysticks", def() thin abi("C") -> None]()()
 
 
-fn get_joystick_axis(joystick: Ptr[Joystick, AnyOrigin[True]], axis: c_int) raises -> Int16:
+def get_joystick_axis[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick], axis: c_int) raises -> Int16:
     """Get the current state of an axis control on a joystick.
 
     SDL makes no promises about what part of the joystick any given axis refers
@@ -1152,10 +1152,10 @@ fn get_joystick_axis(joystick: Ptr[Joystick, AnyOrigin[True]], axis: c_int) rais
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickAxis.
     """
 
-    return _get_dylib_function[lib, "SDL_GetJoystickAxis", fn (joystick: Ptr[Joystick, AnyOrigin[True]], axis: c_int) -> Int16]()(joystick, axis)
+    return _get_dylib_function[lib, "SDL_GetJoystickAxis", def(joystick: Ptr[Joystick, O_joystick], axis: c_int) thin abi("C") -> Int16]()(joystick, axis)
 
 
-fn get_joystick_axis_initial_state(joystick: Ptr[Joystick, AnyOrigin[True]], axis: c_int, state: Ptr[Int16, AnyOrigin[True]]) raises -> Bool:
+def get_joystick_axis_initial_state[O_joystick: Origin, O_state: Origin, //](joystick: Ptr[Joystick, O_joystick], axis: c_int, state: Ptr[Int16, O_state]) raises -> Bool:
     """Get the initial state of an axis control on a joystick.
 
     The state is a value ranging from -32768 to 32767.
@@ -1173,10 +1173,10 @@ fn get_joystick_axis_initial_state(joystick: Ptr[Joystick, AnyOrigin[True]], axi
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickAxisInitialState.
     """
 
-    return _get_dylib_function[lib, "SDL_GetJoystickAxisInitialState", fn (joystick: Ptr[Joystick, AnyOrigin[True]], axis: c_int, state: Ptr[Int16, AnyOrigin[True]]) -> Bool]()(joystick, axis, state)
+    return _get_dylib_function[lib, "SDL_GetJoystickAxisInitialState", def(joystick: Ptr[Joystick, O_joystick], axis: c_int, state: Ptr[Int16, O_state]) thin abi("C") -> Bool]()(joystick, axis, state)
 
 
-fn get_joystick_ball(joystick: Ptr[Joystick, AnyOrigin[True]], ball: c_int, dx: Ptr[c_int, AnyOrigin[True]], dy: Ptr[c_int, AnyOrigin[True]]) raises:
+def get_joystick_ball[O_joystick: Origin, O_dx: Origin, O_dy: Origin, //](joystick: Ptr[Joystick, O_joystick], ball: c_int, dx: Ptr[c_int, O_dx], dy: Ptr[c_int, O_dy]) raises:
     """Get the ball axis change since the last poll.
 
     Trackballs can only return relative motion since the last call to
@@ -1197,12 +1197,12 @@ fn get_joystick_ball(joystick: Ptr[Joystick, AnyOrigin[True]], ball: c_int, dx: 
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickBall.
     """
 
-    ret = _get_dylib_function[lib, "SDL_GetJoystickBall", fn (joystick: Ptr[Joystick, AnyOrigin[True]], ball: c_int, dx: Ptr[c_int, AnyOrigin[True]], dy: Ptr[c_int, AnyOrigin[True]]) -> Bool]()(joystick, ball, dx, dy)
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    var _ffi_ret = _get_dylib_function[lib, "SDL_GetJoystickBall", def(joystick: Ptr[Joystick, O_joystick], ball: c_int, dx: Ptr[c_int, O_dx], dy: Ptr[c_int, O_dy]) thin abi("C") -> Bool]()(joystick, ball, dx, dy)
+    if not _ffi_ret:
+        raise Error(get_error())
 
 
-fn get_joystick_hat(joystick: Ptr[Joystick, AnyOrigin[True]], hat: c_int) raises -> UInt8:
+def get_joystick_hat[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick], hat: c_int) raises -> UInt8:
     """Get the current state of a POV hat on a joystick.
 
     The returned value will be one of the `SDL_HAT_*` values.
@@ -1217,10 +1217,10 @@ fn get_joystick_hat(joystick: Ptr[Joystick, AnyOrigin[True]], hat: c_int) raises
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickHat.
     """
 
-    return _get_dylib_function[lib, "SDL_GetJoystickHat", fn (joystick: Ptr[Joystick, AnyOrigin[True]], hat: c_int) -> UInt8]()(joystick, hat)
+    return _get_dylib_function[lib, "SDL_GetJoystickHat", def(joystick: Ptr[Joystick, O_joystick], hat: c_int) thin abi("C") -> UInt8]()(joystick, hat)
 
 
-fn get_joystick_button(joystick: Ptr[Joystick, AnyOrigin[True]], button: c_int) raises -> Bool:
+def get_joystick_button[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick], button: c_int) raises -> Bool:
     """Get the current state of a button on a joystick.
 
     Args:
@@ -1234,10 +1234,10 @@ fn get_joystick_button(joystick: Ptr[Joystick, AnyOrigin[True]], button: c_int) 
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickButton.
     """
 
-    return _get_dylib_function[lib, "SDL_GetJoystickButton", fn (joystick: Ptr[Joystick, AnyOrigin[True]], button: c_int) -> Bool]()(joystick, button)
+    return _get_dylib_function[lib, "SDL_GetJoystickButton", def(joystick: Ptr[Joystick, O_joystick], button: c_int) thin abi("C") -> Bool]()(joystick, button)
 
 
-fn rumble_joystick(joystick: Ptr[Joystick, AnyOrigin[True]], low_frequency_rumble: UInt16, high_frequency_rumble: UInt16, duration_ms: UInt32) raises -> Bool:
+def rumble_joystick[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick], low_frequency_rumble: UInt16, high_frequency_rumble: UInt16, duration_ms: UInt32) raises -> Bool:
     """Start a rumble effect.
 
     Each call to this function cancels any previous rumble effect, and calling
@@ -1260,10 +1260,10 @@ fn rumble_joystick(joystick: Ptr[Joystick, AnyOrigin[True]], low_frequency_rumbl
     Docs: https://wiki.libsdl.org/SDL3/SDL_RumbleJoystick.
     """
 
-    return _get_dylib_function[lib, "SDL_RumbleJoystick", fn (joystick: Ptr[Joystick, AnyOrigin[True]], low_frequency_rumble: UInt16, high_frequency_rumble: UInt16, duration_ms: UInt32) -> Bool]()(joystick, low_frequency_rumble, high_frequency_rumble, duration_ms)
+    return _get_dylib_function[lib, "SDL_RumbleJoystick", def(joystick: Ptr[Joystick, O_joystick], low_frequency_rumble: UInt16, high_frequency_rumble: UInt16, duration_ms: UInt32) thin abi("C") -> Bool]()(joystick, low_frequency_rumble, high_frequency_rumble, duration_ms)
 
 
-fn rumble_joystick_triggers(joystick: Ptr[Joystick, AnyOrigin[True]], left_rumble: UInt16, right_rumble: UInt16, duration_ms: UInt32) raises:
+def rumble_joystick_triggers[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick], left_rumble: UInt16, right_rumble: UInt16, duration_ms: UInt32) raises:
     """Start a rumble effect in the joystick's triggers.
 
     Each call to this function cancels any previous trigger rumble effect, and
@@ -1292,12 +1292,12 @@ fn rumble_joystick_triggers(joystick: Ptr[Joystick, AnyOrigin[True]], left_rumbl
     Docs: https://wiki.libsdl.org/SDL3/SDL_RumbleJoystickTriggers.
     """
 
-    ret = _get_dylib_function[lib, "SDL_RumbleJoystickTriggers", fn (joystick: Ptr[Joystick, AnyOrigin[True]], left_rumble: UInt16, right_rumble: UInt16, duration_ms: UInt32) -> Bool]()(joystick, left_rumble, right_rumble, duration_ms)
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    var _ffi_ret = _get_dylib_function[lib, "SDL_RumbleJoystickTriggers", def(joystick: Ptr[Joystick, O_joystick], left_rumble: UInt16, right_rumble: UInt16, duration_ms: UInt32) thin abi("C") -> Bool]()(joystick, left_rumble, right_rumble, duration_ms)
+    if not _ffi_ret:
+        raise Error(get_error())
 
 
-fn set_joystick_led(joystick: Ptr[Joystick, AnyOrigin[True]], red: UInt8, green: UInt8, blue: UInt8) raises:
+def set_joystick_led[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick], red: UInt8, green: UInt8, blue: UInt8) raises:
     """Update a joystick's LED color.
 
     An example of a joystick LED is the light on the back of a PlayStation 4's
@@ -1319,12 +1319,12 @@ fn set_joystick_led(joystick: Ptr[Joystick, AnyOrigin[True]], red: UInt8, green:
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetJoystickLED.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetJoystickLED", fn (joystick: Ptr[Joystick, AnyOrigin[True]], red: UInt8, green: UInt8, blue: UInt8) -> Bool]()(joystick, red, green, blue)
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    var _ffi_ret = _get_dylib_function[lib, "SDL_SetJoystickLED", def(joystick: Ptr[Joystick, O_joystick], red: UInt8, green: UInt8, blue: UInt8) thin abi("C") -> Bool]()(joystick, red, green, blue)
+    if not _ffi_ret:
+        raise Error(get_error())
 
 
-fn send_joystick_effect(joystick: Ptr[Joystick, AnyOrigin[True]], data: Ptr[NoneType, AnyOrigin[False]], size: c_int) raises:
+def send_joystick_effect[O_joystick: Origin, O_data: Origin, //](joystick: Ptr[Joystick, O_joystick], data: Ptr[NoneType, O_data], size: c_int) raises:
     """Send a joystick specific effect packet.
 
     Args:
@@ -1339,12 +1339,12 @@ fn send_joystick_effect(joystick: Ptr[Joystick, AnyOrigin[True]], data: Ptr[None
     Docs: https://wiki.libsdl.org/SDL3/SDL_SendJoystickEffect.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SendJoystickEffect", fn (joystick: Ptr[Joystick, AnyOrigin[True]], data: Ptr[NoneType, AnyOrigin[False]], size: c_int) -> Bool]()(joystick, data, size)
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    var _ffi_ret = _get_dylib_function[lib, "SDL_SendJoystickEffect", def(joystick: Ptr[Joystick, O_joystick], data: Ptr[NoneType, O_data], size: c_int) thin abi("C") -> Bool]()(joystick, data, size)
+    if not _ffi_ret:
+        raise Error(get_error())
 
 
-fn close_joystick(joystick: Ptr[Joystick, AnyOrigin[True]]) raises -> None:
+def close_joystick[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick]) raises -> None:
     """Close a joystick previously opened with SDL_OpenJoystick().
 
     Args:
@@ -1353,10 +1353,10 @@ fn close_joystick(joystick: Ptr[Joystick, AnyOrigin[True]]) raises -> None:
     Docs: https://wiki.libsdl.org/SDL3/SDL_CloseJoystick.
     """
 
-    return _get_dylib_function[lib, "SDL_CloseJoystick", fn (joystick: Ptr[Joystick, AnyOrigin[True]]) -> None]()(joystick)
+    return _get_dylib_function[lib, "SDL_CloseJoystick", def(joystick: Ptr[Joystick, O_joystick]) thin abi("C") -> None]()(joystick)
 
 
-fn get_joystick_connection_state(joystick: Ptr[Joystick, AnyOrigin[True]]) raises -> JoystickConnectionState:
+def get_joystick_connection_state[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick]) raises -> JoystickConnectionState:
     """Get the connection state of a joystick.
 
     Args:
@@ -1370,10 +1370,10 @@ fn get_joystick_connection_state(joystick: Ptr[Joystick, AnyOrigin[True]]) raise
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickConnectionState.
     """
 
-    return _get_dylib_function[lib, "SDL_GetJoystickConnectionState", fn (joystick: Ptr[Joystick, AnyOrigin[True]]) -> JoystickConnectionState]()(joystick)
+    return _get_dylib_function[lib, "SDL_GetJoystickConnectionState", def(joystick: Ptr[Joystick, O_joystick]) thin abi("C") -> JoystickConnectionState]()(joystick)
 
 
-fn get_joystick_power_info(joystick: Ptr[Joystick, AnyOrigin[True]], percent: Ptr[c_int, AnyOrigin[True]]) raises -> PowerState:
+def get_joystick_power_info[O_joystick: Origin, O_percent: Origin, //](joystick: Ptr[Joystick, O_joystick], percent: Ptr[c_int, O_percent]) raises -> PowerState:
     """Get the battery state of a joystick.
 
     You should never take a battery status as absolute truth. Batteries
@@ -1396,4 +1396,4 @@ fn get_joystick_power_info(joystick: Ptr[Joystick, AnyOrigin[True]], percent: Pt
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickPowerInfo.
     """
 
-    return _get_dylib_function[lib, "SDL_GetJoystickPowerInfo", fn (joystick: Ptr[Joystick, AnyOrigin[True]], percent: Ptr[c_int, AnyOrigin[True]]) -> PowerState]()(joystick, percent)
+    return _get_dylib_function[lib, "SDL_GetJoystickPowerInfo", def(joystick: Ptr[Joystick, O_joystick], percent: Ptr[c_int, O_percent]) thin abi("C") -> PowerState]()(joystick, percent)

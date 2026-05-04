@@ -21,7 +21,7 @@
 # | 3. This notice may not be removed or altered from any source distribution.
 # x--------------------------------------------------------------------------x #
 
-"""Blendmode
+"""Blendmode.
 
 Blend modes decide how two colors will mix together. There are both
 standard modes for basic needs and a means to create custom modes,
@@ -29,8 +29,7 @@ dictating what sort of math to do on what color components.
 """
 
 
-@register_passable("trivial")
-struct BlendMode(Intable):
+struct BlendMode(Intable, TrivialRegisterPassable):
     """A set of blend modes used in drawing operations.
 
     These predefined blend modes are supported everywhere.
@@ -43,15 +42,15 @@ struct BlendMode(Intable):
     var value: UInt32
 
     @always_inline
-    fn __init__(out self, value: UInt32):
+    def __init__(out self, value: UInt32):
         self.value = value
 
     @always_inline
-    fn __int__(self) -> Int:
+    def __int__(self) -> Int:
         return Int(self.value)
 
     @always_inline
-    fn __or__(lhs, rhs: Self) -> Self:
+    def __or__(lhs, rhs: Self) -> Self:
         return Self(lhs.value | rhs.value)
 
     comptime BLENDMODE_NONE = Self(0x00000000)
@@ -71,8 +70,7 @@ struct BlendMode(Intable):
     comptime BLENDMODE_INVALID = Self(0x7FFFFFFF)
 
 
-@register_passable("trivial")
-struct BlendOperation(Indexer, Intable):
+struct BlendOperation(Indexer, Intable, TrivialRegisterPassable):
     """The blend operation used when combining source and destination pixel
     components.
 
@@ -82,19 +80,19 @@ struct BlendOperation(Indexer, Intable):
     var value: UInt32
 
     @always_inline
-    fn __init__(out self, value: Int):
-        self.value = value
+    def __init__(out self, value: Int):
+        self.value = UInt32(value)
 
     @always_inline
-    fn __int__(self) -> Int:
+    def __int__(self) -> Int:
         return Int(self.value)
 
     @always_inline
-    fn __eq__(lhs, rhs: Self) -> Bool:
+    def __eq__(lhs, rhs: Self) -> Bool:
         return lhs.value == rhs.value
 
     @always_inline("nodebug")
-    fn __mlir_index__(self) -> __mlir_type.index:
+    def __mlir_index__(self) -> __mlir_type.index:
         return Int(self)._mlir_value
 
     comptime BLENDOPERATION_ADD = Self(0x1)
@@ -109,8 +107,7 @@ struct BlendOperation(Indexer, Intable):
     """Max(dst, src) : supported by D3D, OpenGL, OpenGLES, and Vulkan."""
 
 
-@register_passable("trivial")
-struct BlendFactor(Indexer, Intable):
+struct BlendFactor(Indexer, Intable, TrivialRegisterPassable):
     """The normalized factor used to multiply pixel components.
 
     The blend factors are multiplied with the pixels from a drawing operation
@@ -124,19 +121,19 @@ struct BlendFactor(Indexer, Intable):
     var value: UInt32
 
     @always_inline
-    fn __init__(out self, value: Int):
-        self.value = value
+    def __init__(out self, value: Int):
+        self.value = UInt32(value)
 
     @always_inline
-    fn __int__(self) -> Int:
+    def __int__(self) -> Int:
         return Int(self.value)
 
     @always_inline
-    fn __eq__(lhs, rhs: Self) -> Bool:
+    def __eq__(lhs, rhs: Self) -> Bool:
         return lhs.value == rhs.value
 
     @always_inline("nodebug")
-    fn __mlir_index__(self) -> __mlir_type.index:
+    def __mlir_index__(self) -> __mlir_type.index:
         return Int(self)._mlir_value
 
     comptime BLENDFACTOR_ZERO = Self(0x1)
@@ -161,7 +158,7 @@ struct BlendFactor(Indexer, Intable):
     """1-dstA, 1-dstA, 1-dstA, 1-dstA."""
 
 
-fn compose_custom_blend_mode(src_color_factor: BlendFactor, dst_color_factor: BlendFactor, color_operation: BlendOperation, src_alpha_factor: BlendFactor, dst_alpha_factor: BlendFactor, alpha_operation: BlendOperation) raises -> BlendMode:
+def compose_custom_blend_mode(src_color_factor: BlendFactor, dst_color_factor: BlendFactor, color_operation: BlendOperation, src_alpha_factor: BlendFactor, dst_alpha_factor: BlendFactor, alpha_operation: BlendOperation) raises -> BlendMode:
     """Compose a custom blend mode for renderers.
 
     The functions SDL_SetRenderDrawBlendMode and SDL_SetTextureBlendMode accept
@@ -248,4 +245,4 @@ fn compose_custom_blend_mode(src_color_factor: BlendFactor, dst_color_factor: Bl
     Docs: https://wiki.libsdl.org/SDL3/SDL_ComposeCustomBlendMode.
     """
 
-    return _get_dylib_function[lib, "SDL_ComposeCustomBlendMode", fn (src_color_factor: BlendFactor, dst_color_factor: BlendFactor, color_operation: BlendOperation, src_alpha_factor: BlendFactor, dst_alpha_factor: BlendFactor, alpha_operation: BlendOperation) -> BlendMode]()(src_color_factor, dst_color_factor, color_operation, src_alpha_factor, dst_alpha_factor, alpha_operation)
+    return _get_dylib_function[lib, "SDL_ComposeCustomBlendMode", def(src_color_factor: BlendFactor, dst_color_factor: BlendFactor, color_operation: BlendOperation, src_alpha_factor: BlendFactor, dst_alpha_factor: BlendFactor, alpha_operation: BlendOperation) thin abi("C") -> BlendMode]()(src_color_factor, dst_color_factor, color_operation, src_alpha_factor, dst_alpha_factor, alpha_operation)

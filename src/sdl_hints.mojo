@@ -21,7 +21,7 @@
 # | 3. This notice may not be removed or altered from any source distribution.
 # x--------------------------------------------------------------------------x #
 
-"""Hints
+"""Hints.
 
 This file contains functions to set and get configuration hints, as well as
 listing each of them alphabetically.
@@ -36,8 +36,7 @@ work.
 """
 
 
-@register_passable("trivial")
-struct HintPriority(Indexer, Intable):
+struct HintPriority(Indexer, Intable, TrivialRegisterPassable):
     """An enumeration of hint priorities.
 
     Docs: https://wiki.libsdl.org/SDL3/SDL_HintPriority.
@@ -46,19 +45,19 @@ struct HintPriority(Indexer, Intable):
     var value: UInt32
 
     @always_inline
-    fn __init__(out self, value: Int):
-        self.value = value
+    def __init__(out self, value: Int):
+        self.value = UInt32(value)
 
     @always_inline
-    fn __int__(self) -> Int:
+    def __int__(self) -> Int:
         return Int(self.value)
 
     @always_inline
-    fn __eq__(lhs, rhs: Self) -> Bool:
+    def __eq__(lhs, rhs: Self) -> Bool:
         return lhs.value == rhs.value
 
     @always_inline("nodebug")
-    fn __mlir_index__(self) -> __mlir_type.index:
+    def __mlir_index__(self) -> __mlir_type.index:
         return Int(self)._mlir_value
 
     comptime HINT_DEFAULT = Self(0)
@@ -66,7 +65,7 @@ struct HintPriority(Indexer, Intable):
     comptime HINT_OVERRIDE = Self(2)
 
 
-fn set_hint_with_priority(var name: String, var value: String, priority: HintPriority) raises:
+def set_hint_with_priority(var name: String, var value: String, priority: HintPriority) raises:
     """Set a hint with a specific priority.
 
     The priority controls the behavior when setting a hint that already has a
@@ -88,12 +87,12 @@ fn set_hint_with_priority(var name: String, var value: String, priority: HintPri
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetHintWithPriority.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetHintWithPriority", fn (name: Ptr[c_char, AnyOrigin[False]], value: Ptr[c_char, AnyOrigin[False]], priority: HintPriority) -> Bool]()(name.as_c_string_slice().unsafe_ptr(), value.as_c_string_slice().unsafe_ptr(), priority)
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    var _ffi_ret = _get_dylib_function[lib, "SDL_SetHintWithPriority", def(name: Ptr[mut=False, c_char, origin_of(name)], value: Ptr[mut=False, c_char, origin_of(value)], priority: HintPriority) thin abi("C") -> Bool]()(name.as_c_string_slice().unsafe_ptr(), value.as_c_string_slice().unsafe_ptr(), priority)
+    if not _ffi_ret:
+        raise Error(get_error())
 
 
-fn set_hint(var name: String, var value: String) raises:
+def set_hint(var name: String, var value: String) raises:
     """Set a hint with normal priority.
 
     Hints will not be set if there is an existing override hint or environment
@@ -114,12 +113,12 @@ fn set_hint(var name: String, var value: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetHint.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetHint", fn (name: Ptr[c_char, AnyOrigin[False]], value: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(name.as_c_string_slice().unsafe_ptr(), value.as_c_string_slice().unsafe_ptr())
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    var _ffi_ret = _get_dylib_function[lib, "SDL_SetHint", def(name: Ptr[mut=False, c_char, origin_of(name)], value: Ptr[mut=False, c_char, origin_of(value)]) thin abi("C") -> Bool]()(name.as_c_string_slice().unsafe_ptr(), value.as_c_string_slice().unsafe_ptr())
+    if not _ffi_ret:
+        raise Error(get_error())
 
 
-fn reset_hint(var name: String) raises:
+def reset_hint(var name: String) raises:
     """Reset a hint to the default value.
 
     This will reset a hint to the value of the environment variable, or NULL if
@@ -139,12 +138,12 @@ fn reset_hint(var name: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_ResetHint.
     """
 
-    ret = _get_dylib_function[lib, "SDL_ResetHint", fn (name: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(name.as_c_string_slice().unsafe_ptr())
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    var _ffi_ret = _get_dylib_function[lib, "SDL_ResetHint", def(name: Ptr[mut=False, c_char, origin_of(name)]) thin abi("C") -> Bool]()(name.as_c_string_slice().unsafe_ptr())
+    if not _ffi_ret:
+        raise Error(get_error())
 
 
-fn reset_hints() raises -> None:
+def reset_hints() raises -> None:
     """Reset all hints to the default values.
 
     This will reset all hints to the value of the associated environment
@@ -157,10 +156,10 @@ fn reset_hints() raises -> None:
     Docs: https://wiki.libsdl.org/SDL3/SDL_ResetHints.
     """
 
-    return _get_dylib_function[lib, "SDL_ResetHints", fn () -> None]()()
+    return _get_dylib_function[lib, "SDL_ResetHints", def() thin abi("C") -> None]()()
 
 
-fn get_hint(var name: String) raises -> Ptr[c_char, AnyOrigin[False]]:
+def get_hint(var name: String) raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
     """Get the value of a hint.
 
     Args:
@@ -180,10 +179,10 @@ fn get_hint(var name: String) raises -> Ptr[c_char, AnyOrigin[False]]:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetHint.
     """
 
-    return _get_dylib_function[lib, "SDL_GetHint", fn (name: Ptr[c_char, AnyOrigin[False]]) -> Ptr[c_char, AnyOrigin[False]]]()(name.as_c_string_slice().unsafe_ptr())
+    return _get_dylib_function[lib, "SDL_GetHint", def(name: Ptr[mut=False, c_char, origin_of(name)]) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(name.as_c_string_slice().unsafe_ptr()).value()
 
 
-fn get_hint_boolean(var name: String, default_value: Bool) raises -> Bool:
+def get_hint_boolean(var name: String, default_value: Bool) raises -> Bool:
     """Get the boolean value of a hint variable.
 
     Args:
@@ -200,10 +199,10 @@ fn get_hint_boolean(var name: String, default_value: Bool) raises -> Bool:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetHintBoolean.
     """
 
-    return _get_dylib_function[lib, "SDL_GetHintBoolean", fn (name: Ptr[c_char, AnyOrigin[False]], default_value: Bool) -> Bool]()(name.as_c_string_slice().unsafe_ptr(), default_value)
+    return _get_dylib_function[lib, "SDL_GetHintBoolean", def(name: Ptr[mut=False, c_char, origin_of(name)], default_value: Bool) thin abi("C") -> Bool]()(name.as_c_string_slice().unsafe_ptr(), default_value)
 
 
-comptime HintCallback = fn (userdata: Ptr[NoneType, AnyOrigin[True]], name: Ptr[c_char, AnyOrigin[False]], old_value: Ptr[c_char, AnyOrigin[False]], new_value: Ptr[c_char, AnyOrigin[False]]) -> None
+comptime HintCallback = def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]], name: OptPtr[c_char, ExternalOrigin[mut=False]], old_value: OptPtr[c_char, ExternalOrigin[mut=False]], new_value: OptPtr[c_char, ExternalOrigin[mut=False]]) thin abi("C") -> None
 """A callback used to send notifications of hint value changes.
     
     This is called an initial time during SDL_AddHintCallback with the hint's
@@ -224,7 +223,7 @@ Docs: https://wiki.libsdl.org/SDL3/SDL_HintCallback.
 """
 
 
-fn add_hint_callback(var name: String, callback: HintCallback, userdata: Ptr[NoneType, AnyOrigin[True]]) raises:
+def add_hint_callback[O_userdata: Origin, //](var name: String, callback: HintCallback, userdata: Ptr[NoneType, O_userdata]) raises:
     """Add a function to watch a particular hint.
 
     The callback function is called _during_ this function, to provide it an
@@ -246,12 +245,12 @@ fn add_hint_callback(var name: String, callback: HintCallback, userdata: Ptr[Non
     Docs: https://wiki.libsdl.org/SDL3/SDL_AddHintCallback.
     """
 
-    ret = _get_dylib_function[lib, "SDL_AddHintCallback", fn (name: Ptr[c_char, AnyOrigin[False]], callback: HintCallback, userdata: Ptr[NoneType, AnyOrigin[True]]) -> Bool]()(name.as_c_string_slice().unsafe_ptr(), callback, userdata)
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    var _ffi_ret = _get_dylib_function[lib, "SDL_AddHintCallback", def(name: Ptr[mut=False, c_char, origin_of(name)], callback: HintCallback, userdata: Ptr[NoneType, O_userdata]) thin abi("C") -> Bool]()(name.as_c_string_slice().unsafe_ptr(), callback, userdata)
+    if not _ffi_ret:
+        raise Error(get_error())
 
 
-fn remove_hint_callback(var name: String, callback: HintCallback, userdata: Ptr[NoneType, AnyOrigin[True]]) raises -> None:
+def remove_hint_callback[O_userdata: Origin, //](var name: String, callback: HintCallback, userdata: Ptr[NoneType, O_userdata]) raises -> None:
     """Remove a function watching a particular hint.
 
     Args:
@@ -266,4 +265,4 @@ fn remove_hint_callback(var name: String, callback: HintCallback, userdata: Ptr[
     Docs: https://wiki.libsdl.org/SDL3/SDL_RemoveHintCallback.
     """
 
-    return _get_dylib_function[lib, "SDL_RemoveHintCallback", fn (name: Ptr[c_char, AnyOrigin[False]], callback: HintCallback, userdata: Ptr[NoneType, AnyOrigin[True]]) -> None]()(name.as_c_string_slice().unsafe_ptr(), callback, userdata)
+    return _get_dylib_function[lib, "SDL_RemoveHintCallback", def(name: Ptr[mut=False, c_char, origin_of(name)], callback: HintCallback, userdata: Ptr[NoneType, O_userdata]) thin abi("C") -> None]()(name.as_c_string_slice().unsafe_ptr(), callback, userdata)

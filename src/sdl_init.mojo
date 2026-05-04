@@ -21,7 +21,7 @@
 # | 3. This notice may not be removed or altered from any source distribution.
 # x--------------------------------------------------------------------------x #
 
-"""Init
+"""Init.
 
 All SDL programs need to initialize the library before starting to work
 with it.
@@ -48,8 +48,7 @@ SDL_SetAppMetadataProperty().
 """
 
 
-@register_passable("trivial")
-struct InitFlags(Intable):
+struct InitFlags(Intable, TrivialRegisterPassable):
     """Initialization flags for SDL_Init and/or SDL_InitSubSystem.
 
     These are the flags which may be passed to SDL_Init(). You should specify
@@ -61,15 +60,15 @@ struct InitFlags(Intable):
     var value: UInt32
 
     @always_inline
-    fn __init__(out self, value: UInt32):
+    def __init__(out self, value: UInt32):
         self.value = value
 
     @always_inline
-    fn __int__(self) -> Int:
+    def __int__(self) -> Int:
         return Int(self.value)
 
     @always_inline
-    fn __or__(lhs, rhs: Self) -> Self:
+    def __or__(lhs, rhs: Self) -> Self:
         return Self(lhs.value | rhs.value)
 
     comptime INIT_AUDIO = Self(0x00000010)
@@ -88,8 +87,7 @@ struct InitFlags(Intable):
     """`SDL_INIT_CAMERA` implies `SDL_INIT_EVENTS`."""
 
 
-@register_passable("trivial")
-struct AppResult(Indexer, Intable):
+struct AppResult(Indexer, Intable, TrivialRegisterPassable):
     """Return values for optional main callbacks.
 
     Returning SDL_APP_SUCCESS or SDL_APP_FAILURE from SDL_AppInit,
@@ -113,19 +111,19 @@ struct AppResult(Indexer, Intable):
     var value: UInt32
 
     @always_inline
-    fn __init__(out self, value: Int):
-        self.value = value
+    def __init__(out self, value: Int):
+        self.value = UInt32(value)
 
     @always_inline
-    fn __int__(self) -> Int:
+    def __int__(self) -> Int:
         return Int(self.value)
 
     @always_inline
-    fn __eq__(lhs, rhs: Self) -> Bool:
+    def __eq__(lhs, rhs: Self) -> Bool:
         return lhs.value == rhs.value
 
     @always_inline("nodebug")
-    fn __mlir_index__(self) -> __mlir_type.index:
+    def __mlir_index__(self) -> __mlir_type.index:
         return Int(self)._mlir_value
 
     comptime APP_CONTINUE = Self(0)
@@ -136,7 +134,7 @@ struct AppResult(Indexer, Intable):
     """Value that requests termination with error from the main callbacks."""
 
 
-comptime AppInit_func = fn (appstate: Ptr[Ptr[NoneType, AnyOrigin[True]], AnyOrigin[True]], argc: c_int, argv: Ptr[c_char, AnyOrigin[True]]) -> AppResult
+comptime AppInit_func = def(appstate: OptPtr[OptPtr[NoneType, ExternalOrigin[mut=True]], ExternalOrigin[mut=True]], argc: c_int, argv: OptPtr[c_char, ExternalOrigin[mut=True]]) thin abi("C") -> AppResult
 """Function pointer typedef for SDL_AppInit.
     
     These are used by SDL_EnterAppMainCallbacks. This mechanism operates behind
@@ -158,7 +156,7 @@ Docs: https://wiki.libsdl.org/SDL3/SDL_AppInit_func.
 """
 
 
-comptime AppIterate_func = fn (appstate: Ptr[NoneType, AnyOrigin[True]]) -> AppResult
+comptime AppIterate_func = def(appstate: OptPtr[NoneType, ExternalOrigin[mut=True]]) thin abi("C") -> AppResult
 """Function pointer typedef for SDL_AppIterate.
     
     These are used by SDL_EnterAppMainCallbacks. This mechanism operates behind
@@ -176,7 +174,7 @@ Docs: https://wiki.libsdl.org/SDL3/SDL_AppIterate_func.
 """
 
 
-comptime AppEvent_func = fn (appstate: Ptr[NoneType, AnyOrigin[True]], event: Ptr[Event, AnyOrigin[True]]) -> AppResult
+comptime AppEvent_func = def(appstate: OptPtr[NoneType, ExternalOrigin[mut=True]], event: OptPtr[Event, ExternalOrigin[mut=True]]) thin abi("C") -> AppResult
 """Function pointer typedef for SDL_AppEvent.
     
     These are used by SDL_EnterAppMainCallbacks. This mechanism operates behind
@@ -195,7 +193,7 @@ Docs: https://wiki.libsdl.org/SDL3/SDL_AppEvent_func.
 """
 
 
-comptime AppQuit_func = fn (appstate: Ptr[NoneType, AnyOrigin[True]], result: AppResult) -> None
+comptime AppQuit_func = def(appstate: OptPtr[NoneType, ExternalOrigin[mut=True]], result: AppResult) thin abi("C") -> None
 """Function pointer typedef for SDL_AppQuit.
     
     These are used by SDL_EnterAppMainCallbacks. This mechanism operates behind
@@ -210,7 +208,7 @@ Docs: https://wiki.libsdl.org/SDL3/SDL_AppQuit_func.
 """
 
 
-fn init(flags: InitFlags) raises:
+def init(flags: InitFlags) raises:
     """Initialize the SDL library.
 
     SDL_Init() simply forwards to calling SDL_InitSubSystem(). Therefore, the
@@ -262,12 +260,12 @@ fn init(flags: InitFlags) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_Init.
     """
 
-    ret = _get_dylib_function[lib, "SDL_Init", fn (flags: InitFlags) -> Bool]()(flags)
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    var _ffi_ret = _get_dylib_function[lib, "SDL_Init", def(flags: InitFlags) thin abi("C") -> Bool]()(flags)
+    if not _ffi_ret:
+        raise Error(get_error())
 
 
-fn init_sub_system(flags: InitFlags) raises:
+def init_sub_system(flags: InitFlags) raises:
     """Compatibility function to initialize the SDL library.
 
     This function and SDL_Init() are interchangeable.
@@ -282,12 +280,12 @@ fn init_sub_system(flags: InitFlags) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_InitSubSystem.
     """
 
-    ret = _get_dylib_function[lib, "SDL_InitSubSystem", fn (flags: InitFlags) -> Bool]()(flags)
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    var _ffi_ret = _get_dylib_function[lib, "SDL_InitSubSystem", def(flags: InitFlags) thin abi("C") -> Bool]()(flags)
+    if not _ffi_ret:
+        raise Error(get_error())
 
 
-fn quit_sub_system(flags: InitFlags) raises -> None:
+def quit_sub_system(flags: InitFlags) raises -> None:
     """Shut down specific SDL subsystems.
 
     You still need to call SDL_Quit() even if you close all open subsystems
@@ -299,10 +297,10 @@ fn quit_sub_system(flags: InitFlags) raises -> None:
     Docs: https://wiki.libsdl.org/SDL3/SDL_QuitSubSystem.
     """
 
-    return _get_dylib_function[lib, "SDL_QuitSubSystem", fn (flags: InitFlags) -> None]()(flags)
+    return _get_dylib_function[lib, "SDL_QuitSubSystem", def(flags: InitFlags) thin abi("C") -> None]()(flags)
 
 
-fn was_init(flags: InitFlags) raises -> InitFlags:
+def was_init(flags: InitFlags) raises -> InitFlags:
     """Get a mask of the specified subsystems which are currently initialized.
 
     Args:
@@ -315,10 +313,10 @@ fn was_init(flags: InitFlags) raises -> InitFlags:
     Docs: https://wiki.libsdl.org/SDL3/SDL_WasInit.
     """
 
-    return _get_dylib_function[lib, "SDL_WasInit", fn (flags: InitFlags) -> InitFlags]()(flags)
+    return _get_dylib_function[lib, "SDL_WasInit", def(flags: InitFlags) thin abi("C") -> InitFlags]()(flags)
 
 
-fn quit() raises -> None:
+def quit() raises -> None:
     """Clean up all initialized subsystems.
 
     You should call this function even if you have already shutdown each
@@ -332,10 +330,10 @@ fn quit() raises -> None:
     Docs: https://wiki.libsdl.org/SDL3/SDL_Quit.
     """
 
-    return _get_dylib_function[lib, "SDL_Quit", fn () -> None]()()
+    return _get_dylib_function[lib, "SDL_Quit", def() thin abi("C") -> None]()()
 
 
-fn is_main_thread() raises -> Bool:
+def is_main_thread() raises -> Bool:
     """Return whether this is the main thread.
 
     On Apple platforms, the main thread is the thread that runs your program's
@@ -354,10 +352,10 @@ fn is_main_thread() raises -> Bool:
     Docs: https://wiki.libsdl.org/SDL3/SDL_IsMainThread.
     """
 
-    return _get_dylib_function[lib, "SDL_IsMainThread", fn () -> Bool]()()
+    return _get_dylib_function[lib, "SDL_IsMainThread", def() thin abi("C") -> Bool]()()
 
 
-comptime MainThreadCallback = fn (userdata: Ptr[NoneType, AnyOrigin[True]]) -> None
+comptime MainThreadCallback = def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]]) thin abi("C") -> None
 """Callback run on the main thread.
     
     Args:
@@ -367,7 +365,7 @@ Docs: https://wiki.libsdl.org/SDL3/SDL_MainThreadCallback.
 """
 
 
-fn run_on_main_thread(callback: MainThreadCallback, userdata: Ptr[NoneType, AnyOrigin[True]], wait_complete: Bool) raises:
+def run_on_main_thread[O_userdata: Origin, //](callback: MainThreadCallback, userdata: Ptr[NoneType, O_userdata], wait_complete: Bool) raises:
     """Call a function on the main thread during event processing.
 
     If this is called on the main thread, the callback is executed immediately.
@@ -394,12 +392,12 @@ fn run_on_main_thread(callback: MainThreadCallback, userdata: Ptr[NoneType, AnyO
     Docs: https://wiki.libsdl.org/SDL3/SDL_RunOnMainThread.
     """
 
-    ret = _get_dylib_function[lib, "SDL_RunOnMainThread", fn (callback: MainThreadCallback, userdata: Ptr[NoneType, AnyOrigin[True]], wait_complete: Bool) -> Bool]()(callback, userdata, wait_complete)
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    var _ffi_ret = _get_dylib_function[lib, "SDL_RunOnMainThread", def(callback: MainThreadCallback, userdata: Ptr[NoneType, O_userdata], wait_complete: Bool) thin abi("C") -> Bool]()(callback, userdata, wait_complete)
+    if not _ffi_ret:
+        raise Error(get_error())
 
 
-fn set_app_metadata(var appname: String, var appversion: String, var appidentifier: String) raises:
+def set_app_metadata(var appname: String, var appversion: String, var appidentifier: String) raises:
     """Specify basic metadata about your app.
 
     You can optionally provide metadata about your app to SDL. This is not
@@ -438,12 +436,12 @@ fn set_app_metadata(var appname: String, var appversion: String, var appidentifi
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetAppMetadata.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetAppMetadata", fn (appname: Ptr[c_char, AnyOrigin[False]], appversion: Ptr[c_char, AnyOrigin[False]], appidentifier: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(appname.as_c_string_slice().unsafe_ptr(), appversion.as_c_string_slice().unsafe_ptr(), appidentifier.as_c_string_slice().unsafe_ptr())
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    var _ffi_ret = _get_dylib_function[lib, "SDL_SetAppMetadata", def(appname: Ptr[mut=False, c_char, origin_of(appname)], appversion: Ptr[mut=False, c_char, origin_of(appversion)], appidentifier: Ptr[mut=False, c_char, origin_of(appidentifier)]) thin abi("C") -> Bool]()(appname.as_c_string_slice().unsafe_ptr(), appversion.as_c_string_slice().unsafe_ptr(), appidentifier.as_c_string_slice().unsafe_ptr())
+    if not _ffi_ret:
+        raise Error(get_error())
 
 
-fn set_app_metadata_property(var name: String, var value: String) raises:
+def set_app_metadata_property(var name: String, var value: String) raises:
     """Specify metadata about your app through a set of properties.
 
     You can optionally provide metadata about your app to SDL. This is not
@@ -506,12 +504,12 @@ fn set_app_metadata_property(var name: String, var value: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetAppMetadataProperty.
     """
 
-    ret = _get_dylib_function[lib, "SDL_SetAppMetadataProperty", fn (name: Ptr[c_char, AnyOrigin[False]], value: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(name.as_c_string_slice().unsafe_ptr(), value.as_c_string_slice().unsafe_ptr())
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    var _ffi_ret = _get_dylib_function[lib, "SDL_SetAppMetadataProperty", def(name: Ptr[mut=False, c_char, origin_of(name)], value: Ptr[mut=False, c_char, origin_of(value)]) thin abi("C") -> Bool]()(name.as_c_string_slice().unsafe_ptr(), value.as_c_string_slice().unsafe_ptr())
+    if not _ffi_ret:
+        raise Error(get_error())
 
 
-fn get_app_metadata_property(var name: String) raises -> Ptr[c_char, AnyOrigin[False]]:
+def get_app_metadata_property(var name: String) raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
     """Get metadata about your app.
 
     This returns metadata previously set using SDL_SetAppMetadata() or
@@ -534,4 +532,4 @@ fn get_app_metadata_property(var name: String) raises -> Ptr[c_char, AnyOrigin[F
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetAppMetadataProperty.
     """
 
-    return _get_dylib_function[lib, "SDL_GetAppMetadataProperty", fn (name: Ptr[c_char, AnyOrigin[False]]) -> Ptr[c_char, AnyOrigin[False]]]()(name.as_c_string_slice().unsafe_ptr())
+    return _get_dylib_function[lib, "SDL_GetAppMetadataProperty", def(name: Ptr[mut=False, c_char, origin_of(name)]) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(name.as_c_string_slice().unsafe_ptr()).value()

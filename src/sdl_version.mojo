@@ -21,14 +21,14 @@
 # | 3. This notice may not be removed or altered from any source distribution.
 # x--------------------------------------------------------------------------x #
 
-"""Version
+"""Version.
 
 Functionality to query the current SDL version, both as headers the app was
 compiled against, and a library the app is linked to.
 """
 
 
-fn get_version() raises -> c_int:
+def get_version() raises -> c_int:
     """Get the version of SDL that is linked against your program.
 
     If you are linking to SDL dynamically, then it is possible that the current
@@ -44,10 +44,10 @@ fn get_version() raises -> c_int:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetVersion.
     """
 
-    return _get_dylib_function[lib, "SDL_GetVersion", fn () -> c_int]()()
+    return _get_dylib_function[lib, "SDL_GetVersion", def() thin abi("C") -> c_int]()()
 
 
-fn get_revision() raises -> Ptr[c_char, AnyOrigin[False]]:
+def get_revision() raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
     """Get the code revision of SDL that is linked against your program.
 
     This value is the revision of the code you are linked with and may be
@@ -71,4 +71,4 @@ fn get_revision() raises -> Ptr[c_char, AnyOrigin[False]]:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetRevision.
     """
 
-    return _get_dylib_function[lib, "SDL_GetRevision", fn () -> Ptr[c_char, AnyOrigin[False]]]()()
+    return _get_dylib_function[lib, "SDL_GetRevision", def() thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()().value()

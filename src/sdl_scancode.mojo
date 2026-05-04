@@ -21,7 +21,7 @@
 # | 3. This notice may not be removed or altered from any source distribution.
 # x--------------------------------------------------------------------------x #
 
-"""Scancode
+"""Scancode.
 
 Defines keyboard scancodes.
 
@@ -32,8 +32,7 @@ https://wiki.libsdl.org/SDL3/BestKeyboardPractices
 """
 
 
-@register_passable("trivial")
-struct Scancode(Indexer, Intable):
+struct Scancode(Indexer, Intable, TrivialRegisterPassable):
     """The SDL keyboard scancode representation.
 
     An SDL scancode is the physical representation of a key on the keyboard,
@@ -51,19 +50,19 @@ struct Scancode(Indexer, Intable):
     var value: UInt32
 
     @always_inline
-    fn __init__(out self, value: Int):
-        self.value = value
+    def __init__(out self, value: Int):
+        self.value = UInt32(value)
 
     @always_inline
-    fn __int__(self) -> Int:
+    def __int__(self) -> Int:
         return Int(self.value)
 
     @always_inline
-    fn __eq__(lhs, rhs: Self) -> Bool:
+    def __eq__(lhs, rhs: Self) -> Bool:
         return lhs.value == rhs.value
 
     @always_inline("nodebug")
-    fn __mlir_index__(self) -> __mlir_type.index:
+    def __mlir_index__(self) -> __mlir_type.index:
         return Int(self)._mlir_value
 
     comptime SCANCODE_UNKNOWN = Self(0)

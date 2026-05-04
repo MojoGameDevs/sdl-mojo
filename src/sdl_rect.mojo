@@ -21,7 +21,7 @@
 # | 3. This notice may not be removed or altered from any source distribution.
 # x--------------------------------------------------------------------------x #
 
-"""Rect
+"""Rect.
 
 Some helper functions for managing rectangles and 2D points, in both
 integer and floating point versions.
@@ -78,7 +78,7 @@ struct FRect(ImplicitlyCopyable, Movable):
     var h: c_float
 
 
-fn has_rect_intersection(a: Ptr[Rect, AnyOrigin[False]], b: Ptr[Rect, AnyOrigin[False]]) raises -> Bool:
+def has_rect_intersection[O_a: Origin, O_b: Origin, //](a: Ptr[Rect, O_a], b: Ptr[Rect, O_b]) raises -> Bool:
     """Determine whether two rectangles intersect.
 
     If either pointer is NULL the function will return false.
@@ -96,10 +96,10 @@ fn has_rect_intersection(a: Ptr[Rect, AnyOrigin[False]], b: Ptr[Rect, AnyOrigin[
     Docs: https://wiki.libsdl.org/SDL3/SDL_HasRectIntersection.
     """
 
-    return _get_dylib_function[lib, "SDL_HasRectIntersection", fn (a: Ptr[Rect, AnyOrigin[False]], b: Ptr[Rect, AnyOrigin[False]]) -> Bool]()(a, b)
+    return _get_dylib_function[lib, "SDL_HasRectIntersection", def(a: Ptr[Rect, O_a], b: Ptr[Rect, O_b]) thin abi("C") -> Bool]()(a, b)
 
 
-fn get_rect_intersection(a: Ptr[Rect, AnyOrigin[False]], b: Ptr[Rect, AnyOrigin[False]], result: Ptr[Rect, AnyOrigin[True]]) raises -> Bool:
+def get_rect_intersection[O_a: Origin, O_b: Origin, O_result: Origin, //](a: Ptr[Rect, O_a], b: Ptr[Rect, O_b], result: Ptr[Rect, O_result]) raises -> Bool:
     """Calculate the intersection of two rectangles.
 
     If `result` is NULL then this function will return false.
@@ -116,10 +116,10 @@ fn get_rect_intersection(a: Ptr[Rect, AnyOrigin[False]], b: Ptr[Rect, AnyOrigin[
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetRectIntersection.
     """
 
-    return _get_dylib_function[lib, "SDL_GetRectIntersection", fn (a: Ptr[Rect, AnyOrigin[False]], b: Ptr[Rect, AnyOrigin[False]], result: Ptr[Rect, AnyOrigin[True]]) -> Bool]()(a, b, result)
+    return _get_dylib_function[lib, "SDL_GetRectIntersection", def(a: Ptr[Rect, O_a], b: Ptr[Rect, O_b], result: Ptr[Rect, O_result]) thin abi("C") -> Bool]()(a, b, result)
 
 
-fn get_rect_union(a: Ptr[Rect, AnyOrigin[False]], b: Ptr[Rect, AnyOrigin[False]], result: Ptr[Rect, AnyOrigin[True]]) raises:
+def get_rect_union[O_a: Origin, O_b: Origin, O_result: Origin, //](a: Ptr[Rect, O_a], b: Ptr[Rect, O_b], result: Ptr[Rect, O_result]) raises:
     """Calculate the union of two rectangles.
 
     Args:
@@ -135,12 +135,12 @@ fn get_rect_union(a: Ptr[Rect, AnyOrigin[False]], b: Ptr[Rect, AnyOrigin[False]]
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetRectUnion.
     """
 
-    ret = _get_dylib_function[lib, "SDL_GetRectUnion", fn (a: Ptr[Rect, AnyOrigin[False]], b: Ptr[Rect, AnyOrigin[False]], result: Ptr[Rect, AnyOrigin[True]]) -> Bool]()(a, b, result)
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    var _ffi_ret = _get_dylib_function[lib, "SDL_GetRectUnion", def(a: Ptr[Rect, O_a], b: Ptr[Rect, O_b], result: Ptr[Rect, O_result]) thin abi("C") -> Bool]()(a, b, result)
+    if not _ffi_ret:
+        raise Error(get_error())
 
 
-fn get_rect_enclosing_points(points: Ptr[Point, AnyOrigin[False]], count: c_int, clip: Ptr[Rect, AnyOrigin[False]], result: Ptr[Rect, AnyOrigin[True]]) raises -> Bool:
+def get_rect_enclosing_points[O_points: Origin, O_clip: Origin, O_result: Origin, //](points: Ptr[Point, O_points], count: c_int, clip: Ptr[Rect, O_clip], result: Ptr[Rect, O_result]) raises -> Bool:
     """Calculate a minimal rectangle enclosing a set of points.
 
     If `clip` is not NULL then only points inside of the clipping rectangle are
@@ -161,10 +161,10 @@ fn get_rect_enclosing_points(points: Ptr[Point, AnyOrigin[False]], count: c_int,
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetRectEnclosingPoints.
     """
 
-    return _get_dylib_function[lib, "SDL_GetRectEnclosingPoints", fn (points: Ptr[Point, AnyOrigin[False]], count: c_int, clip: Ptr[Rect, AnyOrigin[False]], result: Ptr[Rect, AnyOrigin[True]]) -> Bool]()(points, count, clip, result)
+    return _get_dylib_function[lib, "SDL_GetRectEnclosingPoints", def(points: Ptr[Point, O_points], count: c_int, clip: Ptr[Rect, O_clip], result: Ptr[Rect, O_result]) thin abi("C") -> Bool]()(points, count, clip, result)
 
 
-fn get_rect_and_line_intersection(rect: Ptr[Rect, AnyOrigin[False]], x1: Ptr[c_int, AnyOrigin[True]], y1: Ptr[c_int, AnyOrigin[True]], x2: Ptr[c_int, AnyOrigin[True]], y2: Ptr[c_int, AnyOrigin[True]]) raises -> Bool:
+def get_rect_and_line_intersection[O_rect: Origin, O_x1: Origin, O_y1: Origin, O_x2: Origin, O_y2: Origin, //](rect: Ptr[Rect, O_rect], x1: Ptr[c_int, O_x1], y1: Ptr[c_int, O_y1], x2: Ptr[c_int, O_x2], y2: Ptr[c_int, O_y2]) raises -> Bool:
     """Calculate the intersection of a rectangle and line segment.
 
     This function is used to clip a line segment to a rectangle. A line segment
@@ -186,10 +186,10 @@ fn get_rect_and_line_intersection(rect: Ptr[Rect, AnyOrigin[False]], x1: Ptr[c_i
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetRectAndLineIntersection.
     """
 
-    return _get_dylib_function[lib, "SDL_GetRectAndLineIntersection", fn (rect: Ptr[Rect, AnyOrigin[False]], x1: Ptr[c_int, AnyOrigin[True]], y1: Ptr[c_int, AnyOrigin[True]], x2: Ptr[c_int, AnyOrigin[True]], y2: Ptr[c_int, AnyOrigin[True]]) -> Bool]()(rect, x1, y1, x2, y2)
+    return _get_dylib_function[lib, "SDL_GetRectAndLineIntersection", def(rect: Ptr[Rect, O_rect], x1: Ptr[c_int, O_x1], y1: Ptr[c_int, O_y1], x2: Ptr[c_int, O_x2], y2: Ptr[c_int, O_y2]) thin abi("C") -> Bool]()(rect, x1, y1, x2, y2)
 
 
-fn has_rect_intersection_float(a: Ptr[FRect, AnyOrigin[False]], b: Ptr[FRect, AnyOrigin[False]]) raises -> Bool:
+def has_rect_intersection_float[O_a: Origin, O_b: Origin, //](a: Ptr[FRect, O_a], b: Ptr[FRect, O_b]) raises -> Bool:
     """Determine whether two rectangles intersect with float precision.
 
     If either pointer is NULL the function will return false.
@@ -204,10 +204,10 @@ fn has_rect_intersection_float(a: Ptr[FRect, AnyOrigin[False]], b: Ptr[FRect, An
     Docs: https://wiki.libsdl.org/SDL3/SDL_HasRectIntersectionFloat.
     """
 
-    return _get_dylib_function[lib, "SDL_HasRectIntersectionFloat", fn (a: Ptr[FRect, AnyOrigin[False]], b: Ptr[FRect, AnyOrigin[False]]) -> Bool]()(a, b)
+    return _get_dylib_function[lib, "SDL_HasRectIntersectionFloat", def(a: Ptr[FRect, O_a], b: Ptr[FRect, O_b]) thin abi("C") -> Bool]()(a, b)
 
 
-fn get_rect_intersection_float(a: Ptr[FRect, AnyOrigin[False]], b: Ptr[FRect, AnyOrigin[False]], result: Ptr[FRect, AnyOrigin[True]]) raises -> Bool:
+def get_rect_intersection_float[O_a: Origin, O_b: Origin, O_result: Origin, //](a: Ptr[FRect, O_a], b: Ptr[FRect, O_b], result: Ptr[FRect, O_result]) raises -> Bool:
     """Calculate the intersection of two rectangles with float precision.
 
     If `result` is NULL then this function will return false.
@@ -224,10 +224,10 @@ fn get_rect_intersection_float(a: Ptr[FRect, AnyOrigin[False]], b: Ptr[FRect, An
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetRectIntersectionFloat.
     """
 
-    return _get_dylib_function[lib, "SDL_GetRectIntersectionFloat", fn (a: Ptr[FRect, AnyOrigin[False]], b: Ptr[FRect, AnyOrigin[False]], result: Ptr[FRect, AnyOrigin[True]]) -> Bool]()(a, b, result)
+    return _get_dylib_function[lib, "SDL_GetRectIntersectionFloat", def(a: Ptr[FRect, O_a], b: Ptr[FRect, O_b], result: Ptr[FRect, O_result]) thin abi("C") -> Bool]()(a, b, result)
 
 
-fn get_rect_union_float(a: Ptr[FRect, AnyOrigin[False]], b: Ptr[FRect, AnyOrigin[False]], result: Ptr[FRect, AnyOrigin[True]]) raises:
+def get_rect_union_float[O_a: Origin, O_b: Origin, O_result: Origin, //](a: Ptr[FRect, O_a], b: Ptr[FRect, O_b], result: Ptr[FRect, O_result]) raises:
     """Calculate the union of two rectangles with float precision.
 
     Args:
@@ -243,12 +243,12 @@ fn get_rect_union_float(a: Ptr[FRect, AnyOrigin[False]], b: Ptr[FRect, AnyOrigin
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetRectUnionFloat.
     """
 
-    ret = _get_dylib_function[lib, "SDL_GetRectUnionFloat", fn (a: Ptr[FRect, AnyOrigin[False]], b: Ptr[FRect, AnyOrigin[False]], result: Ptr[FRect, AnyOrigin[True]]) -> Bool]()(a, b, result)
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    var _ffi_ret = _get_dylib_function[lib, "SDL_GetRectUnionFloat", def(a: Ptr[FRect, O_a], b: Ptr[FRect, O_b], result: Ptr[FRect, O_result]) thin abi("C") -> Bool]()(a, b, result)
+    if not _ffi_ret:
+        raise Error(get_error())
 
 
-fn get_rect_enclosing_points_float(points: Ptr[FPoint, AnyOrigin[False]], count: c_int, clip: Ptr[FRect, AnyOrigin[False]], result: Ptr[FRect, AnyOrigin[True]]) raises -> Bool:
+def get_rect_enclosing_points_float[O_points: Origin, O_clip: Origin, O_result: Origin, //](points: Ptr[FPoint, O_points], count: c_int, clip: Ptr[FRect, O_clip], result: Ptr[FRect, O_result]) raises -> Bool:
     """Calculate a minimal rectangle enclosing a set of points with float
     precision.
 
@@ -270,10 +270,10 @@ fn get_rect_enclosing_points_float(points: Ptr[FPoint, AnyOrigin[False]], count:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetRectEnclosingPointsFloat.
     """
 
-    return _get_dylib_function[lib, "SDL_GetRectEnclosingPointsFloat", fn (points: Ptr[FPoint, AnyOrigin[False]], count: c_int, clip: Ptr[FRect, AnyOrigin[False]], result: Ptr[FRect, AnyOrigin[True]]) -> Bool]()(points, count, clip, result)
+    return _get_dylib_function[lib, "SDL_GetRectEnclosingPointsFloat", def(points: Ptr[FPoint, O_points], count: c_int, clip: Ptr[FRect, O_clip], result: Ptr[FRect, O_result]) thin abi("C") -> Bool]()(points, count, clip, result)
 
 
-fn get_rect_and_line_intersection_float(rect: Ptr[FRect, AnyOrigin[False]], x1: Ptr[c_float, AnyOrigin[True]], y1: Ptr[c_float, AnyOrigin[True]], x2: Ptr[c_float, AnyOrigin[True]], y2: Ptr[c_float, AnyOrigin[True]]) raises -> Bool:
+def get_rect_and_line_intersection_float[O_rect: Origin, O_x1: Origin, O_y1: Origin, O_x2: Origin, O_y2: Origin, //](rect: Ptr[FRect, O_rect], x1: Ptr[c_float, O_x1], y1: Ptr[c_float, O_y1], x2: Ptr[c_float, O_x2], y2: Ptr[c_float, O_y2]) raises -> Bool:
     """Calculate the intersection of a rectangle and line segment with float
     precision.
 
@@ -296,4 +296,4 @@ fn get_rect_and_line_intersection_float(rect: Ptr[FRect, AnyOrigin[False]], x1: 
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetRectAndLineIntersectionFloat.
     """
 
-    return _get_dylib_function[lib, "SDL_GetRectAndLineIntersectionFloat", fn (rect: Ptr[FRect, AnyOrigin[False]], x1: Ptr[c_float, AnyOrigin[True]], y1: Ptr[c_float, AnyOrigin[True]], x2: Ptr[c_float, AnyOrigin[True]], y2: Ptr[c_float, AnyOrigin[True]]) -> Bool]()(rect, x1, y1, x2, y2)
+    return _get_dylib_function[lib, "SDL_GetRectAndLineIntersectionFloat", def(rect: Ptr[FRect, O_rect], x1: Ptr[c_float, O_x1], y1: Ptr[c_float, O_y1], x2: Ptr[c_float, O_x2], y2: Ptr[c_float, O_y2]) thin abi("C") -> Bool]()(rect, x1, y1, x2, y2)

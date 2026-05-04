@@ -21,7 +21,7 @@
 # | 3. This notice may not be removed or altered from any source distribution.
 # x--------------------------------------------------------------------------x #
 
-"""Power
+"""Power.
 
 SDL power management routines.
 
@@ -36,8 +36,7 @@ they can save their game.
 """
 
 
-@register_passable("trivial")
-struct PowerState(Indexer, Intable):
+struct PowerState(Indexer, Intable, TrivialRegisterPassable):
     """The basic state for the system's power supply.
 
     These are results returned by SDL_GetPowerInfo().
@@ -48,19 +47,19 @@ struct PowerState(Indexer, Intable):
     var value: UInt32
 
     @always_inline
-    fn __init__(out self, value: Int):
-        self.value = value
+    def __init__(out self, value: Int):
+        self.value = UInt32(value)
 
     @always_inline
-    fn __int__(self) -> Int:
+    def __int__(self) -> Int:
         return Int(self.value)
 
     @always_inline
-    fn __eq__(lhs, rhs: Self) -> Bool:
+    def __eq__(lhs, rhs: Self) -> Bool:
         return lhs.value == rhs.value
 
     @always_inline("nodebug")
-    fn __mlir_index__(self) -> __mlir_type.index:
+    def __mlir_index__(self) -> __mlir_type.index:
         return Int(self)._mlir_value
 
     comptime POWERSTATE_ERROR = Self(-1)
@@ -77,7 +76,7 @@ struct PowerState(Indexer, Intable):
     """Plugged in, battery charged."""
 
 
-fn get_power_info(seconds: Ptr[c_int, AnyOrigin[True]], percent: Ptr[c_int, AnyOrigin[True]]) raises -> PowerState:
+def get_power_info[O_seconds: Origin, O_percent: Origin, //](seconds: Ptr[c_int, O_seconds], percent: Ptr[c_int, O_percent]) raises -> PowerState:
     """Get the current power supply details.
 
     You should never take a battery status as absolute truth. Batteries
@@ -113,4 +112,4 @@ fn get_power_info(seconds: Ptr[c_int, AnyOrigin[True]], percent: Ptr[c_int, AnyO
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetPowerInfo.
     """
 
-    return _get_dylib_function[lib, "SDL_GetPowerInfo", fn (seconds: Ptr[c_int, AnyOrigin[True]], percent: Ptr[c_int, AnyOrigin[True]]) -> PowerState]()(seconds, percent)
+    return _get_dylib_function[lib, "SDL_GetPowerInfo", def(seconds: Ptr[c_int, O_seconds], percent: Ptr[c_int, O_percent]) thin abi("C") -> PowerState]()(seconds, percent)

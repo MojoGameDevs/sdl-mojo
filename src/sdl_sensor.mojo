@@ -21,7 +21,7 @@
 # | 3. This notice may not be removed or altered from any source distribution.
 # x--------------------------------------------------------------------------x #
 
-"""Sensor
+"""Sensor.
 
 SDL sensor management.
 
@@ -43,8 +43,7 @@ struct Sensor(ImplicitlyCopyable, Movable):
     pass
 
 
-@register_passable("trivial")
-struct SensorID(Intable):
+struct SensorID(Intable, TrivialRegisterPassable):
     """This is a unique ID for a sensor for the time it is connected to the
     system, and is never reused for the lifetime of the application.
 
@@ -56,20 +55,19 @@ struct SensorID(Intable):
     var value: UInt32
 
     @always_inline
-    fn __init__(out self, value: UInt32):
+    def __init__(out self, value: UInt32):
         self.value = value
 
     @always_inline
-    fn __int__(self) -> Int:
+    def __int__(self) -> Int:
         return Int(self.value)
 
     @always_inline
-    fn __or__(lhs, rhs: Self) -> Self:
+    def __or__(lhs, rhs: Self) -> Self:
         return Self(lhs.value | rhs.value)
 
 
-@register_passable("trivial")
-struct SensorType(Indexer, Intable):
+struct SensorType(Indexer, Intable, TrivialRegisterPassable):
     """The different sensors defined by SDL.
 
     Additional sensors may be available, using platform dependent semantics.
@@ -125,19 +123,19 @@ struct SensorType(Indexer, Intable):
     var value: UInt32
 
     @always_inline
-    fn __init__(out self, value: Int):
-        self.value = value
+    def __init__(out self, value: Int):
+        self.value = UInt32(value)
 
     @always_inline
-    fn __int__(self) -> Int:
+    def __int__(self) -> Int:
         return Int(self.value)
 
     @always_inline
-    fn __eq__(lhs, rhs: Self) -> Bool:
+    def __eq__(lhs, rhs: Self) -> Bool:
         return lhs.value == rhs.value
 
     @always_inline("nodebug")
-    fn __mlir_index__(self) -> __mlir_type.index:
+    def __mlir_index__(self) -> __mlir_type.index:
         return Int(self)._mlir_value
 
     comptime SENSOR_INVALID = Self(-1)
@@ -159,7 +157,7 @@ struct SensorType(Indexer, Intable):
     comptime SENSOR_COUNT = Self(7)
 
 
-fn get_sensors(count: Ptr[c_int, AnyOrigin[True]], out ret: Ptr[SensorID, AnyOrigin[True]]) raises:
+def get_sensors[O_count: Origin, //](count: Ptr[c_int, O_count], out ret: Ptr[SensorID, ExternalOrigin[mut=True]]) raises:
     """Get a list of currently connected sensors.
 
     Args:
@@ -174,12 +172,13 @@ fn get_sensors(count: Ptr[c_int, AnyOrigin[True]], out ret: Ptr[SensorID, AnyOri
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetSensors.
     """
 
-    ret = _get_dylib_function[lib, "SDL_GetSensors", fn (count: Ptr[c_int, AnyOrigin[True]]) -> Ptr[SensorID, AnyOrigin[True]]]()(count)
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    _ffi_ret = _get_dylib_function[lib, "SDL_GetSensors", def(count: Ptr[c_int, O_count]) thin abi("C") -> OptPtr[SensorID, ExternalOrigin[mut=True]]]()(count)
+    if not _ffi_ret:
+        raise Error(get_error())
+    ret = _ffi_ret.value()
 
 
-fn get_sensor_name_for_id(instance_id: SensorID) raises -> Ptr[c_char, AnyOrigin[False]]:
+def get_sensor_name_for_id(instance_id: SensorID) raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
     """Get the implementation dependent name of a sensor.
 
     This can be called before any sensors are opened.
@@ -193,10 +192,10 @@ fn get_sensor_name_for_id(instance_id: SensorID) raises -> Ptr[c_char, AnyOrigin
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetSensorNameForID.
     """
 
-    return _get_dylib_function[lib, "SDL_GetSensorNameForID", fn (instance_id: SensorID) -> Ptr[c_char, AnyOrigin[False]]]()(instance_id)
+    return _get_dylib_function[lib, "SDL_GetSensorNameForID", def(instance_id: SensorID) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(instance_id).value()
 
 
-fn get_sensor_type_for_id(instance_id: SensorID) raises -> SensorType:
+def get_sensor_type_for_id(instance_id: SensorID) raises -> SensorType:
     """Get the type of a sensor.
 
     This can be called before any sensors are opened.
@@ -211,10 +210,10 @@ fn get_sensor_type_for_id(instance_id: SensorID) raises -> SensorType:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetSensorTypeForID.
     """
 
-    return _get_dylib_function[lib, "SDL_GetSensorTypeForID", fn (instance_id: SensorID) -> SensorType]()(instance_id)
+    return _get_dylib_function[lib, "SDL_GetSensorTypeForID", def(instance_id: SensorID) thin abi("C") -> SensorType]()(instance_id)
 
 
-fn get_sensor_non_portable_type_for_id(instance_id: SensorID) raises -> c_int:
+def get_sensor_non_portable_type_for_id(instance_id: SensorID) raises -> c_int:
     """Get the platform dependent type of a sensor.
 
     This can be called before any sensors are opened.
@@ -229,10 +228,10 @@ fn get_sensor_non_portable_type_for_id(instance_id: SensorID) raises -> c_int:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetSensorNonPortableTypeForID.
     """
 
-    return _get_dylib_function[lib, "SDL_GetSensorNonPortableTypeForID", fn (instance_id: SensorID) -> c_int]()(instance_id)
+    return _get_dylib_function[lib, "SDL_GetSensorNonPortableTypeForID", def(instance_id: SensorID) thin abi("C") -> c_int]()(instance_id)
 
 
-fn open_sensor(instance_id: SensorID, out ret: Ptr[Sensor, AnyOrigin[True]]) raises:
+def open_sensor(instance_id: SensorID, out ret: Ptr[Sensor, ExternalOrigin[mut=True]]) raises:
     """Open a sensor for use.
 
     Args:
@@ -245,12 +244,13 @@ fn open_sensor(instance_id: SensorID, out ret: Ptr[Sensor, AnyOrigin[True]]) rai
     Docs: https://wiki.libsdl.org/SDL3/SDL_OpenSensor.
     """
 
-    ret = _get_dylib_function[lib, "SDL_OpenSensor", fn (instance_id: SensorID) -> Ptr[Sensor, AnyOrigin[True]]]()(instance_id)
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    _ffi_ret = _get_dylib_function[lib, "SDL_OpenSensor", def(instance_id: SensorID) thin abi("C") -> OptPtr[Sensor, ExternalOrigin[mut=True]]]()(instance_id)
+    if not _ffi_ret:
+        raise Error(get_error())
+    ret = _ffi_ret.value()
 
 
-fn get_sensor_from_id(instance_id: SensorID, out ret: Ptr[Sensor, AnyOrigin[True]]) raises:
+def get_sensor_from_id(instance_id: SensorID, out ret: Ptr[Sensor, ExternalOrigin[mut=True]]) raises:
     """Return the SDL_Sensor associated with an instance ID.
 
     Args:
@@ -263,12 +263,13 @@ fn get_sensor_from_id(instance_id: SensorID, out ret: Ptr[Sensor, AnyOrigin[True
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetSensorFromID.
     """
 
-    ret = _get_dylib_function[lib, "SDL_GetSensorFromID", fn (instance_id: SensorID) -> Ptr[Sensor, AnyOrigin[True]]]()(instance_id)
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    _ffi_ret = _get_dylib_function[lib, "SDL_GetSensorFromID", def(instance_id: SensorID) thin abi("C") -> OptPtr[Sensor, ExternalOrigin[mut=True]]]()(instance_id)
+    if not _ffi_ret:
+        raise Error(get_error())
+    ret = _ffi_ret.value()
 
 
-fn get_sensor_properties(sensor: Ptr[Sensor, AnyOrigin[True]]) raises -> PropertiesID:
+def get_sensor_properties[O_sensor: Origin, //](sensor: Ptr[Sensor, O_sensor]) raises -> PropertiesID:
     """Get the properties associated with a sensor.
 
     Args:
@@ -281,10 +282,10 @@ fn get_sensor_properties(sensor: Ptr[Sensor, AnyOrigin[True]]) raises -> Propert
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetSensorProperties.
     """
 
-    return _get_dylib_function[lib, "SDL_GetSensorProperties", fn (sensor: Ptr[Sensor, AnyOrigin[True]]) -> PropertiesID]()(sensor)
+    return _get_dylib_function[lib, "SDL_GetSensorProperties", def(sensor: Ptr[Sensor, O_sensor]) thin abi("C") -> PropertiesID]()(sensor)
 
 
-fn get_sensor_name(sensor: Ptr[Sensor, AnyOrigin[True]], out ret: Ptr[c_char, AnyOrigin[False]]) raises:
+def get_sensor_name[O_sensor: Origin, //](sensor: Ptr[Sensor, O_sensor], out ret: Ptr[c_char, ExternalOrigin[mut=False]]) raises:
     """Get the implementation dependent name of a sensor.
 
     Args:
@@ -297,12 +298,13 @@ fn get_sensor_name(sensor: Ptr[Sensor, AnyOrigin[True]], out ret: Ptr[c_char, An
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetSensorName.
     """
 
-    ret = _get_dylib_function[lib, "SDL_GetSensorName", fn (sensor: Ptr[Sensor, AnyOrigin[True]]) -> Ptr[c_char, AnyOrigin[False]]]()(sensor)
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    _ffi_ret = _get_dylib_function[lib, "SDL_GetSensorName", def(sensor: Ptr[Sensor, O_sensor]) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(sensor)
+    if not _ffi_ret:
+        raise Error(get_error())
+    ret = _ffi_ret.value()
 
 
-fn get_sensor_type(sensor: Ptr[Sensor, AnyOrigin[True]]) raises -> SensorType:
+def get_sensor_type[O_sensor: Origin, //](sensor: Ptr[Sensor, O_sensor]) raises -> SensorType:
     """Get the type of a sensor.
 
     Args:
@@ -315,10 +317,10 @@ fn get_sensor_type(sensor: Ptr[Sensor, AnyOrigin[True]]) raises -> SensorType:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetSensorType.
     """
 
-    return _get_dylib_function[lib, "SDL_GetSensorType", fn (sensor: Ptr[Sensor, AnyOrigin[True]]) -> SensorType]()(sensor)
+    return _get_dylib_function[lib, "SDL_GetSensorType", def(sensor: Ptr[Sensor, O_sensor]) thin abi("C") -> SensorType]()(sensor)
 
 
-fn get_sensor_non_portable_type(sensor: Ptr[Sensor, AnyOrigin[True]]) raises -> c_int:
+def get_sensor_non_portable_type[O_sensor: Origin, //](sensor: Ptr[Sensor, O_sensor]) raises -> c_int:
     """Get the platform dependent type of a sensor.
 
     Args:
@@ -330,10 +332,10 @@ fn get_sensor_non_portable_type(sensor: Ptr[Sensor, AnyOrigin[True]]) raises -> 
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetSensorNonPortableType.
     """
 
-    return _get_dylib_function[lib, "SDL_GetSensorNonPortableType", fn (sensor: Ptr[Sensor, AnyOrigin[True]]) -> c_int]()(sensor)
+    return _get_dylib_function[lib, "SDL_GetSensorNonPortableType", def(sensor: Ptr[Sensor, O_sensor]) thin abi("C") -> c_int]()(sensor)
 
 
-fn get_sensor_id(sensor: Ptr[Sensor, AnyOrigin[True]]) raises -> SensorID:
+def get_sensor_id[O_sensor: Origin, //](sensor: Ptr[Sensor, O_sensor]) raises -> SensorID:
     """Get the instance ID of a sensor.
 
     Args:
@@ -346,10 +348,10 @@ fn get_sensor_id(sensor: Ptr[Sensor, AnyOrigin[True]]) raises -> SensorID:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetSensorID.
     """
 
-    return _get_dylib_function[lib, "SDL_GetSensorID", fn (sensor: Ptr[Sensor, AnyOrigin[True]]) -> SensorID]()(sensor)
+    return _get_dylib_function[lib, "SDL_GetSensorID", def(sensor: Ptr[Sensor, O_sensor]) thin abi("C") -> SensorID]()(sensor)
 
 
-fn get_sensor_data(sensor: Ptr[Sensor, AnyOrigin[True]], data: Ptr[c_float, AnyOrigin[True]], num_values: c_int) raises:
+def get_sensor_data[O_sensor: Origin, O_data: Origin, //](sensor: Ptr[Sensor, O_sensor], data: Ptr[c_float, O_data], num_values: c_int) raises:
     """Get the current state of an opened sensor.
 
     The number of values and interpretation of the data is sensor dependent.
@@ -366,12 +368,12 @@ fn get_sensor_data(sensor: Ptr[Sensor, AnyOrigin[True]], data: Ptr[c_float, AnyO
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetSensorData.
     """
 
-    ret = _get_dylib_function[lib, "SDL_GetSensorData", fn (sensor: Ptr[Sensor, AnyOrigin[True]], data: Ptr[c_float, AnyOrigin[True]], num_values: c_int) -> Bool]()(sensor, data, num_values)
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    var _ffi_ret = _get_dylib_function[lib, "SDL_GetSensorData", def(sensor: Ptr[Sensor, O_sensor], data: Ptr[c_float, O_data], num_values: c_int) thin abi("C") -> Bool]()(sensor, data, num_values)
+    if not _ffi_ret:
+        raise Error(get_error())
 
 
-fn close_sensor(sensor: Ptr[Sensor, AnyOrigin[True]]) raises -> None:
+def close_sensor[O_sensor: Origin, //](sensor: Ptr[Sensor, O_sensor]) raises -> None:
     """Close a sensor previously opened with SDL_OpenSensor().
 
     Args:
@@ -380,10 +382,10 @@ fn close_sensor(sensor: Ptr[Sensor, AnyOrigin[True]]) raises -> None:
     Docs: https://wiki.libsdl.org/SDL3/SDL_CloseSensor.
     """
 
-    return _get_dylib_function[lib, "SDL_CloseSensor", fn (sensor: Ptr[Sensor, AnyOrigin[True]]) -> None]()(sensor)
+    return _get_dylib_function[lib, "SDL_CloseSensor", def(sensor: Ptr[Sensor, O_sensor]) thin abi("C") -> None]()(sensor)
 
 
-fn update_sensors() raises -> None:
+def update_sensors() raises -> None:
     """Update the current state of the open sensors.
 
     This is called automatically by the event loop if sensor events are
@@ -395,4 +397,4 @@ fn update_sensors() raises -> None:
     Docs: https://wiki.libsdl.org/SDL3/SDL_UpdateSensors.
     """
 
-    return _get_dylib_function[lib, "SDL_UpdateSensors", fn () -> None]()()
+    return _get_dylib_function[lib, "SDL_UpdateSensors", def() thin abi("C") -> None]()()

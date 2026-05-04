@@ -21,7 +21,7 @@
 # | 3. This notice may not be removed or altered from any source distribution.
 # x--------------------------------------------------------------------------x #
 
-"""Touch
+"""Touch.
 
 SDL offers touch input, on platforms that support it. It can manage
 multiple touch devices and track multiple fingers on those devices.
@@ -38,8 +38,7 @@ SDL_TOUCH_MOUSEID.
 """
 
 
-@register_passable("trivial")
-struct TouchID(Intable):
+struct TouchID(Intable, TrivialRegisterPassable):
     """A unique ID for a touch device.
 
     This ID is valid for the time the device is connected to the system, and is
@@ -53,20 +52,19 @@ struct TouchID(Intable):
     var value: UInt64
 
     @always_inline
-    fn __init__(out self, value: UInt64):
+    def __init__(out self, value: UInt64):
         self.value = value
 
     @always_inline
-    fn __int__(self) -> Int:
+    def __int__(self) -> Int:
         return Int(self.value)
 
     @always_inline
-    fn __or__(lhs, rhs: Self) -> Self:
+    def __or__(lhs, rhs: Self) -> Self:
         return Self(lhs.value | rhs.value)
 
 
-@register_passable("trivial")
-struct FingerID(Intable):
+struct FingerID(Intable, TrivialRegisterPassable):
     """A unique ID for a single finger on a touch device.
 
     This ID is valid for the time the finger (stylus, etc) is touching and will
@@ -82,20 +80,19 @@ struct FingerID(Intable):
     var value: UInt64
 
     @always_inline
-    fn __init__(out self, value: UInt64):
+    def __init__(out self, value: UInt64):
         self.value = value
 
     @always_inline
-    fn __int__(self) -> Int:
+    def __int__(self) -> Int:
         return Int(self.value)
 
     @always_inline
-    fn __or__(lhs, rhs: Self) -> Self:
+    def __or__(lhs, rhs: Self) -> Self:
         return Self(lhs.value | rhs.value)
 
 
-@register_passable("trivial")
-struct TouchDeviceType(Indexer, Intable):
+struct TouchDeviceType(Indexer, Intable, TrivialRegisterPassable):
     """An enum that describes the type of a touch device.
 
     Docs: https://wiki.libsdl.org/SDL3/SDL_TouchDeviceType.
@@ -104,19 +101,19 @@ struct TouchDeviceType(Indexer, Intable):
     var value: UInt32
 
     @always_inline
-    fn __init__(out self, value: Int):
-        self.value = value
+    def __init__(out self, value: Int):
+        self.value = UInt32(value)
 
     @always_inline
-    fn __int__(self) -> Int:
+    def __int__(self) -> Int:
         return Int(self.value)
 
     @always_inline
-    fn __eq__(lhs, rhs: Self) -> Bool:
+    def __eq__(lhs, rhs: Self) -> Bool:
         return lhs.value == rhs.value
 
     @always_inline("nodebug")
-    fn __mlir_index__(self) -> __mlir_type.index:
+    def __mlir_index__(self) -> __mlir_type.index:
         return Int(self)._mlir_value
 
     comptime TOUCH_DEVICE_INVALID = Self(-1)
@@ -149,7 +146,7 @@ struct Finger(ImplicitlyCopyable, Movable):
     """The quantity of pressure applied, normalized (0...1)."""
 
 
-fn get_touch_devices(count: Ptr[c_int, AnyOrigin[True]], out ret: Ptr[TouchID, AnyOrigin[True]]) raises:
+def get_touch_devices[O_count: Origin, //](count: Ptr[c_int, O_count], out ret: Ptr[TouchID, ExternalOrigin[mut=True]]) raises:
     """Get a list of registered touch devices.
 
     On some platforms SDL first sees the touch device if it was actually used.
@@ -168,12 +165,13 @@ fn get_touch_devices(count: Ptr[c_int, AnyOrigin[True]], out ret: Ptr[TouchID, A
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetTouchDevices.
     """
 
-    ret = _get_dylib_function[lib, "SDL_GetTouchDevices", fn (count: Ptr[c_int, AnyOrigin[True]]) -> Ptr[TouchID, AnyOrigin[True]]]()(count)
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    _ffi_ret = _get_dylib_function[lib, "SDL_GetTouchDevices", def(count: Ptr[c_int, O_count]) thin abi("C") -> OptPtr[TouchID, ExternalOrigin[mut=True]]]()(count)
+    if not _ffi_ret:
+        raise Error(get_error())
+    ret = _ffi_ret.value()
 
 
-fn get_touch_device_name(touch_id: TouchID, out ret: Ptr[c_char, AnyOrigin[False]]) raises:
+def get_touch_device_name(touch_id: TouchID, out ret: Ptr[c_char, ExternalOrigin[mut=False]]) raises:
     """Get the touch device name as reported from the driver.
 
     Args:
@@ -186,12 +184,13 @@ fn get_touch_device_name(touch_id: TouchID, out ret: Ptr[c_char, AnyOrigin[False
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetTouchDeviceName.
     """
 
-    ret = _get_dylib_function[lib, "SDL_GetTouchDeviceName", fn (touch_id: TouchID) -> Ptr[c_char, AnyOrigin[False]]]()(touch_id)
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    _ffi_ret = _get_dylib_function[lib, "SDL_GetTouchDeviceName", def(touch_id: TouchID) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(touch_id)
+    if not _ffi_ret:
+        raise Error(get_error())
+    ret = _ffi_ret.value()
 
 
-fn get_touch_device_type(touch_id: TouchID) raises -> TouchDeviceType:
+def get_touch_device_type(touch_id: TouchID) raises -> TouchDeviceType:
     """Get the type of the given touch device.
 
     Args:
@@ -203,10 +202,10 @@ fn get_touch_device_type(touch_id: TouchID) raises -> TouchDeviceType:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetTouchDeviceType.
     """
 
-    return _get_dylib_function[lib, "SDL_GetTouchDeviceType", fn (touch_id: TouchID) -> TouchDeviceType]()(touch_id)
+    return _get_dylib_function[lib, "SDL_GetTouchDeviceType", def(touch_id: TouchID) thin abi("C") -> TouchDeviceType]()(touch_id)
 
 
-fn get_touch_fingers(touch_id: TouchID, count: Ptr[c_int, AnyOrigin[True]], out ret: Ptr[Ptr[Finger, AnyOrigin[True]], AnyOrigin[True]]) raises:
+def get_touch_fingers[O_count: Origin, //](touch_id: TouchID, count: Ptr[c_int, O_count], out ret: Ptr[OptPtr[Finger, ExternalOrigin[mut=True]], ExternalOrigin[mut=True]]) raises:
     """Get a list of active fingers for a given touch device.
 
     Args:
@@ -223,6 +222,7 @@ fn get_touch_fingers(touch_id: TouchID, count: Ptr[c_int, AnyOrigin[True]], out 
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetTouchFingers.
     """
 
-    ret = _get_dylib_function[lib, "SDL_GetTouchFingers", fn (touch_id: TouchID, count: Ptr[c_int, AnyOrigin[True]]) -> Ptr[Ptr[Finger, AnyOrigin[True]], AnyOrigin[True]]]()(touch_id, count)
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    _ffi_ret = _get_dylib_function[lib, "SDL_GetTouchFingers", def(touch_id: TouchID, count: Ptr[c_int, O_count]) thin abi("C") -> OptPtr[OptPtr[Finger, ExternalOrigin[mut=True]], ExternalOrigin[mut=True]]]()(touch_id, count)
+    if not _ffi_ret:
+        raise Error(get_error())
+    ret = _ffi_ret.value()

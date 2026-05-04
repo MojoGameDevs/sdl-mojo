@@ -21,7 +21,7 @@
 # | 3. This notice may not be removed or altered from any source distribution.
 # x--------------------------------------------------------------------------x #
 
-"""GUID
+"""GUID.
 
 A GUID is a 128-bit value that represents something that is uniquely
 identifiable by this value: "globally unique."
@@ -49,10 +49,10 @@ struct GUID(ImplicitlyCopyable, Movable):
     Docs: https://wiki.libsdl.org/SDL3/GUID.
     """
 
-    var data: ArrayHelper[UInt8, 16, AnyOrigin[True]]
+    var data: ArrayHelper[UInt8, 16, ExternalOrigin[mut=True]]
 
 
-fn guid_to_string(guid: GUID, psz_guid: Ptr[c_char, AnyOrigin[True]], cb_guid: c_int) raises -> None:
+def guid_to_string[O_psz_guid: Origin, //](guid: GUID, psz_guid: Ptr[c_char, O_psz_guid], cb_guid: c_int) raises -> None:
     """Get an ASCII string representation for a given SDL_GUID.
 
     Args:
@@ -66,10 +66,10 @@ fn guid_to_string(guid: GUID, psz_guid: Ptr[c_char, AnyOrigin[True]], cb_guid: c
     Docs: https://wiki.libsdl.org/SDL3/SDL_GUIDToString.
     """
 
-    return _get_dylib_function[lib, "SDL_GUIDToString", fn (guid: GUID, psz_guid: Ptr[c_char, AnyOrigin[True]], cb_guid: c_int) -> None]()(guid, psz_guid, cb_guid)
+    return _get_dylib_function[lib, "SDL_GUIDToString", def(guid: GUID, psz_guid: Ptr[c_char, O_psz_guid], cb_guid: c_int) thin abi("C") -> None]()(guid, psz_guid, cb_guid)
 
 
-fn string_to_guid(var pch_guid: String) raises -> GUID:
+def string_to_guid(var pch_guid: String) raises -> GUID:
     """Convert a GUID string into a SDL_GUID structure.
 
     Performs no error checking. If this function is given a string containing
@@ -88,4 +88,4 @@ fn string_to_guid(var pch_guid: String) raises -> GUID:
     Docs: https://wiki.libsdl.org/SDL3/SDL_StringToGUID.
     """
 
-    return _get_dylib_function[lib, "SDL_StringToGUID", fn (pch_guid: Ptr[c_char, AnyOrigin[False]]) -> GUID]()(pch_guid.as_c_string_slice().unsafe_ptr())
+    return _get_dylib_function[lib, "SDL_StringToGUID", def(pch_guid: Ptr[mut=False, c_char, origin_of(pch_guid)]) thin abi("C") -> GUID]()(pch_guid.as_c_string_slice().unsafe_ptr())

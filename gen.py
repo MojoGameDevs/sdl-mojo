@@ -112,6 +112,7 @@ def drop_prefix(string: str) -> str:
 def translate_heading(m: re.Match) -> str:
     license = re.sub(r"^(?:  )?", r"# | ", m["license"], flags=re.MULTILINE)
     filedoc = re.sub(r"^ \* ?", r"", m["filedoc"], flags=re.MULTILINE)
+    filedoc = re.sub(r"^([^\n]+?)(?<!\.)(\n)", r"\1.\2", filedoc, count=1)
     return f'''# x--------------------------------------------------------------------------x #
 # | SDL3 Bindings in Mojo
 # x--------------------------------------------------------------------------x #
@@ -127,7 +128,7 @@ def translate_heading(m: re.Match) -> str:
 #
 type_map = {
     "void": "NoneType",
-    "SDL_FunctionPointer": "fn () -> None",
+    "SDL_FunctionPointer": "def () thin abi(\"C\") -> None",
     "SDL_Time": "Int64",
     "intptr_t": "Int",
     "char": "c_char",
@@ -169,10 +170,10 @@ def translate_type(m: re.Match) -> str:
 
     if m.groupdict().get("ptrs"):
         for _ in range(len(m["ptrs"])):
-            result = f"Ptr[{result}, AnyOrigin[{not bool(m['mut'])}]]"
+            result = f"OptPtr[{result}, ExternalOrigin[mut={not bool(m['mut'])}]]"
 
     if m.groupdict().get("vecs"):
-        result = f"ArrayHelper[{result}, {m['vecs']}, AnyOrigin[{not bool(m['mut'])}]]"
+        result = f"ArrayHelper[{result}, {m['vecs']}, ExternalOrigin[mut={not bool(m['mut'])}]]"
 
     if m.groupdict().get("amnt"):
         result = f"InlineArray[{result}, {m['amnt']}]"
@@ -207,7 +208,7 @@ def translate_function_pointer(m: re.Match) -> str:
     if m:
         ret = translate_return_type(re.match(match_return, m["ret"]))
         args = re.sub(match_argument, translate_argument, m["args"])
-        return f"{snake_case(drop_prefix(m['name']))}: fn ({args}) -> {ret}"
+        return f"{snake_case(drop_prefix(m['name']))}: def ({args}) thin -> {ret}"
 
 
 # +------( docstring )------+ #
@@ -297,7 +298,7 @@ def translate_typedef(m: re.Match) -> str:
     ptr = m["td_ptr"]
 
     if ptr:
-        return f"comptime {mojo_name} = Ptr[NoneType, AnyOrigin[True]]\n{doc_template(doc, name)}"
+        return f"comptime {mojo_name} = Ptr[NoneType, MutExternalOrigin]\n{doc_template(doc, name)}"
 
     def translate_def(m: re.Match) -> str:
         def_name = drop_prefix(m["name"])
@@ -311,7 +312,7 @@ def translate_typedef(m: re.Match) -> str:
             return f"""
     @always_inline
     @staticmethod
-    fn {def_name}({def_params}: {type}) -> {type}:
+    def {def_name}({def_params}: {type}) -> {type}:
         return {def_expr}
 
 """
@@ -324,21 +325,20 @@ def translate_typedef(m: re.Match) -> str:
 
     defs = re.sub(match_typedef_defines, translate_def, m["td_defs"])
     return f"""
-@register_passable("trivial")
-struct {mojo_name}(Intable):
+struct {mojo_name}(TrivialRegisterPassable, Intable):
     {doc_template(doc, name, "    ")}
     var value: {type}
 
     @always_inline
-    fn __init__(out self, value: {type}):
+    def __init__(out self, value: {type}):
         self.value = value
 
     @always_inline
-    fn __int__(self) -> Int:
+    def __int__(self) -> Int:
         return Int(self.value)
 
     @always_inline
-    fn __or__(lhs, rhs: Self) -> Self:
+    def __or__(lhs, rhs: Self) -> Self:
         return Self(lhs.value | rhs.value)
 
 {defs}
@@ -434,25 +434,24 @@ def translate_enum(m: re.Match) -> str:
     body = re.sub(match_enum_types, translate_enum_type, body)
     body = re.sub(match_enum_comment, translate_enum_comment, body)
     return f"""
-@register_passable("trivial")
-struct {drop_prefix(name)}(Indexer, Intable):
+struct {drop_prefix(name)}(TrivialRegisterPassable, Indexer, Intable):
     {doc_template(doc, name, "    ")}
     var value: UInt32
 
     @always_inline
-    fn __init__(out self, value: Int):
-        self.value = value
+    def __init__(out self, value: Int):
+        self.value = UInt32(value)
 
     @always_inline
-    fn __int__(self) -> Int:
+    def __int__(self) -> Int:
         return Int(self.value)
 
     @always_inline
-    fn __eq__(lhs, rhs: Self) -> Bool:
+    def __eq__(lhs, rhs: Self) -> Bool:
         return lhs.value == rhs.value
 
     @always_inline("nodebug")
-    fn __mlir_index__(self) -> __mlir_type.index:
+    def __mlir_index__(self) -> __mlir_type.index:
         return Int(self)._mlir_value
 {body}
 """
@@ -512,7 +511,7 @@ struct {drop_prefix(m["os_name"])}(ImplicitlyCopyable, Movable):
 #
 def translate_ptr_struct(m: re.Match) -> str:
     return f"""
-comptime {drop_prefix(m["ps_name"])} = Ptr[NoneType, AnyOrigin[True]]
+comptime {drop_prefix(m["ps_name"])} = Ptr[NoneType, MutExternalOrigin]
 {doc_template(format_docblock(m["doc"]), drop_prefix(m["ps_name"]))}
 """
 
@@ -530,7 +529,7 @@ def translate_typedef_struct(m: re.Match) -> str:
     body = re.sub(match_multi_field, split_multifield, body)
     body = re.sub(match_field, translate_field, body)
     if name == "StorageInterface":
-        body = body.replace("var copy: fn", "var copy_file: fn")
+        body = body.replace("var copy: def", "var copy_file: def")
     return f"""
 @fieldwise_init
 struct {name}(ImplicitlyCopyable, Movable):
@@ -551,28 +550,17 @@ def translate_union(m: re.Match) -> str:
     name = m["tu_name"]
     body = ""
     for member in re.finditer(match_union_member, m["tu_body"]):
-        body += "    " + translate_type(member) + ", `, `,\n"
-    body = body.removesuffix(" `, `,\n")
+        body += translate_type(member) + ", "
+    body = body.removesuffix(", ")
     return f"""
-struct {drop_prefix(name)}:
-    comptime _mlir_type = __mlir_type[`!pop.union<`,
-{body}
-    `>`]
-    var _impl: Self._mlir_type
-
-    @implicit
-    fn __init__[T: AnyType](out self, value: T):
-        self._impl = rebind[Self._mlir_type](value)
-
-    fn __getitem__[T: AnyType](ref self) -> ref [self._impl] T:
-        return rebind[Ptr[T, origin_of(self._impl)]](Ptr(to=self._impl))[]
+comptime {drop_prefix(name)} = UnsafeUnion[{body}]
 """
 
 
 # +------( argument )------+ #
 #
 match_argument = re.compile(r"(?:(?<=,)|^)\s*(.+?)(?:(?=,)|$)")
-match_string_argument = re.compile(r"(\w+): Ptr\[c_char, AnyOrigin\[False\]\]")
+match_string_argument = re.compile(r"(\w+): Ptr\[c_char, ExternalOrigin\[mut=False\]\]")
 match_argument_names = re.compile(r"(, ?)?(\w+):.*?(?:(?=, \w*?:)|$)")
 
 
@@ -587,27 +575,62 @@ def translate_argument(arg: re.Match) -> str:
 # +------( function )------+ #
 #
 def fn_raises_template(
-    doc: str, sdl_name: str, mojo_name: str, args: str, ret: str, call: str
+    doc: str, sdl_name: str, mojo_name: str, generics: str, args: str, ret: str, call: str
 ) -> str:
-    return f"""
-fn {mojo_name}({args}{", " * bool(args) * (ret != "None")}{f"out ret: {ret}" * (ret != "None")}) raises:
+    if ret == "String":
+        return f"""
+def {mojo_name}{generics}({args}{", " * bool(args)}out ret: String) raises:
     {doc_template(doc, sdl_name, "    ")}
-    ret = {call}
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    var _ffi_ret = {call}
+    if not _ffi_ret:
+        raise Error(get_error())
+    ret = String(unsafe_from_utf8_ptr=_ffi_ret.value())
 
+"""
+    elif ret == "None":
+        return f"""
+def {mojo_name}{generics}({args}) raises:
+    {doc_template(doc, sdl_name, "    ")}
+    var _ffi_ret = {call}
+    if not _ffi_ret:
+        raise Error(get_error())
+
+"""
+    else:
+        return f"""
+def {mojo_name}{generics}({args}{", " * bool(args)}out ret: {ret}) raises:
+    {doc_template(doc, sdl_name, "    ")}
+    _ffi_ret = {call}
+    if not _ffi_ret:
+        raise Error(get_error())
+    ret = _ffi_ret.value()
 """
 
 
 def fn_template(
-    doc: str, sdl_name: str, mojo_name: str, args: str, ret: str, call: str
+    doc: str, sdl_name: str, mojo_name: str, generics: str, args: str, ret: str, call: str
 ) -> str:
-    return f"""
-fn {mojo_name}({args}) raises -> {ret}:
+    if ret == "String":
+        return f"""
+def {mojo_name}{generics}({args}) raises -> {ret}:
+    {doc_template(doc, sdl_name, "    ")}
+    return String(unsafe_from_utf8_ptr={call}.value())
+
+    """
+    elif ret.startswith("Ptr"):
+        return f"""
+def {mojo_name}{generics}({args}) raises -> {ret}:
+    {doc_template(doc, sdl_name, "    ")}
+    return {call}.value()
+
+    """
+    else:
+        return f"""
+def {mojo_name}{generics}({args}) raises -> {ret}:
     {doc_template(doc, sdl_name, "    ")}
     return {call}
 
-"""
+    """
 
 
 def translate_function(m: re.Match):
@@ -618,30 +641,93 @@ def translate_function(m: re.Match):
     sdl_name = m.group("f_name")
     mojo_name = snake_case(drop_prefix(sdl_name))
     sdl_ret = translate_return_type(re.match(match_return, m.group("f_ret")))
-    mojo_ret = re.sub(match_string_argument, r"String", sdl_ret)
-    sdl_args = re.sub(
-        match_argument, translate_argument, m.group("f_args")
-    ).removeprefix(" ")
-    mojo_args = re.sub(match_string_argument, r"var \1: String", sdl_args)
-    pass_args = re.sub(match_argument_names, r"\1\2", sdl_args)
-    for arg_name in re.finditer(r"\w+(?=: String)", mojo_args):
-        pass_args = re.sub(
-            r"\b" + arg_name[0] + r"\b", arg_name[0] + ".as_c_string_slice().unsafe_ptr()", pass_args
-        )
-    call = f'_get_dylib_function[lib, "{m["f_name"]}", fn ({sdl_args}) -> {sdl_ret}]()({pass_args})'
-    if mojo_ret == "String":
-        call = "String(unsafe_from_utf8_ptr=" + call + ")"
+    
+    # Properly map string returns
+    mojo_ret = sdl_ret.replace("OptPtr", "Ptr", 1)
+    if sdl_ret.startswith("Ptr[c_char"):
+        mojo_ret = "String"
+
+    generic_params = []
+    mojo_args_list =[]
+    sdl_args_list = []
+    pass_args_list =[]
+
+    args_str = m.group("f_args")
+    if args_str != "void":
+        for arg_m in re.finditer(match_argument, args_str):
+            arg_str_val = arg_m.group(1)
+            var_match = re.match(match_variable, arg_str_val)
+            if not var_match:
+                continue
+
+            name = snake_case(drop_prefix(var_match["name"]))
+            mut = not bool(var_match["mut"])
+            ptrs = var_match["ptrs"]
+            num_ptrs = len(ptrs) if ptrs else 0
+            vecs = var_match.groupdict().get("vecs")
+
+            raw_type = var_match["type"].replace(" *const", "").replace(" * const", "")
+            base_type = type_map.get(raw_type) or raw_type
+            base_type = drop_prefix(base_type)
+
+            if base_type == "c_char" and num_ptrs == 1 and not mut:
+                # String argument handling
+                mojo_args_list.append(f"var {name}: String")
+                sdl_args_list.append(f"{name}: Ptr[mut=False, {base_type}, origin_of({name})]")
+                pass_args_list.append(f"{name}.as_c_string_slice().unsafe_ptr()")
+                continue
+
+            mojo_type = base_type
+            sdl_type = base_type
+
+            if num_ptrs > 0:
+                for i in range(num_ptrs):
+                    is_outer = (i == num_ptrs - 1)
+                    origin_mut = "True" if mut else "False"
+                    origin_str = f"ExternalOrigin[mut={origin_mut}]"
+
+                    # Dynamically parameterize the outermost origin
+                    if is_outer:
+                        orig_name = f"O_{name}"
+                        generic_params.append(f"{orig_name}: Origin")
+                        origin_str = orig_name
+                    
+                    mojo_type = f"Ptr[{mojo_type}, {origin_str}]"
+                    sdl_type = f"Ptr[{sdl_type}, {origin_str}]"
+
+                    if origin_str.startswith("ExternalOrigin"):
+                        mojo_type = "Opt" + mojo_type
+                        sdl_type = "Opt" + sdl_type
+
+            if vecs:
+                orig_name = f"O_{name}"
+                generic_params.append(f"{orig_name}: Origin")
+                mojo_type = f"ArrayHelper[{mojo_type}, {vecs}, {orig_name}]"
+                sdl_type = f"ArrayHelper[{sdl_type}, {vecs}, {orig_name}]"
+
+            mojo_args_list.append(f"{name}: {mojo_type}")
+            sdl_args_list.append(f"{name}: {sdl_type}")
+            pass_args_list.append(name)
+
+    mojo_args = ", ".join(mojo_args_list)
+    sdl_args = ", ".join(sdl_args_list)
+    pass_args = ", ".join(pass_args_list)
+    
+    generic_str = f"[{', '.join(generic_params)}, //]" if generic_params else ""
+
+    call = f'_get_dylib_function[lib, "{m["f_name"]}", def ({sdl_args}) thin abi("C") -> {sdl_ret}]()({pass_args})'
+    
     if re.search("Returns:\n        True on success", doc) and (mojo_ret == "Bool"):
         doc = doc.replace("Returns", "Raises")
         doc = re.sub(r"True on success.*?false (.*)", r"Raises \1", doc)
         mojo_ret = "None"
-        return fn_raises_template(doc, sdl_name, mojo_name, mojo_args, mojo_ret, call)
+        return fn_raises_template(doc, sdl_name, mojo_name, generic_str, mojo_args, mojo_ret, call)
     elif re.search(r"on failure;", doc, re.MULTILINE) and (
         mojo_ret.startswith("Ptr") or mojo_ret.startswith("String")
     ):
-        return fn_raises_template(doc, sdl_name, mojo_name, mojo_args, mojo_ret, call)
+        return fn_raises_template(doc, sdl_name, mojo_name, generic_str, mojo_args, mojo_ret, call)
     else:
-        return fn_template(doc, sdl_name, mojo_name, mojo_args, mojo_ret, call)
+        return fn_template(doc, sdl_name, mojo_name, generic_str, mojo_args, mojo_ret, call)
 
 
 # +------( typedef function )------+ #
@@ -651,9 +737,9 @@ def translate_typedef_function(m: re.Match):
     name = m["tf_name"]
     ret = translate_return_type(re.match(match_return, m["tf_ret"]))
     args = re.sub(match_argument, translate_argument, m["tf_args"]).removeprefix(" ")
-    f_type = f"fn ({args}) -> {ret}"
+    f_type = f"def ({args}) thin abi(\"C\") -> {ret}"
     if m["tf_ptr"]:
-        f_type = f"Ptr[{f_type}, AnyOrigin[True]]"
+        f_type = f"Ptr[{f_type}, MutExternalOrigin]"
     return f"""
 comptime {drop_prefix(name)} = {f_type}
 {doc_template(doc, name)}
@@ -668,58 +754,32 @@ def translate_gamepadbinding(doc: str) -> str:
     # nested structs
     return f'''
 @fieldwise_init
-@register_passable("trivial")
-struct GamepadBindingInputAxis(ImplicitlyCopyable, Movable):
+struct GamepadBindingInputAxis(TrivialRegisterPassable, ImplicitlyCopyable, Movable):
     var axis: c_int
     var axis_min: c_int
     var axis_max: c_int
 
 
 @fieldwise_init
-@register_passable("trivial")
-struct GamepadBindingInputHat(ImplicitlyCopyable, Movable):
+struct GamepadBindingInputHat(TrivialRegisterPassable, ImplicitlyCopyable, Movable):
     var hat: c_int
     var hat_mask: c_int
 
 
-@fieldwise_init
-@register_passable("trivial")
-struct GamepadBindingInput(ImplicitlyCopyable, Movable):
-    comptime _mlir_type = __mlir_type[`!pop.union<`, GamepadBindingInputAxis, `, `, GamepadBindingInputHat, `>`]
-    var _impl: Self._mlir_type
-
-    @implicit
-    fn __init__[T: AnyType](out self, value: T):
-        self._impl = rebind[Self._mlir_type](value)
-
-    fn __getitem__[T: AnyType](ref self) -> ref [self._impl] T:
-        return rebind[Ptr[T, origin_of(self._impl)]](Ptr(to=self._impl))[]
+comptime GamepadBindingInput = UnsafeUnion[GamepadBindingInputAxis, GamepadBindingInputHat]
 
 
 @fieldwise_init
-@register_passable("trivial")
-struct GamepadBindingOutputAxis(ImplicitlyCopyable, Movable):
+struct GamepadBindingOutputAxis(TrivialRegisterPassable, ImplicitlyCopyable, Movable):
     var axis: GamepadAxis
     var axis_min: c_int
     var axis_max: c_int
 
 
-@fieldwise_init
-@register_passable("trivial")
-struct GamepadBindingOutput(ImplicitlyCopyable, Movable):
-    comptime _mlir_type = __mlir_type[`!pop.union<`, GamepadButton, `, `, GamepadBindingOutputAxis, `>`]
-    var _impl: Self._mlir_type
-
-    @implicit
-    fn __init__[T: AnyType](out self, value: T):
-        self._impl = rebind[Self._mlir_type](value)
-
-    fn __getitem__[T: AnyType](ref self) -> ref [self._impl] T:
-        return rebind[Ptr[T, origin_of(self._impl)]](Ptr(to=self._impl))[]
+comptime GamepadBindingOutput = UnsafeUnion[GamepadButton, GamepadBindingOutputAxis]
 
 
 @fieldwise_init
-@register_passable("trivial")
 struct GamepadBinding(ImplicitlyCopyable, Movable):
     """{doc}
 
@@ -810,36 +870,34 @@ with open(out_dir / "__init__.mojo", "w") as imp:
 # | SDL3 Bindings in Mojo
 # +--------------------------------------------------------------------------+ #
 
-"""SDL3 Bindings in Mojo"""
-from memory import UnsafePointer
+"""SDL3 Bindings in Mojo."""
+from std.memory import UnsafePointer, OptionalUnsafePointer
 {imports}
 
-comptime AnyOrigin[mut: Bool] = __mlir_attr[`#lit.any.origin<`, mut._mlir_value, `>: !lit.origin<`, mut._mlir_value, `>`]
 comptime Ptr = UnsafePointer
+comptime OptPtr = OptionalUnsafePointer
 
-
-from sys import CompilationTarget, is_little_endian, is_big_endian
-from sys.ffi import _Global, OwnedDLHandle, _get_dylib_function, c_char, c_uchar, c_int, c_uint, c_short, c_ushort, c_long, c_long_long, c_size_t, c_ssize_t, c_float, c_double
+from std.builtin.globals import global_constant
+from std.sys import CompilationTarget, is_little_endian, is_big_endian
+from std.ffi import _Global, OwnedDLHandle, _get_dylib_function, c_char, c_uchar, c_int, c_uint, c_short, c_ushort, c_long, c_long_long, c_size_t, c_ssize_t, c_float, c_double, UnsafeUnion
 
 comptime lib = _Global["SDL", _init_sdl_handle]()
 
-fn _init_sdl_handle() -> OwnedDLHandle:
+def _init_sdl_handle() -> OwnedDLHandle:
     try:
-        @parameter
-        if CompilationTarget.is_macos():
+        comptime if CompilationTarget.is_macos():
             return OwnedDLHandle(".pixi/envs/default/lib/libSDL3.dylib")
         elif CompilationTarget.is_linux():
             return OwnedDLHandle(".pixi/envs/default/lib/libSDL3.so")
         else:
-            constrained[False, "OS is not supported"]()
-            return _uninit[OwnedDLHandle]()
+            comptime assert False, "OS is not supported"
     except:
         print("libSDL3 not found at .pixi/envs/default/lib/")
         return _uninit[OwnedDLHandle]()
 
 
 @always_inline
-fn _uninit[T: AnyType](out value: T):
+def _uninit[T: AnyType](out value: T):
     """Returns uninitialized data."""
     __mlir_op.`lit.ownership.mark_initialized`(__get_mvalue_as_litref(value))
 

@@ -21,7 +21,7 @@
 # | 3. This notice may not be removed or altered from any source distribution.
 # x--------------------------------------------------------------------------x #
 
-"""Keycode
+"""Keycode.
 
 Defines constants which identify keyboard keys and modifiers.
 
@@ -32,8 +32,7 @@ https://wiki.libsdl.org/SDL3/BestKeyboardPractices
 """
 
 
-@register_passable("trivial")
-struct Keycode(Intable):
+struct Keycode(Intable, TrivialRegisterPassable):
     """The SDL virtual key representation.
 
     Values of this type are used to represent keyboard keys using the current
@@ -53,15 +52,15 @@ struct Keycode(Intable):
     var value: UInt32
 
     @always_inline
-    fn __init__(out self, value: UInt32):
+    def __init__(out self, value: UInt32):
         self.value = value
 
     @always_inline
-    fn __int__(self) -> Int:
+    def __int__(self) -> Int:
         return Int(self.value)
 
     @always_inline
-    fn __or__(lhs, rhs: Self) -> Self:
+    def __or__(lhs, rhs: Self) -> Self:
         return Self(lhs.value | rhs.value)
 
     comptime SDLK_EXTENDED_MASK = Self(1 << 29)
@@ -69,7 +68,7 @@ struct Keycode(Intable):
 
     @always_inline
     @staticmethod
-    fn SCANCODE_TO_KEYCODE(X: UInt32) -> UInt32:
+    def SCANCODE_TO_KEYCODE(X: UInt32) -> UInt32:
         return X | Self.SDLK_SCANCODE_MASK.value
 
     comptime SDLK_UNKNOWN = Self(0x00000000)
@@ -586,8 +585,7 @@ struct Keycode(Intable):
     """Extended key Right Hyper."""
 
 
-@register_passable("trivial")
-struct Keymod(Intable):
+struct Keymod(Intable, TrivialRegisterPassable):
     """Valid key modifiers (possibly OR'd together).
 
     Docs: https://wiki.libsdl.org/SDL3/SDL_Keymod.
@@ -596,15 +594,15 @@ struct Keymod(Intable):
     var value: UInt16
 
     @always_inline
-    fn __init__(out self, value: UInt16):
+    def __init__(out self, value: UInt16):
         self.value = value
 
     @always_inline
-    fn __int__(self) -> Int:
+    def __int__(self) -> Int:
         return Int(self.value)
 
     @always_inline
-    fn __or__(lhs, rhs: Self) -> Self:
+    def __or__(lhs, rhs: Self) -> Self:
         return Self(lhs.value | rhs.value)
 
     comptime KMOD_NONE = Self(0x0000)

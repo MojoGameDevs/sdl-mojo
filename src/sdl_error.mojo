@@ -21,7 +21,7 @@
 # | 3. This notice may not be removed or altered from any source distribution.
 # x--------------------------------------------------------------------------x #
 
-"""Error
+"""Error.
 
 Simple error message routines for SDL.
 
@@ -47,7 +47,7 @@ is known to call SDL_SetError(), so errors simply propagate through.
 """
 
 
-fn out_of_memory() raises -> Bool:
+def out_of_memory() raises -> Bool:
     """Set an error indicating that memory allocation failed.
 
     This function does not do any memory allocation.
@@ -61,10 +61,10 @@ fn out_of_memory() raises -> Bool:
     Docs: https://wiki.libsdl.org/SDL3/SDL_OutOfMemory.
     """
 
-    return _get_dylib_function[lib, "SDL_OutOfMemory", fn () -> Bool]()()
+    return _get_dylib_function[lib, "SDL_OutOfMemory", def() thin abi("C") -> Bool]()()
 
 
-fn get_error() raises -> Ptr[c_char, AnyOrigin[False]]:
+def get_error() raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
     """Retrieve a message about the last error that occurred on the current
     thread.
 
@@ -99,10 +99,10 @@ fn get_error() raises -> Ptr[c_char, AnyOrigin[False]]:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetError.
     """
 
-    return _get_dylib_function[lib, "SDL_GetError", fn () -> Ptr[c_char, AnyOrigin[False]]]()()
+    return _get_dylib_function[lib, "SDL_GetError", def() thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()().value()
 
 
-fn clear_error() raises -> Bool:
+def clear_error() raises -> Bool:
     """Clear any previous error message for this thread.
 
     Returns:
@@ -114,4 +114,4 @@ fn clear_error() raises -> Bool:
     Docs: https://wiki.libsdl.org/SDL3/SDL_ClearError.
     """
 
-    return _get_dylib_function[lib, "SDL_ClearError", fn () -> Bool]()()
+    return _get_dylib_function[lib, "SDL_ClearError", def() thin abi("C") -> Bool]()()

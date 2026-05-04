@@ -21,7 +21,7 @@
 # | 3. This notice may not be removed or altered from any source distribution.
 # x--------------------------------------------------------------------------x #
 
-"""Filesystem
+"""Filesystem.
 
 SDL offers an API for examining and manipulating the system's filesystem.
 This covers most things one would need to do with directories, except for
@@ -43,7 +43,7 @@ removing, copying files.
 """
 
 
-fn get_base_path() raises -> Ptr[c_char, AnyOrigin[False]]:
+def get_base_path() raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
     """Get the directory where the application was run from.
 
     SDL caches the result of this call internally, but the first call to this
@@ -82,10 +82,10 @@ fn get_base_path() raises -> Ptr[c_char, AnyOrigin[False]]:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetBasePath.
     """
 
-    return _get_dylib_function[lib, "SDL_GetBasePath", fn () -> Ptr[c_char, AnyOrigin[False]]]()()
+    return _get_dylib_function[lib, "SDL_GetBasePath", def() thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()().value()
 
 
-fn get_pref_path(var org: String, var app: String) raises -> Ptr[c_char, AnyOrigin[True]]:
+def get_pref_path(var org: String, var app: String) raises -> Ptr[c_char, ExternalOrigin[mut=True]]:
     """Get the user-and-app-specific path where files can be written.
 
     Get the "pref dir". This is meant to be where users can write personal
@@ -140,11 +140,10 @@ fn get_pref_path(var org: String, var app: String) raises -> Ptr[c_char, AnyOrig
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetPrefPath.
     """
 
-    return _get_dylib_function[lib, "SDL_GetPrefPath", fn (org: Ptr[c_char, AnyOrigin[False]], app: Ptr[c_char, AnyOrigin[False]]) -> Ptr[c_char, AnyOrigin[True]]]()(org.as_c_string_slice().unsafe_ptr(), app.as_c_string_slice().unsafe_ptr())
+    return _get_dylib_function[lib, "SDL_GetPrefPath", def(org: Ptr[mut=False, c_char, origin_of(org)], app: Ptr[mut=False, c_char, origin_of(app)]) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=True]]]()(org.as_c_string_slice().unsafe_ptr(), app.as_c_string_slice().unsafe_ptr()).value()
 
 
-@register_passable("trivial")
-struct Folder(Indexer, Intable):
+struct Folder(Indexer, Intable, TrivialRegisterPassable):
     """The type of the OS-provided default folder for a specific purpose.
 
     Note that the Trash folder isn't included here, because trashing files
@@ -175,19 +174,19 @@ struct Folder(Indexer, Intable):
     var value: UInt32
 
     @always_inline
-    fn __init__(out self, value: Int):
-        self.value = value
+    def __init__(out self, value: Int):
+        self.value = UInt32(value)
 
     @always_inline
-    fn __int__(self) -> Int:
+    def __int__(self) -> Int:
         return Int(self.value)
 
     @always_inline
-    fn __eq__(lhs, rhs: Self) -> Bool:
+    def __eq__(lhs, rhs: Self) -> Bool:
         return lhs.value == rhs.value
 
     @always_inline("nodebug")
-    fn __mlir_index__(self) -> __mlir_type.index:
+    def __mlir_index__(self) -> __mlir_type.index:
         return Int(self)._mlir_value
 
     comptime FOLDER_HOME = Self(0x0)
@@ -216,7 +215,7 @@ struct Folder(Indexer, Intable):
     """Total number of types in this enum, not a folder type by itself."""
 
 
-fn get_user_folder(folder: Folder) raises -> Ptr[c_char, AnyOrigin[False]]:
+def get_user_folder(folder: Folder) raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
     """Finds the most suitable user folder for a specific purpose.
 
     Many OSes provide certain standard folders for certain purposes, such as
@@ -243,11 +242,10 @@ fn get_user_folder(folder: Folder) raises -> Ptr[c_char, AnyOrigin[False]]:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetUserFolder.
     """
 
-    return _get_dylib_function[lib, "SDL_GetUserFolder", fn (folder: Folder) -> Ptr[c_char, AnyOrigin[False]]]()(folder)
+    return _get_dylib_function[lib, "SDL_GetUserFolder", def(folder: Folder) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(folder).value()
 
 
-@register_passable("trivial")
-struct PathType(Indexer, Intable):
+struct PathType(Indexer, Intable, TrivialRegisterPassable):
     """Types of filesystem entries.
 
     Note that there may be other sorts of items on a filesystem: devices,
@@ -260,19 +258,19 @@ struct PathType(Indexer, Intable):
     var value: UInt32
 
     @always_inline
-    fn __init__(out self, value: Int):
-        self.value = value
+    def __init__(out self, value: Int):
+        self.value = UInt32(value)
 
     @always_inline
-    fn __int__(self) -> Int:
+    def __int__(self) -> Int:
         return Int(self.value)
 
     @always_inline
-    fn __eq__(lhs, rhs: Self) -> Bool:
+    def __eq__(lhs, rhs: Self) -> Bool:
         return lhs.value == rhs.value
 
     @always_inline("nodebug")
-    fn __mlir_index__(self) -> __mlir_type.index:
+    def __mlir_index__(self) -> __mlir_type.index:
         return Int(self)._mlir_value
 
     comptime PATHTYPE_NONE = Self(0x0)
@@ -304,8 +302,7 @@ struct PathInfo(ImplicitlyCopyable, Movable):
     """The last time the path was read."""
 
 
-@register_passable("trivial")
-struct GlobFlags(Intable):
+struct GlobFlags(Intable, TrivialRegisterPassable):
     """Flags for path matching.
 
     Docs: https://wiki.libsdl.org/SDL3/SDL_GlobFlags.
@@ -314,21 +311,21 @@ struct GlobFlags(Intable):
     var value: UInt32
 
     @always_inline
-    fn __init__(out self, value: UInt32):
+    def __init__(out self, value: UInt32):
         self.value = value
 
     @always_inline
-    fn __int__(self) -> Int:
+    def __int__(self) -> Int:
         return Int(self.value)
 
     @always_inline
-    fn __or__(lhs, rhs: Self) -> Self:
+    def __or__(lhs, rhs: Self) -> Self:
         return Self(lhs.value | rhs.value)
 
     comptime GLOB_CASEINSENSITIVE = Self(1 << 0)
 
 
-fn create_directory(var path: String) raises:
+def create_directory(var path: String) raises:
     """Create a directory, and any missing parent directories.
 
     This reports success if `path` already exists as a directory.
@@ -346,13 +343,12 @@ fn create_directory(var path: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateDirectory.
     """
 
-    ret = _get_dylib_function[lib, "SDL_CreateDirectory", fn (path: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(path.as_c_string_slice().unsafe_ptr())
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    var _ffi_ret = _get_dylib_function[lib, "SDL_CreateDirectory", def(path: Ptr[mut=False, c_char, origin_of(path)]) thin abi("C") -> Bool]()(path.as_c_string_slice().unsafe_ptr())
+    if not _ffi_ret:
+        raise Error(get_error())
 
 
-@register_passable("trivial")
-struct EnumerationResult(Indexer, Intable):
+struct EnumerationResult(Indexer, Intable, TrivialRegisterPassable):
     """Possible results from an enumeration callback.
 
     Docs: https://wiki.libsdl.org/SDL3/SDL_EnumerationResult.
@@ -361,19 +357,19 @@ struct EnumerationResult(Indexer, Intable):
     var value: UInt32
 
     @always_inline
-    fn __init__(out self, value: Int):
-        self.value = value
+    def __init__(out self, value: Int):
+        self.value = UInt32(value)
 
     @always_inline
-    fn __int__(self) -> Int:
+    def __int__(self) -> Int:
         return Int(self.value)
 
     @always_inline
-    fn __eq__(lhs, rhs: Self) -> Bool:
+    def __eq__(lhs, rhs: Self) -> Bool:
         return lhs.value == rhs.value
 
     @always_inline("nodebug")
-    fn __mlir_index__(self) -> __mlir_type.index:
+    def __mlir_index__(self) -> __mlir_type.index:
         return Int(self)._mlir_value
 
     comptime ENUM_CONTINUE = Self(0x0)
@@ -384,7 +380,7 @@ struct EnumerationResult(Indexer, Intable):
     """Value that requests that enumeration stop, as a failure."""
 
 
-comptime EnumerateDirectoryCallback = fn (userdata: Ptr[NoneType, AnyOrigin[True]], dirname: Ptr[c_char, AnyOrigin[False]], fname: Ptr[c_char, AnyOrigin[False]]) -> EnumerationResult
+comptime EnumerateDirectoryCallback = def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]], dirname: OptPtr[c_char, ExternalOrigin[mut=False]], fname: OptPtr[c_char, ExternalOrigin[mut=False]]) thin abi("C") -> EnumerationResult
 """Callback for directory enumeration.
     
     Enumeration of directory entries will continue until either all entries
@@ -411,7 +407,7 @@ Docs: https://wiki.libsdl.org/SDL3/SDL_EnumerateDirectoryCallback.
 """
 
 
-fn enumerate_directory(var path: String, callback: EnumerateDirectoryCallback, userdata: Ptr[NoneType, AnyOrigin[True]]) raises:
+def enumerate_directory[O_userdata: Origin, //](var path: String, callback: EnumerateDirectoryCallback, userdata: Ptr[NoneType, O_userdata]) raises:
     """Enumerate a directory through a callback function.
 
     This function provides every directory entry through an app-provided
@@ -436,12 +432,12 @@ fn enumerate_directory(var path: String, callback: EnumerateDirectoryCallback, u
     Docs: https://wiki.libsdl.org/SDL3/SDL_EnumerateDirectory.
     """
 
-    ret = _get_dylib_function[lib, "SDL_EnumerateDirectory", fn (path: Ptr[c_char, AnyOrigin[False]], callback: EnumerateDirectoryCallback, userdata: Ptr[NoneType, AnyOrigin[True]]) -> Bool]()(path.as_c_string_slice().unsafe_ptr(), callback, userdata)
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    var _ffi_ret = _get_dylib_function[lib, "SDL_EnumerateDirectory", def(path: Ptr[mut=False, c_char, origin_of(path)], callback: EnumerateDirectoryCallback, userdata: Ptr[NoneType, O_userdata]) thin abi("C") -> Bool]()(path.as_c_string_slice().unsafe_ptr(), callback, userdata)
+    if not _ffi_ret:
+        raise Error(get_error())
 
 
-fn remove_path(var path: String) raises:
+def remove_path(var path: String) raises:
     """Remove a file or an empty directory.
 
     Directories that are not empty will fail; this function will not recursely
@@ -457,12 +453,12 @@ fn remove_path(var path: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_RemovePath.
     """
 
-    ret = _get_dylib_function[lib, "SDL_RemovePath", fn (path: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(path.as_c_string_slice().unsafe_ptr())
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    var _ffi_ret = _get_dylib_function[lib, "SDL_RemovePath", def(path: Ptr[mut=False, c_char, origin_of(path)]) thin abi("C") -> Bool]()(path.as_c_string_slice().unsafe_ptr())
+    if not _ffi_ret:
+        raise Error(get_error())
 
 
-fn rename_path(var oldpath: String, var newpath: String) raises:
+def rename_path(var oldpath: String, var newpath: String) raises:
     """Rename a file or directory.
 
     If the file at `newpath` already exists, it will replaced.
@@ -487,12 +483,12 @@ fn rename_path(var oldpath: String, var newpath: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_RenamePath.
     """
 
-    ret = _get_dylib_function[lib, "SDL_RenamePath", fn (oldpath: Ptr[c_char, AnyOrigin[False]], newpath: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(oldpath.as_c_string_slice().unsafe_ptr(), newpath.as_c_string_slice().unsafe_ptr())
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    var _ffi_ret = _get_dylib_function[lib, "SDL_RenamePath", def(oldpath: Ptr[mut=False, c_char, origin_of(oldpath)], newpath: Ptr[mut=False, c_char, origin_of(newpath)]) thin abi("C") -> Bool]()(oldpath.as_c_string_slice().unsafe_ptr(), newpath.as_c_string_slice().unsafe_ptr())
+    if not _ffi_ret:
+        raise Error(get_error())
 
 
-fn copy_file(var oldpath: String, var newpath: String) raises:
+def copy_file(var oldpath: String, var newpath: String) raises:
     """Copy a file.
 
     If the file at `newpath` already exists, it will be overwritten with the
@@ -534,12 +530,12 @@ fn copy_file(var oldpath: String, var newpath: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_CopyFile.
     """
 
-    ret = _get_dylib_function[lib, "SDL_CopyFile", fn (oldpath: Ptr[c_char, AnyOrigin[False]], newpath: Ptr[c_char, AnyOrigin[False]]) -> Bool]()(oldpath.as_c_string_slice().unsafe_ptr(), newpath.as_c_string_slice().unsafe_ptr())
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    var _ffi_ret = _get_dylib_function[lib, "SDL_CopyFile", def(oldpath: Ptr[mut=False, c_char, origin_of(oldpath)], newpath: Ptr[mut=False, c_char, origin_of(newpath)]) thin abi("C") -> Bool]()(oldpath.as_c_string_slice().unsafe_ptr(), newpath.as_c_string_slice().unsafe_ptr())
+    if not _ffi_ret:
+        raise Error(get_error())
 
 
-fn get_path_info(var path: String, info: Ptr[PathInfo, AnyOrigin[True]]) raises:
+def get_path_info[O_info: Origin, //](var path: String, info: Ptr[PathInfo, O_info]) raises:
     """Get information about a filesystem path.
 
     Args:
@@ -554,12 +550,12 @@ fn get_path_info(var path: String, info: Ptr[PathInfo, AnyOrigin[True]]) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetPathInfo.
     """
 
-    ret = _get_dylib_function[lib, "SDL_GetPathInfo", fn (path: Ptr[c_char, AnyOrigin[False]], info: Ptr[PathInfo, AnyOrigin[True]]) -> Bool]()(path.as_c_string_slice().unsafe_ptr(), info)
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    var _ffi_ret = _get_dylib_function[lib, "SDL_GetPathInfo", def(path: Ptr[mut=False, c_char, origin_of(path)], info: Ptr[PathInfo, O_info]) thin abi("C") -> Bool]()(path.as_c_string_slice().unsafe_ptr(), info)
+    if not _ffi_ret:
+        raise Error(get_error())
 
 
-fn glob_directory(var path: String, var pattern: String, flags: GlobFlags, count: Ptr[c_int, AnyOrigin[True]], out ret: Ptr[Ptr[c_char, AnyOrigin[True]], AnyOrigin[True]]) raises:
+def glob_directory[O_count: Origin, //](var path: String, var pattern: String, flags: GlobFlags, count: Ptr[c_int, O_count], out ret: Ptr[OptPtr[c_char, ExternalOrigin[mut=True]], ExternalOrigin[mut=True]]) raises:
     """Enumerate a directory tree, filtered by pattern, and return a list.
 
     Files are filtered out if they don't match the string in `pattern`, which
@@ -595,12 +591,13 @@ fn glob_directory(var path: String, var pattern: String, flags: GlobFlags, count
     Docs: https://wiki.libsdl.org/SDL3/SDL_GlobDirectory.
     """
 
-    ret = _get_dylib_function[lib, "SDL_GlobDirectory", fn (path: Ptr[c_char, AnyOrigin[False]], pattern: Ptr[c_char, AnyOrigin[False]], flags: GlobFlags, count: Ptr[c_int, AnyOrigin[True]]) -> Ptr[Ptr[c_char, AnyOrigin[True]], AnyOrigin[True]]]()(path.as_c_string_slice().unsafe_ptr(), pattern.as_c_string_slice().unsafe_ptr(), flags, count)
-    if not ret:
-        raise Error(String(unsafe_from_utf8_ptr=get_error()))
+    _ffi_ret = _get_dylib_function[lib, "SDL_GlobDirectory", def(path: Ptr[mut=False, c_char, origin_of(path)], pattern: Ptr[mut=False, c_char, origin_of(pattern)], flags: GlobFlags, count: Ptr[c_int, O_count]) thin abi("C") -> OptPtr[OptPtr[c_char, ExternalOrigin[mut=True]], ExternalOrigin[mut=True]]]()(path.as_c_string_slice().unsafe_ptr(), pattern.as_c_string_slice().unsafe_ptr(), flags, count)
+    if not _ffi_ret:
+        raise Error(get_error())
+    ret = _ffi_ret.value()
 
 
-fn get_current_directory() raises -> Ptr[c_char, AnyOrigin[True]]:
+def get_current_directory() raises -> Ptr[c_char, ExternalOrigin[mut=True]]:
     """Get what the system believes is the "current working directory.".
 
     For systems without a concept of a current working directory, this will
@@ -621,4 +618,4 @@ fn get_current_directory() raises -> Ptr[c_char, AnyOrigin[True]]:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetCurrentDirectory.
     """
 
-    return _get_dylib_function[lib, "SDL_GetCurrentDirectory", fn () -> Ptr[c_char, AnyOrigin[True]]]()()
+    return _get_dylib_function[lib, "SDL_GetCurrentDirectory", def() thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=True]]]()().value()
