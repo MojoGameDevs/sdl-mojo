@@ -60,7 +60,7 @@ struct PowerState(Indexer, Intable, TrivialRegisterPassable):
 
     @always_inline("nodebug")
     def __mlir_index__(self) -> __mlir_type.index:
-        return Int(self)._mlir_value
+        return __mlir_op.`pop.cast_to_builtin`[_type=__mlir_type.index](Int(self)._mlir_value)
 
     comptime POWERSTATE_ERROR = Self(-1)
     """Error determining power status."""

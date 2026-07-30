@@ -119,7 +119,7 @@ struct SystemTheme(Indexer, Intable, TrivialRegisterPassable):
 
     @always_inline("nodebug")
     def __mlir_index__(self) -> __mlir_type.index:
-        return Int(self)._mlir_value
+        return __mlir_op.`pop.cast_to_builtin`[_type=__mlir_type.index](Int(self)._mlir_value)
 
     comptime SYSTEM_THEME_UNKNOWN = Self(0)
     """Unknown system theme."""
@@ -191,7 +191,7 @@ struct DisplayOrientation(Indexer, Intable, TrivialRegisterPassable):
 
     @always_inline("nodebug")
     def __mlir_index__(self) -> __mlir_type.index:
-        return Int(self)._mlir_value
+        return __mlir_op.`pop.cast_to_builtin`[_type=__mlir_type.index](Int(self)._mlir_value)
 
     comptime ORIENTATION_UNKNOWN = Self(0)
     """The display orientation can't be determined."""
@@ -314,7 +314,7 @@ struct FlashOperation(Indexer, Intable, TrivialRegisterPassable):
 
     @always_inline("nodebug")
     def __mlir_index__(self) -> __mlir_type.index:
-        return Int(self)._mlir_value
+        return __mlir_op.`pop.cast_to_builtin`[_type=__mlir_type.index](Int(self)._mlir_value)
 
     comptime FLASH_CANCEL = Self(0)
     """Cancel any window flash state."""
@@ -481,7 +481,7 @@ struct GLAttr(Indexer, Intable, TrivialRegisterPassable):
 
     @always_inline("nodebug")
     def __mlir_index__(self) -> __mlir_type.index:
-        return Int(self)._mlir_value
+        return __mlir_op.`pop.cast_to_builtin`[_type=__mlir_type.index](Int(self)._mlir_value)
 
     comptime GL_RED_SIZE = Self(0)
     """The minimum number of bits for the red channel of the color buffer; defaults to 8."""
@@ -3159,7 +3159,7 @@ struct HitTestResult(Indexer, Intable, TrivialRegisterPassable):
 
     @always_inline("nodebug")
     def __mlir_index__(self) -> __mlir_type.index:
-        return Int(self)._mlir_value
+        return __mlir_op.`pop.cast_to_builtin`[_type=__mlir_type.index](Int(self)._mlir_value)
 
     comptime HITTEST_NORMAL = Self(0)
     """Region is normal. No special properties."""

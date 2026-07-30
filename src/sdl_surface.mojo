@@ -93,7 +93,7 @@ struct ScaleMode(Indexer, Intable, TrivialRegisterPassable):
 
     @always_inline("nodebug")
     def __mlir_index__(self) -> __mlir_type.index:
-        return Int(self)._mlir_value
+        return __mlir_op.`pop.cast_to_builtin`[_type=__mlir_type.index](Int(self)._mlir_value)
 
     comptime SCALEMODE_INVALID = Self(-1)
     comptime SCALEMODE_NEAREST = Self(0)
@@ -124,7 +124,7 @@ struct FlipMode(Indexer, Intable, TrivialRegisterPassable):
 
     @always_inline("nodebug")
     def __mlir_index__(self) -> __mlir_type.index:
-        return Int(self)._mlir_value
+        return __mlir_op.`pop.cast_to_builtin`[_type=__mlir_type.index](Int(self)._mlir_value)
 
     comptime FLIP_NONE = Self(0)
     """Do not flip."""

@@ -111,7 +111,7 @@ struct GamepadType(Indexer, Intable, TrivialRegisterPassable):
 
     @always_inline("nodebug")
     def __mlir_index__(self) -> __mlir_type.index:
-        return Int(self)._mlir_value
+        return __mlir_op.`pop.cast_to_builtin`[_type=__mlir_type.index](Int(self)._mlir_value)
 
     comptime GAMEPAD_TYPE_UNKNOWN = Self(0)
     comptime GAMEPAD_TYPE_STANDARD = Self(1)
@@ -167,7 +167,7 @@ struct GamepadButton(Indexer, Intable, TrivialRegisterPassable):
 
     @always_inline("nodebug")
     def __mlir_index__(self) -> __mlir_type.index:
-        return Int(self)._mlir_value
+        return __mlir_op.`pop.cast_to_builtin`[_type=__mlir_type.index](Int(self)._mlir_value)
 
     comptime GAMEPAD_BUTTON_INVALID = Self(-1)
     comptime GAMEPAD_BUTTON_SOUTH = Self(0)
@@ -242,7 +242,7 @@ struct GamepadButtonLabel(Indexer, Intable, TrivialRegisterPassable):
 
     @always_inline("nodebug")
     def __mlir_index__(self) -> __mlir_type.index:
-        return Int(self)._mlir_value
+        return __mlir_op.`pop.cast_to_builtin`[_type=__mlir_type.index](Int(self)._mlir_value)
 
     comptime GAMEPAD_BUTTON_LABEL_UNKNOWN = Self(0)
     comptime GAMEPAD_BUTTON_LABEL_A = Self(1)
@@ -286,7 +286,7 @@ struct GamepadAxis(Indexer, Intable, TrivialRegisterPassable):
 
     @always_inline("nodebug")
     def __mlir_index__(self) -> __mlir_type.index:
-        return Int(self)._mlir_value
+        return __mlir_op.`pop.cast_to_builtin`[_type=__mlir_type.index](Int(self)._mlir_value)
 
     comptime GAMEPAD_AXIS_INVALID = Self(-1)
     comptime GAMEPAD_AXIS_LEFTX = Self(0)
@@ -325,7 +325,7 @@ struct GamepadBindingType(Indexer, Intable, TrivialRegisterPassable):
 
     @always_inline("nodebug")
     def __mlir_index__(self) -> __mlir_type.index:
-        return Int(self)._mlir_value
+        return __mlir_op.`pop.cast_to_builtin`[_type=__mlir_type.index](Int(self)._mlir_value)
 
     comptime GAMEPAD_BINDTYPE_NONE = Self(0)
     comptime GAMEPAD_BINDTYPE_BUTTON = Self(1)

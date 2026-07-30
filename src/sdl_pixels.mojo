@@ -101,7 +101,7 @@ struct PixelType(Indexer, Intable, TrivialRegisterPassable):
 
     @always_inline("nodebug")
     def __mlir_index__(self) -> __mlir_type.index:
-        return Int(self)._mlir_value
+        return __mlir_op.`pop.cast_to_builtin`[_type=__mlir_type.index](Int(self)._mlir_value)
 
     comptime PIXELTYPE_UNKNOWN = Self(0)
     comptime PIXELTYPE_INDEX1 = Self(1)
@@ -141,7 +141,7 @@ struct BitmapOrder(Indexer, Intable, TrivialRegisterPassable):
 
     @always_inline("nodebug")
     def __mlir_index__(self) -> __mlir_type.index:
-        return Int(self)._mlir_value
+        return __mlir_op.`pop.cast_to_builtin`[_type=__mlir_type.index](Int(self)._mlir_value)
 
     comptime BITMAPORDER_NONE = Self(0)
     comptime BITMAPORDER_4321 = Self(1)
@@ -170,7 +170,7 @@ struct PackedOrder(Indexer, Intable, TrivialRegisterPassable):
 
     @always_inline("nodebug")
     def __mlir_index__(self) -> __mlir_type.index:
-        return Int(self)._mlir_value
+        return __mlir_op.`pop.cast_to_builtin`[_type=__mlir_type.index](Int(self)._mlir_value)
 
     comptime PACKEDORDER_NONE = Self(0)
     comptime PACKEDORDER_XRGB = Self(1)
@@ -205,7 +205,7 @@ struct ArrayOrder(Indexer, Intable, TrivialRegisterPassable):
 
     @always_inline("nodebug")
     def __mlir_index__(self) -> __mlir_type.index:
-        return Int(self)._mlir_value
+        return __mlir_op.`pop.cast_to_builtin`[_type=__mlir_type.index](Int(self)._mlir_value)
 
     comptime ARRAYORDER_NONE = Self(0)
     comptime ARRAYORDER_RGB = Self(1)
@@ -238,7 +238,7 @@ struct PackedLayout(Indexer, Intable, TrivialRegisterPassable):
 
     @always_inline("nodebug")
     def __mlir_index__(self) -> __mlir_type.index:
-        return Int(self)._mlir_value
+        return __mlir_op.`pop.cast_to_builtin`[_type=__mlir_type.index](Int(self)._mlir_value)
 
     comptime PACKEDLAYOUT_NONE = Self(0)
     comptime PACKEDLAYOUT_332 = Self(1)
@@ -305,7 +305,7 @@ struct PixelFormat(Indexer, Intable, TrivialRegisterPassable):
 
     @always_inline("nodebug")
     def __mlir_index__(self) -> __mlir_type.index:
-        return Int(self)._mlir_value
+        return __mlir_op.`pop.cast_to_builtin`[_type=__mlir_type.index](Int(self)._mlir_value)
 
     comptime PIXELFORMAT_UNKNOWN = Self(0)
     comptime PIXELFORMAT_INDEX1LSB = Self(0x11100100)
@@ -482,7 +482,7 @@ struct ColorType(Indexer, Intable, TrivialRegisterPassable):
 
     @always_inline("nodebug")
     def __mlir_index__(self) -> __mlir_type.index:
-        return Int(self)._mlir_value
+        return __mlir_op.`pop.cast_to_builtin`[_type=__mlir_type.index](Int(self)._mlir_value)
 
     comptime COLOR_TYPE_UNKNOWN = Self(0)
     comptime COLOR_TYPE_RGB = Self(1)
@@ -512,7 +512,7 @@ struct ColorRange(Indexer, Intable, TrivialRegisterPassable):
 
     @always_inline("nodebug")
     def __mlir_index__(self) -> __mlir_type.index:
-        return Int(self)._mlir_value
+        return __mlir_op.`pop.cast_to_builtin`[_type=__mlir_type.index](Int(self)._mlir_value)
 
     comptime COLOR_RANGE_UNKNOWN = Self(0)
     comptime COLOR_RANGE_LIMITED = Self(1)
@@ -544,7 +544,7 @@ struct ColorPrimaries(Indexer, Intable, TrivialRegisterPassable):
 
     @always_inline("nodebug")
     def __mlir_index__(self) -> __mlir_type.index:
-        return Int(self)._mlir_value
+        return __mlir_op.`pop.cast_to_builtin`[_type=__mlir_type.index](Int(self)._mlir_value)
 
     comptime COLOR_PRIMARIES_UNKNOWN = Self(0)
     comptime COLOR_PRIMARIES_BT709 = Self(1)
@@ -597,7 +597,7 @@ struct TransferCharacteristics(Indexer, Intable, TrivialRegisterPassable):
 
     @always_inline("nodebug")
     def __mlir_index__(self) -> __mlir_type.index:
-        return Int(self)._mlir_value
+        return __mlir_op.`pop.cast_to_builtin`[_type=__mlir_type.index](Int(self)._mlir_value)
 
     comptime TRANSFER_CHARACTERISTICS_UNKNOWN = Self(0)
     comptime TRANSFER_CHARACTERISTICS_BT709 = Self(1)
@@ -657,7 +657,7 @@ struct MatrixCoefficients(Indexer, Intable, TrivialRegisterPassable):
 
     @always_inline("nodebug")
     def __mlir_index__(self) -> __mlir_type.index:
-        return Int(self)._mlir_value
+        return __mlir_op.`pop.cast_to_builtin`[_type=__mlir_type.index](Int(self)._mlir_value)
 
     comptime MATRIX_COEFFICIENTS_IDENTITY = Self(0)
     comptime MATRIX_COEFFICIENTS_BT709 = Self(1)
@@ -707,7 +707,7 @@ struct ChromaLocation(Indexer, Intable, TrivialRegisterPassable):
 
     @always_inline("nodebug")
     def __mlir_index__(self) -> __mlir_type.index:
-        return Int(self)._mlir_value
+        return __mlir_op.`pop.cast_to_builtin`[_type=__mlir_type.index](Int(self)._mlir_value)
 
     comptime CHROMA_LOCATION_NONE = Self(0)
     """RGB, no chroma sampling."""
@@ -745,7 +745,7 @@ struct Colorspace(Indexer, Intable, TrivialRegisterPassable):
 
     @always_inline("nodebug")
     def __mlir_index__(self) -> __mlir_type.index:
-        return Int(self)._mlir_value
+        return __mlir_op.`pop.cast_to_builtin`[_type=__mlir_type.index](Int(self)._mlir_value)
 
     comptime COLORSPACE_UNKNOWN = Self(0)
 

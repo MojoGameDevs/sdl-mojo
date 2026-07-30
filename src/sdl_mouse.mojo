@@ -116,7 +116,7 @@ struct SystemCursor(Indexer, Intable, TrivialRegisterPassable):
 
     @always_inline("nodebug")
     def __mlir_index__(self) -> __mlir_type.index:
-        return Int(self)._mlir_value
+        return __mlir_op.`pop.cast_to_builtin`[_type=__mlir_type.index](Int(self)._mlir_value)
 
     comptime SYSTEM_CURSOR_DEFAULT = Self(0)
     """Default cursor. Usually an arrow."""
@@ -183,7 +183,7 @@ struct MouseWheelDirection(Indexer, Intable, TrivialRegisterPassable):
 
     @always_inline("nodebug")
     def __mlir_index__(self) -> __mlir_type.index:
-        return Int(self)._mlir_value
+        return __mlir_op.`pop.cast_to_builtin`[_type=__mlir_type.index](Int(self)._mlir_value)
 
     comptime MOUSEWHEEL_NORMAL = Self(0)
     """The scroll direction is normal."""
