@@ -1,0 +1,25 @@
+pixi.toml
+  s_a88eff9569d5d6::t_9dc478d6ad2e28 8,20
+gen.py
+  s_a88eff9569d5d6::t_b8d5ce6b1c4daa 636-649,740-741
+  s_a88eff9569d5d6::t_b3ed73f22ee9e2 739
+src/sdl_video.mojo
+  s_a88eff9569d5d6::t_36e04db2195d3c 3631-3634
+  s_a88eff9569d5d6::t_306dfa6548f72e 3693-3696,3712-3715,3731-3734
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "d98b3bfc2c603fd95c95d1b010d22ad9e7a6f809",
+  "prompts": {},
+  "sessions": {
+    "s_a88eff9569d5d6": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fb1be-9b27-7801-ac5a-7e3a9a4a8019",
+        "model": "gpt-5.6-terra"
+      },
+      "human_author": null
+    }
+  }
+}
