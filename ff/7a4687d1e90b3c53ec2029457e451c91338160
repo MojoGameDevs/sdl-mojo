@@ -1,0 +1,19 @@
+pixi.toml
+  s_a88eff9569d5d6::t_9dc478d6ad2e28 8,20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "ff7a4687d1e90b3c53ec2029457e451c91338160",
+  "prompts": {},
+  "sessions": {
+    "s_a88eff9569d5d6": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fb1be-9b27-7801-ac5a-7e3a9a4a8019",
+        "model": "gpt-5.6-terra"
+      },
+      "human_author": "Slava Chaunin <67190162+Ssslakter@users.noreply.github.com>"
+    }
+  }
+}
