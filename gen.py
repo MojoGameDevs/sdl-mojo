@@ -633,6 +633,20 @@ def {mojo_name}{generics}({args}) raises -> {ret}:
     """
 
 
+def fn_nullable_template(
+    doc: str, sdl_name: str, mojo_name: str, generics: str, args: str, ret: str, call: str
+) -> str:
+    return f"""
+def {mojo_name}{generics}({args}) raises -> {ret}:
+    {doc_template(doc, sdl_name, "    ")}
+    var result = {call}
+    if not result:
+        raise Error(get_error())
+    return result.value()
+
+    """
+
+
 def translate_function(m: re.Match):
     if m.group("f_attr") and ("VARARG" in m.group("f_attr")):
         # handle variadic functions
@@ -722,6 +736,9 @@ def translate_function(m: re.Match):
         doc = re.sub(r"True on success.*?false (.*)", r"Raises \1", doc)
         mojo_ret = "None"
         return fn_raises_template(doc, sdl_name, mojo_name, generic_str, mojo_args, mojo_ret, call)
+    elif "or NULL on failure" in doc and not sdl_ret.startswith("OptPtr"):
+        nullable_call = call.replace(f"-> {sdl_ret}]", f"-> Optional[{sdl_ret}]]")
+        return fn_nullable_template(doc, sdl_name, mojo_name, generic_str, mojo_args, mojo_ret, nullable_call)
     elif re.search(r"on failure;", doc, re.MULTILINE) and (
         mojo_ret.startswith("Ptr") or mojo_ret.startswith("String")
     ):

@@ -5,7 +5,7 @@ channels = ["conda-forge","https://conda.modular.com/max-nightly"]
 description = "Bindings for SDL3 in Mojo"
 name = "sdl-mojo"
 platforms = ["linux-64", "linux-aarch64", "osx-arm64"]
-version = "0.1.0"
+version = "0.1.2"
 
 [tasks]
 fmt = "mojo format -l 1000 src"
@@ -17,7 +17,7 @@ temp = "mojo temp.mojo"
 
 [package]
 name = "sdl-mojo"
-version = "0.1.0"
+version = "0.1.2"
 
 [package.build.config.pkg]
 name = "sdl"

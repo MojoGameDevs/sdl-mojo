@@ -3628,7 +3628,10 @@ def gl_create_context[O_window: Origin, //](window: Ptr[Window, O_window]) raise
     Docs: https://wiki.libsdl.org/SDL3/SDL_GL_CreateContext.
     """
 
-    return _get_dylib_function[lib, "SDL_GL_CreateContext", def(window: Ptr[Window, O_window]) thin abi("C") -> GLContext]()(window)
+    var result = _get_dylib_function[lib, "SDL_GL_CreateContext", def(window: Ptr[Window, O_window]) thin abi("C") -> Optional[GLContext]]()(window)
+    if not result:
+        raise Error(get_error())
+    return result.value()
 
 
 def gl_make_current[O_window: Origin, //](window: Ptr[Window, O_window], context: GLContext) raises:
@@ -3687,7 +3690,10 @@ def gl_get_current_context() raises -> GLContext:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GL_GetCurrentContext.
     """
 
-    return _get_dylib_function[lib, "SDL_GL_GetCurrentContext", def() thin abi("C") -> GLContext]()()
+    var result = _get_dylib_function[lib, "SDL_GL_GetCurrentContext", def() thin abi("C") -> Optional[GLContext]]()()
+    if not result:
+        raise Error(get_error())
+    return result.value()
 
 
 def egl_get_current_display() raises -> EGLDisplay:
@@ -3703,7 +3709,10 @@ def egl_get_current_display() raises -> EGLDisplay:
     Docs: https://wiki.libsdl.org/SDL3/SDL_EGL_GetCurrentDisplay.
     """
 
-    return _get_dylib_function[lib, "SDL_EGL_GetCurrentDisplay", def() thin abi("C") -> EGLDisplay]()()
+    var result = _get_dylib_function[lib, "SDL_EGL_GetCurrentDisplay", def() thin abi("C") -> Optional[EGLDisplay]]()()
+    if not result:
+        raise Error(get_error())
+    return result.value()
 
 
 def egl_get_current_config() raises -> EGLConfig:
@@ -3719,7 +3728,10 @@ def egl_get_current_config() raises -> EGLConfig:
     Docs: https://wiki.libsdl.org/SDL3/SDL_EGL_GetCurrentConfig.
     """
 
-    return _get_dylib_function[lib, "SDL_EGL_GetCurrentConfig", def() thin abi("C") -> EGLConfig]()()
+    var result = _get_dylib_function[lib, "SDL_EGL_GetCurrentConfig", def() thin abi("C") -> Optional[EGLConfig]]()()
+    if not result:
+        raise Error(get_error())
+    return result.value()
 
 
 def egl_get_window_surface[O_window: Origin, //](window: Ptr[Window, O_window]) raises -> EGLSurface:
