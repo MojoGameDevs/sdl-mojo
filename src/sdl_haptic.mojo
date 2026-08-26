@@ -114,6 +114,19 @@ bool test_haptic(SDL_Joystick *joystick)
 Note that the SDL haptic subsystem is not thread-safe.
 """
 
+from std.ffi import UnsafeUnion, _get_dylib_function, c_char, c_float, c_int
+from ._core import ArrayHelper, OptPtr, Ptr, c_string, lib
+from .sdl_error import get_error
+from .sdl_joystick import Joystick
+from .sdl_timer import delay
+
+
+from std.ffi import UnsafeUnion, _get_dylib_function, c_char, c_float, c_int
+from ._core import ArrayHelper, OptPtr, Ptr, c_string, lib
+from .sdl_error import get_error
+from .sdl_joystick import Joystick
+from .sdl_timer import delay
+
 
 @fieldwise_init
 struct Haptic(ImplicitlyCopyable, Movable):
@@ -223,7 +236,7 @@ struct HapticDirection(ImplicitlyCopyable, Movable):
 
     var type: UInt8
     """The type of encoding."""
-    var dir: ArrayHelper[Int32, 3, ExternalOrigin[mut=True]]
+    var dir: ArrayHelper[Int32, 3, UntrackedOrigin[mut=True]]
     """The encoded direction."""
 
 
@@ -395,17 +408,17 @@ struct HapticCondition(ImplicitlyCopyable, Movable):
     var interval: UInt16
     """How soon it can be triggered again after button."""
 
-    var right_sat: ArrayHelper[UInt16, 3, ExternalOrigin[mut=True]]
+    var right_sat: ArrayHelper[UInt16, 3, UntrackedOrigin[mut=True]]
     """Condition."""
-    var left_sat: ArrayHelper[UInt16, 3, ExternalOrigin[mut=True]]
+    var left_sat: ArrayHelper[UInt16, 3, UntrackedOrigin[mut=True]]
     """Level when joystick is to the negative side; max 0xFFFF."""
-    var right_coeff: ArrayHelper[Int16, 3, ExternalOrigin[mut=True]]
+    var right_coeff: ArrayHelper[Int16, 3, UntrackedOrigin[mut=True]]
     """How fast to increase the force towards the positive side."""
-    var left_coeff: ArrayHelper[Int16, 3, ExternalOrigin[mut=True]]
+    var left_coeff: ArrayHelper[Int16, 3, UntrackedOrigin[mut=True]]
     """How fast to increase the force towards the negative side."""
-    var deadband: ArrayHelper[UInt16, 3, ExternalOrigin[mut=True]]
+    var deadband: ArrayHelper[UInt16, 3, UntrackedOrigin[mut=True]]
     """Size of the dead zone; max 0xFFFF: whole axis-range when 0-centered."""
-    var center: ArrayHelper[Int16, 3, ExternalOrigin[mut=True]]
+    var center: ArrayHelper[Int16, 3, UntrackedOrigin[mut=True]]
     """Position of the dead zone."""
 
 
@@ -515,7 +528,7 @@ struct HapticCustom(ImplicitlyCopyable, Movable):
     """Sample periods."""
     var samples: UInt16
     """Amount of samples."""
-    var data: OptPtr[UInt16, ExternalOrigin[mut=True]]
+    var data: OptPtr[UInt16, UntrackedOrigin[mut=True]]
     """Should contain channels*samples items."""
 
     var attack_length: UInt16
@@ -557,7 +570,7 @@ struct HapticID(Intable, TrivialRegisterPassable):
         return Self(lhs.value | rhs.value)
 
 
-def get_haptics[O_count: Origin, //](count: Ptr[c_int, O_count]) raises -> Ptr[HapticID, ExternalOrigin[mut=True]]:
+def get_haptics[O_count: Origin, //](count: Ptr[c_int, O_count]) raises -> Ptr[HapticID, UntrackedOrigin[mut=True]]:
     """Get a list of currently connected haptic devices.
 
     Args:
@@ -572,10 +585,10 @@ def get_haptics[O_count: Origin, //](count: Ptr[c_int, O_count]) raises -> Ptr[H
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetHaptics.
     """
 
-    return _get_dylib_function[lib, "SDL_GetHaptics", def(count: Ptr[c_int, O_count]) thin abi("C") -> OptPtr[HapticID, ExternalOrigin[mut=True]]]()(count).value()
+    return _get_dylib_function[lib, "SDL_GetHaptics", def(count: Ptr[c_int, O_count]) thin abi("C") -> OptPtr[HapticID, UntrackedOrigin[mut=True]]]()(count).value()
 
 
-def get_haptic_name_for_id(instance_id: HapticID) raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
+def get_haptic_name_for_id(instance_id: HapticID) raises -> String:
     """Get the implementation dependent name of a haptic device.
 
     This can be called before any haptic devices are opened.
@@ -591,10 +604,10 @@ def get_haptic_name_for_id(instance_id: HapticID) raises -> Ptr[c_char, External
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetHapticNameForID.
     """
 
-    return _get_dylib_function[lib, "SDL_GetHapticNameForID", def(instance_id: HapticID) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(instance_id).value()
+    return c_string(_get_dylib_function[lib, "SDL_GetHapticNameForID", def(instance_id: HapticID) thin abi("C") -> OptPtr[c_char, UntrackedOrigin[mut=False]]]()(instance_id).value())
 
 
-def open_haptic(instance_id: HapticID, out ret: Ptr[Haptic, ExternalOrigin[mut=True]]) raises:
+def open_haptic(instance_id: HapticID, out ret: Ptr[Haptic, UntrackedOrigin[mut=True]]) raises:
     """Open a haptic device for use.
 
     The index passed as an argument refers to the N'th haptic device on this
@@ -614,13 +627,13 @@ def open_haptic(instance_id: HapticID, out ret: Ptr[Haptic, ExternalOrigin[mut=T
     Docs: https://wiki.libsdl.org/SDL3/SDL_OpenHaptic.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_OpenHaptic", def(instance_id: HapticID) thin abi("C") -> OptPtr[Haptic, ExternalOrigin[mut=True]]]()(instance_id)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_OpenHaptic", def(instance_id: HapticID) thin abi("C") -> OptPtr[Haptic, UntrackedOrigin[mut=True]]]()(instance_id)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
 
 
-def get_haptic_from_id(instance_id: HapticID) raises -> Ptr[Haptic, ExternalOrigin[mut=True]]:
+def get_haptic_from_id(instance_id: HapticID) raises -> Ptr[Haptic, UntrackedOrigin[mut=True]]:
     """Get the SDL_Haptic associated with an instance ID, if it has been opened.
 
     Args:
@@ -633,7 +646,7 @@ def get_haptic_from_id(instance_id: HapticID) raises -> Ptr[Haptic, ExternalOrig
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetHapticFromID.
     """
 
-    return _get_dylib_function[lib, "SDL_GetHapticFromID", def(instance_id: HapticID) thin abi("C") -> OptPtr[Haptic, ExternalOrigin[mut=True]]]()(instance_id).value()
+    return _get_dylib_function[lib, "SDL_GetHapticFromID", def(instance_id: HapticID) thin abi("C") -> OptPtr[Haptic, UntrackedOrigin[mut=True]]]()(instance_id).value()
 
 
 def get_haptic_id[O_haptic: Origin, //](haptic: Ptr[Haptic, O_haptic]) raises -> HapticID:
@@ -652,7 +665,7 @@ def get_haptic_id[O_haptic: Origin, //](haptic: Ptr[Haptic, O_haptic]) raises ->
     return _get_dylib_function[lib, "SDL_GetHapticID", def(haptic: Ptr[Haptic, O_haptic]) thin abi("C") -> HapticID]()(haptic)
 
 
-def get_haptic_name[O_haptic: Origin, //](haptic: Ptr[Haptic, O_haptic]) raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
+def get_haptic_name[O_haptic: Origin, //](haptic: Ptr[Haptic, O_haptic]) raises -> String:
     """Get the implementation dependent name of a haptic device.
 
     Args:
@@ -666,7 +679,7 @@ def get_haptic_name[O_haptic: Origin, //](haptic: Ptr[Haptic, O_haptic]) raises 
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetHapticName.
     """
 
-    return _get_dylib_function[lib, "SDL_GetHapticName", def(haptic: Ptr[Haptic, O_haptic]) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(haptic).value()
+    return c_string(_get_dylib_function[lib, "SDL_GetHapticName", def(haptic: Ptr[Haptic, O_haptic]) thin abi("C") -> OptPtr[c_char, UntrackedOrigin[mut=False]]]()(haptic).value())
 
 
 def is_mouse_haptic() raises -> Bool:
@@ -681,7 +694,7 @@ def is_mouse_haptic() raises -> Bool:
     return _get_dylib_function[lib, "SDL_IsMouseHaptic", def() thin abi("C") -> Bool]()()
 
 
-def open_haptic_from_mouse(out ret: Ptr[Haptic, ExternalOrigin[mut=True]]) raises:
+def open_haptic_from_mouse(out ret: Ptr[Haptic, UntrackedOrigin[mut=True]]) raises:
     """Try to open a haptic device from the current mouse.
 
     Returns:
@@ -691,7 +704,7 @@ def open_haptic_from_mouse(out ret: Ptr[Haptic, ExternalOrigin[mut=True]]) raise
     Docs: https://wiki.libsdl.org/SDL3/SDL_OpenHapticFromMouse.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_OpenHapticFromMouse", def() thin abi("C") -> OptPtr[Haptic, ExternalOrigin[mut=True]]]()()
+    var _ffi_ret = _get_dylib_function[lib, "SDL_OpenHapticFromMouse", def() thin abi("C") -> OptPtr[Haptic, UntrackedOrigin[mut=True]]]()()
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
@@ -712,7 +725,7 @@ def is_joystick_haptic[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystic
     return _get_dylib_function[lib, "SDL_IsJoystickHaptic", def(joystick: Ptr[Joystick, O_joystick]) thin abi("C") -> Bool]()(joystick)
 
 
-def open_haptic_from_joystick[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick], out ret: Ptr[Haptic, ExternalOrigin[mut=True]]) raises:
+def open_haptic_from_joystick[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick], out ret: Ptr[Haptic, UntrackedOrigin[mut=True]]) raises:
     """Open a haptic device for use from a joystick device.
 
     You must still close the haptic device separately. It will not be closed
@@ -733,7 +746,7 @@ def open_haptic_from_joystick[O_joystick: Origin, //](joystick: Ptr[Joystick, O_
     Docs: https://wiki.libsdl.org/SDL3/SDL_OpenHapticFromJoystick.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_OpenHapticFromJoystick", def(joystick: Ptr[Joystick, O_joystick]) thin abi("C") -> OptPtr[Haptic, ExternalOrigin[mut=True]]]()(joystick)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_OpenHapticFromJoystick", def(joystick: Ptr[Joystick, O_joystick]) thin abi("C") -> OptPtr[Haptic, UntrackedOrigin[mut=True]]]()(joystick)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()

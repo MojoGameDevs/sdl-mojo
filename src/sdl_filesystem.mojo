@@ -42,8 +42,17 @@ SDL also offers functions to manipulate the directory tree: renaming,
 removing, copying files.
 """
 
+from std.ffi import _get_dylib_function, c_char, c_int
+from ._core import OptPtr, Ptr, c_string, lib
+from .sdl_error import get_error
 
-def get_base_path() raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
+
+from std.ffi import _get_dylib_function, c_char, c_int
+from ._core import OptPtr, Ptr, c_string, lib
+from .sdl_error import get_error
+
+
+def get_base_path() raises -> String:
     """Get the directory where the application was run from.
 
     SDL caches the result of this call internally, but the first call to this
@@ -82,10 +91,10 @@ def get_base_path() raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetBasePath.
     """
 
-    return _get_dylib_function[lib, "SDL_GetBasePath", def() thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()().value()
+    return c_string(_get_dylib_function[lib, "SDL_GetBasePath", def() thin abi("C") -> OptPtr[c_char, UntrackedOrigin[mut=False]]]()().value())
 
 
-def get_pref_path(var org: String, var app: String) raises -> Ptr[c_char, ExternalOrigin[mut=True]]:
+def get_pref_path(var org: String, var app: String) raises -> Ptr[c_char, UntrackedOrigin[mut=True]]:
     """Get the user-and-app-specific path where files can be written.
 
     Get the "pref dir". This is meant to be where users can write personal
@@ -140,7 +149,7 @@ def get_pref_path(var org: String, var app: String) raises -> Ptr[c_char, Extern
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetPrefPath.
     """
 
-    return _get_dylib_function[lib, "SDL_GetPrefPath", def(org: Ptr[mut=False, c_char, origin_of(org)], app: Ptr[mut=False, c_char, origin_of(app)]) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=True]]]()(org.as_c_string_slice().unsafe_ptr(), app.as_c_string_slice().unsafe_ptr()).value()
+    return _get_dylib_function[lib, "SDL_GetPrefPath", def(org: Ptr[mut=False, c_char, origin_of(org)], app: Ptr[mut=False, c_char, origin_of(app)]) thin abi("C") -> OptPtr[c_char, UntrackedOrigin[mut=True]]]()(org.as_c_string_slice().ptr(), app.as_c_string_slice().ptr()).value()
 
 
 struct Folder(Indexer, Intable, TrivialRegisterPassable):
@@ -215,7 +224,7 @@ struct Folder(Indexer, Intable, TrivialRegisterPassable):
     """Total number of types in this enum, not a folder type by itself."""
 
 
-def get_user_folder(folder: Folder) raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
+def get_user_folder(folder: Folder) raises -> String:
     """Finds the most suitable user folder for a specific purpose.
 
     Many OSes provide certain standard folders for certain purposes, such as
@@ -242,7 +251,7 @@ def get_user_folder(folder: Folder) raises -> Ptr[c_char, ExternalOrigin[mut=Fal
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetUserFolder.
     """
 
-    return _get_dylib_function[lib, "SDL_GetUserFolder", def(folder: Folder) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(folder).value()
+    return c_string(_get_dylib_function[lib, "SDL_GetUserFolder", def(folder: Folder) thin abi("C") -> OptPtr[c_char, UntrackedOrigin[mut=False]]]()(folder).value())
 
 
 struct PathType(Indexer, Intable, TrivialRegisterPassable):
@@ -343,7 +352,7 @@ def create_directory(var path: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateDirectory.
     """
 
-    var _ffi_ret = _get_dylib_function[lib, "SDL_CreateDirectory", def(path: Ptr[mut=False, c_char, origin_of(path)]) thin abi("C") -> Bool]()(path.as_c_string_slice().unsafe_ptr())
+    var _ffi_ret = _get_dylib_function[lib, "SDL_CreateDirectory", def(path: Ptr[mut=False, c_char, origin_of(path)]) thin abi("C") -> Bool]()(path.as_c_string_slice().ptr())
     if not _ffi_ret:
         raise Error(get_error())
 
@@ -380,7 +389,7 @@ struct EnumerationResult(Indexer, Intable, TrivialRegisterPassable):
     """Value that requests that enumeration stop, as a failure."""
 
 
-comptime EnumerateDirectoryCallback = def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]], dirname: OptPtr[c_char, ExternalOrigin[mut=False]], fname: OptPtr[c_char, ExternalOrigin[mut=False]]) thin abi("C") -> EnumerationResult
+comptime EnumerateDirectoryCallback = def(userdata: OptPtr[NoneType, UntrackedOrigin[mut=True]], dirname: OptPtr[c_char, UntrackedOrigin[mut=False]], fname: OptPtr[c_char, UntrackedOrigin[mut=False]]) thin abi("C") -> EnumerationResult
 """Callback for directory enumeration.
     
     Enumeration of directory entries will continue until either all entries
@@ -432,7 +441,7 @@ def enumerate_directory[O_userdata: Origin, //](var path: String, callback: Enum
     Docs: https://wiki.libsdl.org/SDL3/SDL_EnumerateDirectory.
     """
 
-    var _ffi_ret = _get_dylib_function[lib, "SDL_EnumerateDirectory", def(path: Ptr[mut=False, c_char, origin_of(path)], callback: EnumerateDirectoryCallback, userdata: Ptr[NoneType, O_userdata]) thin abi("C") -> Bool]()(path.as_c_string_slice().unsafe_ptr(), callback, userdata)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_EnumerateDirectory", def(path: Ptr[mut=False, c_char, origin_of(path)], callback: EnumerateDirectoryCallback, userdata: Ptr[NoneType, O_userdata]) thin abi("C") -> Bool]()(path.as_c_string_slice().ptr(), callback, userdata)
     if not _ffi_ret:
         raise Error(get_error())
 
@@ -453,7 +462,7 @@ def remove_path(var path: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_RemovePath.
     """
 
-    var _ffi_ret = _get_dylib_function[lib, "SDL_RemovePath", def(path: Ptr[mut=False, c_char, origin_of(path)]) thin abi("C") -> Bool]()(path.as_c_string_slice().unsafe_ptr())
+    var _ffi_ret = _get_dylib_function[lib, "SDL_RemovePath", def(path: Ptr[mut=False, c_char, origin_of(path)]) thin abi("C") -> Bool]()(path.as_c_string_slice().ptr())
     if not _ffi_ret:
         raise Error(get_error())
 
@@ -483,7 +492,7 @@ def rename_path(var oldpath: String, var newpath: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_RenamePath.
     """
 
-    var _ffi_ret = _get_dylib_function[lib, "SDL_RenamePath", def(oldpath: Ptr[mut=False, c_char, origin_of(oldpath)], newpath: Ptr[mut=False, c_char, origin_of(newpath)]) thin abi("C") -> Bool]()(oldpath.as_c_string_slice().unsafe_ptr(), newpath.as_c_string_slice().unsafe_ptr())
+    var _ffi_ret = _get_dylib_function[lib, "SDL_RenamePath", def(oldpath: Ptr[mut=False, c_char, origin_of(oldpath)], newpath: Ptr[mut=False, c_char, origin_of(newpath)]) thin abi("C") -> Bool]()(oldpath.as_c_string_slice().ptr(), newpath.as_c_string_slice().ptr())
     if not _ffi_ret:
         raise Error(get_error())
 
@@ -530,7 +539,7 @@ def copy_file(var oldpath: String, var newpath: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_CopyFile.
     """
 
-    var _ffi_ret = _get_dylib_function[lib, "SDL_CopyFile", def(oldpath: Ptr[mut=False, c_char, origin_of(oldpath)], newpath: Ptr[mut=False, c_char, origin_of(newpath)]) thin abi("C") -> Bool]()(oldpath.as_c_string_slice().unsafe_ptr(), newpath.as_c_string_slice().unsafe_ptr())
+    var _ffi_ret = _get_dylib_function[lib, "SDL_CopyFile", def(oldpath: Ptr[mut=False, c_char, origin_of(oldpath)], newpath: Ptr[mut=False, c_char, origin_of(newpath)]) thin abi("C") -> Bool]()(oldpath.as_c_string_slice().ptr(), newpath.as_c_string_slice().ptr())
     if not _ffi_ret:
         raise Error(get_error())
 
@@ -550,12 +559,12 @@ def get_path_info[O_info: Origin, //](var path: String, info: Ptr[PathInfo, O_in
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetPathInfo.
     """
 
-    var _ffi_ret = _get_dylib_function[lib, "SDL_GetPathInfo", def(path: Ptr[mut=False, c_char, origin_of(path)], info: Ptr[PathInfo, O_info]) thin abi("C") -> Bool]()(path.as_c_string_slice().unsafe_ptr(), info)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_GetPathInfo", def(path: Ptr[mut=False, c_char, origin_of(path)], info: Ptr[PathInfo, O_info]) thin abi("C") -> Bool]()(path.as_c_string_slice().ptr(), info)
     if not _ffi_ret:
         raise Error(get_error())
 
 
-def glob_directory[O_count: Origin, //](var path: String, var pattern: String, flags: GlobFlags, count: Ptr[c_int, O_count], out ret: Ptr[OptPtr[c_char, ExternalOrigin[mut=True]], ExternalOrigin[mut=True]]) raises:
+def glob_directory[O_count: Origin, //](var path: String, var pattern: String, flags: GlobFlags, count: Ptr[c_int, O_count], out ret: Ptr[OptPtr[c_char, UntrackedOrigin[mut=True]], UntrackedOrigin[mut=True]]) raises:
     """Enumerate a directory tree, filtered by pattern, and return a list.
 
     Files are filtered out if they don't match the string in `pattern`, which
@@ -591,13 +600,13 @@ def glob_directory[O_count: Origin, //](var path: String, var pattern: String, f
     Docs: https://wiki.libsdl.org/SDL3/SDL_GlobDirectory.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_GlobDirectory", def(path: Ptr[mut=False, c_char, origin_of(path)], pattern: Ptr[mut=False, c_char, origin_of(pattern)], flags: GlobFlags, count: Ptr[c_int, O_count]) thin abi("C") -> OptPtr[OptPtr[c_char, ExternalOrigin[mut=True]], ExternalOrigin[mut=True]]]()(path.as_c_string_slice().unsafe_ptr(), pattern.as_c_string_slice().unsafe_ptr(), flags, count)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_GlobDirectory", def(path: Ptr[mut=False, c_char, origin_of(path)], pattern: Ptr[mut=False, c_char, origin_of(pattern)], flags: GlobFlags, count: Ptr[c_int, O_count]) thin abi("C") -> OptPtr[OptPtr[c_char, UntrackedOrigin[mut=True]], UntrackedOrigin[mut=True]]]()(path.as_c_string_slice().ptr(), pattern.as_c_string_slice().ptr(), flags, count)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
 
 
-def get_current_directory() raises -> Ptr[c_char, ExternalOrigin[mut=True]]:
+def get_current_directory() raises -> Ptr[c_char, UntrackedOrigin[mut=True]]:
     """Get what the system believes is the "current working directory.".
 
     For systems without a concept of a current working directory, this will
@@ -618,4 +627,4 @@ def get_current_directory() raises -> Ptr[c_char, ExternalOrigin[mut=True]]:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetCurrentDirectory.
     """
 
-    return _get_dylib_function[lib, "SDL_GetCurrentDirectory", def() thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=True]]]()().value()
+    return _get_dylib_function[lib, "SDL_GetCurrentDirectory", def() thin abi("C") -> OptPtr[c_char, UntrackedOrigin[mut=True]]]()().value()

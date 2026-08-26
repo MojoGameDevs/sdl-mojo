@@ -35,6 +35,15 @@ or user to give the library a hint as to how they would like the library to
 work.
 """
 
+from std.ffi import _get_dylib_function, c_char
+from ._core import OptPtr, Ptr, c_string, lib
+from .sdl_error import get_error
+
+
+from std.ffi import _get_dylib_function, c_char
+from ._core import OptPtr, Ptr, c_string, lib
+from .sdl_error import get_error
+
 
 struct HintPriority(Indexer, Intable, TrivialRegisterPassable):
     """An enumeration of hint priorities.
@@ -87,7 +96,7 @@ def set_hint_with_priority(var name: String, var value: String, priority: HintPr
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetHintWithPriority.
     """
 
-    var _ffi_ret = _get_dylib_function[lib, "SDL_SetHintWithPriority", def(name: Ptr[mut=False, c_char, origin_of(name)], value: Ptr[mut=False, c_char, origin_of(value)], priority: HintPriority) thin abi("C") -> Bool]()(name.as_c_string_slice().unsafe_ptr(), value.as_c_string_slice().unsafe_ptr(), priority)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_SetHintWithPriority", def(name: Ptr[mut=False, c_char, origin_of(name)], value: Ptr[mut=False, c_char, origin_of(value)], priority: HintPriority) thin abi("C") -> Bool]()(name.as_c_string_slice().ptr(), value.as_c_string_slice().ptr(), priority)
     if not _ffi_ret:
         raise Error(get_error())
 
@@ -113,7 +122,7 @@ def set_hint(var name: String, var value: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetHint.
     """
 
-    var _ffi_ret = _get_dylib_function[lib, "SDL_SetHint", def(name: Ptr[mut=False, c_char, origin_of(name)], value: Ptr[mut=False, c_char, origin_of(value)]) thin abi("C") -> Bool]()(name.as_c_string_slice().unsafe_ptr(), value.as_c_string_slice().unsafe_ptr())
+    var _ffi_ret = _get_dylib_function[lib, "SDL_SetHint", def(name: Ptr[mut=False, c_char, origin_of(name)], value: Ptr[mut=False, c_char, origin_of(value)]) thin abi("C") -> Bool]()(name.as_c_string_slice().ptr(), value.as_c_string_slice().ptr())
     if not _ffi_ret:
         raise Error(get_error())
 
@@ -138,7 +147,7 @@ def reset_hint(var name: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_ResetHint.
     """
 
-    var _ffi_ret = _get_dylib_function[lib, "SDL_ResetHint", def(name: Ptr[mut=False, c_char, origin_of(name)]) thin abi("C") -> Bool]()(name.as_c_string_slice().unsafe_ptr())
+    var _ffi_ret = _get_dylib_function[lib, "SDL_ResetHint", def(name: Ptr[mut=False, c_char, origin_of(name)]) thin abi("C") -> Bool]()(name.as_c_string_slice().ptr())
     if not _ffi_ret:
         raise Error(get_error())
 
@@ -159,7 +168,7 @@ def reset_hints() raises -> None:
     return _get_dylib_function[lib, "SDL_ResetHints", def() thin abi("C") -> None]()()
 
 
-def get_hint(var name: String) raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
+def get_hint(var name: String) raises -> String:
     """Get the value of a hint.
 
     Args:
@@ -179,7 +188,7 @@ def get_hint(var name: String) raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetHint.
     """
 
-    return _get_dylib_function[lib, "SDL_GetHint", def(name: Ptr[mut=False, c_char, origin_of(name)]) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(name.as_c_string_slice().unsafe_ptr()).value()
+    return c_string(_get_dylib_function[lib, "SDL_GetHint", def(name: Ptr[mut=False, c_char, origin_of(name)]) thin abi("C") -> OptPtr[c_char, UntrackedOrigin[mut=False]]]()(name.as_c_string_slice().ptr()).value())
 
 
 def get_hint_boolean(var name: String, default_value: Bool) raises -> Bool:
@@ -199,10 +208,10 @@ def get_hint_boolean(var name: String, default_value: Bool) raises -> Bool:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetHintBoolean.
     """
 
-    return _get_dylib_function[lib, "SDL_GetHintBoolean", def(name: Ptr[mut=False, c_char, origin_of(name)], default_value: Bool) thin abi("C") -> Bool]()(name.as_c_string_slice().unsafe_ptr(), default_value)
+    return _get_dylib_function[lib, "SDL_GetHintBoolean", def(name: Ptr[mut=False, c_char, origin_of(name)], default_value: Bool) thin abi("C") -> Bool]()(name.as_c_string_slice().ptr(), default_value)
 
 
-comptime HintCallback = def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]], name: OptPtr[c_char, ExternalOrigin[mut=False]], old_value: OptPtr[c_char, ExternalOrigin[mut=False]], new_value: OptPtr[c_char, ExternalOrigin[mut=False]]) thin abi("C") -> None
+comptime HintCallback = def(userdata: OptPtr[NoneType, UntrackedOrigin[mut=True]], name: OptPtr[c_char, UntrackedOrigin[mut=False]], old_value: OptPtr[c_char, UntrackedOrigin[mut=False]], new_value: OptPtr[c_char, UntrackedOrigin[mut=False]]) thin abi("C") -> None
 """A callback used to send notifications of hint value changes.
     
     This is called an initial time during SDL_AddHintCallback with the hint's
@@ -245,7 +254,7 @@ def add_hint_callback[O_userdata: Origin, //](var name: String, callback: HintCa
     Docs: https://wiki.libsdl.org/SDL3/SDL_AddHintCallback.
     """
 
-    var _ffi_ret = _get_dylib_function[lib, "SDL_AddHintCallback", def(name: Ptr[mut=False, c_char, origin_of(name)], callback: HintCallback, userdata: Ptr[NoneType, O_userdata]) thin abi("C") -> Bool]()(name.as_c_string_slice().unsafe_ptr(), callback, userdata)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_AddHintCallback", def(name: Ptr[mut=False, c_char, origin_of(name)], callback: HintCallback, userdata: Ptr[NoneType, O_userdata]) thin abi("C") -> Bool]()(name.as_c_string_slice().ptr(), callback, userdata)
     if not _ffi_ret:
         raise Error(get_error())
 
@@ -265,4 +274,4 @@ def remove_hint_callback[O_userdata: Origin, //](var name: String, callback: Hin
     Docs: https://wiki.libsdl.org/SDL3/SDL_RemoveHintCallback.
     """
 
-    return _get_dylib_function[lib, "SDL_RemoveHintCallback", def(name: Ptr[mut=False, c_char, origin_of(name)], callback: HintCallback, userdata: Ptr[NoneType, O_userdata]) thin abi("C") -> None]()(name.as_c_string_slice().unsafe_ptr(), callback, userdata)
+    return _get_dylib_function[lib, "SDL_RemoveHintCallback", def(name: Ptr[mut=False, c_char, origin_of(name)], callback: HintCallback, userdata: Ptr[NoneType, O_userdata]) thin abi("C") -> None]()(name.as_c_string_slice().ptr(), callback, userdata)

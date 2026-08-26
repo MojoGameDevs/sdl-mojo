@@ -47,6 +47,23 @@ most apps can get by with simply creating a window and listening for
 events, so start with SDL_CreateWindow() and SDL_PollEvent().
 """
 
+from std.ffi import _get_dylib_function, c_char, c_float, c_int, c_size_t
+from ._core import OptPtr, Ptr, c_string, lib
+from .sdl_error import get_error
+from .sdl_pixels import PixelFormat
+from .sdl_properties import PropertiesID
+from .sdl_rect import Point, Rect
+from .sdl_surface import Surface
+
+
+from std.ffi import _get_dylib_function, c_char, c_float, c_int, c_size_t
+from ._core import OptPtr, Ptr, c_string, lib
+from .sdl_error import get_error
+from .sdl_pixels import PixelFormat
+from .sdl_properties import PropertiesID
+from .sdl_rect import Point, Rect
+from .sdl_surface import Surface
+
 
 struct DisplayID(Intable, TrivialRegisterPassable):
     """This is a unique ID for a display for the time it is connected to the
@@ -165,7 +182,7 @@ struct DisplayMode(ImplicitlyCopyable, Movable):
     var refresh_rate_denominator: c_int
     """Precise refresh rate denominator."""
 
-    var internal: OptPtr[DisplayModeData, ExternalOrigin[mut=True]]
+    var internal: OptPtr[DisplayModeData, UntrackedOrigin[mut=True]]
     """Private."""
 
 
@@ -324,23 +341,23 @@ struct FlashOperation(Indexer, Intable, TrivialRegisterPassable):
     """Flash the window until it gets focus."""
 
 
-comptime GLContext = Ptr[NoneType, MutExternalOrigin]
+comptime GLContext = Ptr[NoneType, MutUntrackedOrigin]
 """An opaque handle to an OpenGL context.
 
 Docs: https://wiki.libsdl.org/SDL3/GLContext.
 """
 
-comptime EGLDisplay = Ptr[NoneType, MutExternalOrigin]
+comptime EGLDisplay = Ptr[NoneType, MutUntrackedOrigin]
 """Opaque type for an EGL display.
 
 Docs: https://wiki.libsdl.org/SDL3/SDL_EGLDisplay.
 """
-comptime EGLConfig = Ptr[NoneType, MutExternalOrigin]
+comptime EGLConfig = Ptr[NoneType, MutUntrackedOrigin]
 """Opaque type for an EGL config.
 
 Docs: https://wiki.libsdl.org/SDL3/SDL_EGLConfig.
 """
-comptime EGLSurface = Ptr[NoneType, MutExternalOrigin]
+comptime EGLSurface = Ptr[NoneType, MutUntrackedOrigin]
 """Opaque type for an EGL surface.
 
 Docs: https://wiki.libsdl.org/SDL3/SDL_EGLSurface.
@@ -389,7 +406,7 @@ struct EGLint(Intable, TrivialRegisterPassable):
         return Self(lhs.value | rhs.value)
 
 
-comptime EGLAttribArrayCallback = Ptr[def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]]) thin abi("C") -> EGLAttrib, MutExternalOrigin]
+comptime EGLAttribArrayCallback = Ptr[def(userdata: OptPtr[NoneType, UntrackedOrigin[mut=True]]) thin abi("C") -> EGLAttrib, MutUntrackedOrigin]
 """EGL platform attribute initialization callback.
     
     This is called when SDL is attempting to create an EGL context, to let the
@@ -415,7 +432,7 @@ Docs: https://wiki.libsdl.org/SDL3/SDL_EGLAttribArrayCallback.
 """
 
 
-comptime EGLIntArrayCallback = Ptr[def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]], display: EGLDisplay, config: EGLConfig) thin abi("C") -> EGLint, MutExternalOrigin]
+comptime EGLIntArrayCallback = Ptr[def(userdata: OptPtr[NoneType, UntrackedOrigin[mut=True]], display: EGLDisplay, config: EGLConfig) thin abi("C") -> EGLint, MutUntrackedOrigin]
 """EGL surface/context attribute initialization callback types.
     
     This is called when SDL is attempting to create an EGL surface, to let the
@@ -656,7 +673,7 @@ def get_num_video_drivers() raises -> c_int:
     return _get_dylib_function[lib, "SDL_GetNumVideoDrivers", def() thin abi("C") -> c_int]()()
 
 
-def get_video_driver(index: c_int) raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
+def get_video_driver(index: c_int) raises -> String:
     """Get the name of a built in video driver.
 
     The video drivers are presented in the order in which they are normally
@@ -678,10 +695,10 @@ def get_video_driver(index: c_int) raises -> Ptr[c_char, ExternalOrigin[mut=Fals
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetVideoDriver.
     """
 
-    return _get_dylib_function[lib, "SDL_GetVideoDriver", def(index: c_int) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(index).value()
+    return c_string(_get_dylib_function[lib, "SDL_GetVideoDriver", def(index: c_int) thin abi("C") -> OptPtr[c_char, UntrackedOrigin[mut=False]]]()(index).value())
 
 
-def get_current_video_driver() raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
+def get_current_video_driver() raises -> String:
     """Get the name of the currently initialized video driver.
 
     The names of drivers are all simple, low-ASCII identifiers, like "cocoa",
@@ -698,7 +715,7 @@ def get_current_video_driver() raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetCurrentVideoDriver.
     """
 
-    return _get_dylib_function[lib, "SDL_GetCurrentVideoDriver", def() thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()().value()
+    return c_string(_get_dylib_function[lib, "SDL_GetCurrentVideoDriver", def() thin abi("C") -> OptPtr[c_char, UntrackedOrigin[mut=False]]]()().value())
 
 
 def get_system_theme() raises -> SystemTheme:
@@ -716,7 +733,7 @@ def get_system_theme() raises -> SystemTheme:
     return _get_dylib_function[lib, "SDL_GetSystemTheme", def() thin abi("C") -> SystemTheme]()()
 
 
-def get_displays[O_count: Origin, //](count: Ptr[c_int, O_count], out ret: Ptr[DisplayID, ExternalOrigin[mut=True]]) raises:
+def get_displays[O_count: Origin, //](count: Ptr[c_int, O_count], out ret: Ptr[DisplayID, UntrackedOrigin[mut=True]]) raises:
     """Get a list of currently connected displays.
 
     Args:
@@ -734,7 +751,7 @@ def get_displays[O_count: Origin, //](count: Ptr[c_int, O_count], out ret: Ptr[D
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetDisplays.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_GetDisplays", def(count: Ptr[c_int, O_count]) thin abi("C") -> OptPtr[DisplayID, ExternalOrigin[mut=True]]]()(count)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_GetDisplays", def(count: Ptr[c_int, O_count]) thin abi("C") -> OptPtr[DisplayID, UntrackedOrigin[mut=True]]]()(count)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
@@ -790,7 +807,7 @@ def get_display_properties(display_id: DisplayID) raises -> PropertiesID:
     return _get_dylib_function[lib, "SDL_GetDisplayProperties", def(display_id: DisplayID) thin abi("C") -> PropertiesID]()(display_id)
 
 
-def get_display_name(display_id: DisplayID, out ret: Ptr[c_char, ExternalOrigin[mut=False]]) raises:
+def get_display_name(display_id: DisplayID, out ret: String) raises:
     """Get the name of a display in UTF-8 encoding.
 
     Args:
@@ -806,10 +823,10 @@ def get_display_name(display_id: DisplayID, out ret: Ptr[c_char, ExternalOrigin[
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetDisplayName.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_GetDisplayName", def(display_id: DisplayID) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(display_id)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_GetDisplayName", def(display_id: DisplayID) thin abi("C") -> OptPtr[c_char, UntrackedOrigin[mut=False]]]()(display_id)
     if not _ffi_ret:
         raise Error(get_error())
-    ret = _ffi_ret.value()
+    ret = c_string(_ffi_ret.value())
 
 
 def get_display_bounds[O_rect: Origin, //](display_id: DisplayID, rect: Ptr[Rect, O_rect]) raises:
@@ -936,7 +953,7 @@ def get_display_content_scale(display_id: DisplayID) raises -> c_float:
     return _get_dylib_function[lib, "SDL_GetDisplayContentScale", def(display_id: DisplayID) thin abi("C") -> c_float]()(display_id)
 
 
-def get_fullscreen_display_modes[O_count: Origin, //](display_id: DisplayID, count: Ptr[c_int, O_count]) raises -> Ptr[OptPtr[DisplayMode, ExternalOrigin[mut=True]], ExternalOrigin[mut=True]]:
+def get_fullscreen_display_modes[O_count: Origin, //](display_id: DisplayID, count: Ptr[c_int, O_count]) raises -> Ptr[OptPtr[DisplayMode, UntrackedOrigin[mut=True]], UntrackedOrigin[mut=True]]:
     """Get a list of fullscreen display modes available on a display.
 
     The display modes are sorted in this priority:
@@ -965,7 +982,7 @@ def get_fullscreen_display_modes[O_count: Origin, //](display_id: DisplayID, cou
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetFullscreenDisplayModes.
     """
 
-    return _get_dylib_function[lib, "SDL_GetFullscreenDisplayModes", def(display_id: DisplayID, count: Ptr[c_int, O_count]) thin abi("C") -> OptPtr[OptPtr[DisplayMode, ExternalOrigin[mut=True]], ExternalOrigin[mut=True]]]()(display_id, count).value()
+    return _get_dylib_function[lib, "SDL_GetFullscreenDisplayModes", def(display_id: DisplayID, count: Ptr[c_int, O_count]) thin abi("C") -> OptPtr[OptPtr[DisplayMode, UntrackedOrigin[mut=True]], UntrackedOrigin[mut=True]]]()(display_id, count).value()
 
 
 def get_closest_fullscreen_display_mode[O_closest: Origin, //](display_id: DisplayID, w: c_int, h: c_int, refresh_rate: c_float, include_high_density_modes: Bool, closest: Ptr[DisplayMode, O_closest]) raises:
@@ -1004,7 +1021,7 @@ def get_closest_fullscreen_display_mode[O_closest: Origin, //](display_id: Displ
         raise Error(get_error())
 
 
-def get_desktop_display_mode(display_id: DisplayID, out ret: Ptr[DisplayMode, ExternalOrigin[mut=False]]) raises:
+def get_desktop_display_mode(display_id: DisplayID, out ret: Ptr[DisplayMode, UntrackedOrigin[mut=False]]) raises:
     """Get information about the desktop's display mode.
 
     There's a difference between this function and SDL_GetCurrentDisplayMode()
@@ -1025,13 +1042,13 @@ def get_desktop_display_mode(display_id: DisplayID, out ret: Ptr[DisplayMode, Ex
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetDesktopDisplayMode.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_GetDesktopDisplayMode", def(display_id: DisplayID) thin abi("C") -> OptPtr[DisplayMode, ExternalOrigin[mut=False]]]()(display_id)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_GetDesktopDisplayMode", def(display_id: DisplayID) thin abi("C") -> OptPtr[DisplayMode, UntrackedOrigin[mut=False]]]()(display_id)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
 
 
-def get_current_display_mode(display_id: DisplayID, out ret: Ptr[DisplayMode, ExternalOrigin[mut=False]]) raises:
+def get_current_display_mode(display_id: DisplayID, out ret: Ptr[DisplayMode, UntrackedOrigin[mut=False]]) raises:
     """Get information about the current display mode.
 
     There's a difference between this function and SDL_GetDesktopDisplayMode()
@@ -1052,7 +1069,7 @@ def get_current_display_mode(display_id: DisplayID, out ret: Ptr[DisplayMode, Ex
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetCurrentDisplayMode.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_GetCurrentDisplayMode", def(display_id: DisplayID) thin abi("C") -> OptPtr[DisplayMode, ExternalOrigin[mut=False]]]()(display_id)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_GetCurrentDisplayMode", def(display_id: DisplayID) thin abi("C") -> OptPtr[DisplayMode, UntrackedOrigin[mut=False]]]()(display_id)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
@@ -1209,7 +1226,7 @@ def set_window_fullscreen_mode[O_window: Origin, O_mode: Origin, //](window: Ptr
         raise Error(get_error())
 
 
-def get_window_fullscreen_mode[O_window: Origin, //](window: Ptr[Window, O_window]) raises -> Ptr[DisplayMode, ExternalOrigin[mut=False]]:
+def get_window_fullscreen_mode[O_window: Origin, //](window: Ptr[Window, O_window]) raises -> Ptr[DisplayMode, UntrackedOrigin[mut=False]]:
     """Query the display mode to use when a window is visible at fullscreen.
 
     Args:
@@ -1225,10 +1242,10 @@ def get_window_fullscreen_mode[O_window: Origin, //](window: Ptr[Window, O_windo
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetWindowFullscreenMode.
     """
 
-    return _get_dylib_function[lib, "SDL_GetWindowFullscreenMode", def(window: Ptr[Window, O_window]) thin abi("C") -> OptPtr[DisplayMode, ExternalOrigin[mut=False]]]()(window).value()
+    return _get_dylib_function[lib, "SDL_GetWindowFullscreenMode", def(window: Ptr[Window, O_window]) thin abi("C") -> OptPtr[DisplayMode, UntrackedOrigin[mut=False]]]()(window).value()
 
 
-def get_window_icc_profile[O_window: Origin, O_size: Origin, //](window: Ptr[Window, O_window], size: Ptr[c_size_t, O_size], out ret: Ptr[NoneType, ExternalOrigin[mut=True]]) raises:
+def get_window_icc_profile[O_window: Origin, O_size: Origin, //](window: Ptr[Window, O_window], size: Ptr[c_size_t, O_size], out ret: Ptr[NoneType, UntrackedOrigin[mut=True]]) raises:
     """Get the raw ICC profile data for the screen the window is currently on.
 
     Args:
@@ -1246,7 +1263,7 @@ def get_window_icc_profile[O_window: Origin, O_size: Origin, //](window: Ptr[Win
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetWindowICCProfile.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_GetWindowICCProfile", def(window: Ptr[Window, O_window], size: Ptr[c_size_t, O_size]) thin abi("C") -> OptPtr[NoneType, ExternalOrigin[mut=True]]]()(window, size)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_GetWindowICCProfile", def(window: Ptr[Window, O_window], size: Ptr[c_size_t, O_size]) thin abi("C") -> OptPtr[NoneType, UntrackedOrigin[mut=True]]]()(window, size)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
@@ -1272,7 +1289,7 @@ def get_window_pixel_format[O_window: Origin, //](window: Ptr[Window, O_window])
     return _get_dylib_function[lib, "SDL_GetWindowPixelFormat", def(window: Ptr[Window, O_window]) thin abi("C") -> PixelFormat]()(window)
 
 
-def get_windows[O_count: Origin, //](count: Ptr[c_int, O_count], out ret: Ptr[OptPtr[Window, ExternalOrigin[mut=True]], ExternalOrigin[mut=True]]) raises:
+def get_windows[O_count: Origin, //](count: Ptr[c_int, O_count], out ret: Ptr[OptPtr[Window, UntrackedOrigin[mut=True]], UntrackedOrigin[mut=True]]) raises:
     """Get a list of valid windows.
 
     Args:
@@ -1291,13 +1308,13 @@ def get_windows[O_count: Origin, //](count: Ptr[c_int, O_count], out ret: Ptr[Op
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetWindows.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_GetWindows", def(count: Ptr[c_int, O_count]) thin abi("C") -> OptPtr[OptPtr[Window, ExternalOrigin[mut=True]], ExternalOrigin[mut=True]]]()(count)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_GetWindows", def(count: Ptr[c_int, O_count]) thin abi("C") -> OptPtr[OptPtr[Window, UntrackedOrigin[mut=True]], UntrackedOrigin[mut=True]]]()(count)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
 
 
-def create_window(var title: String, w: c_int, h: c_int, flags: WindowFlags, out ret: Ptr[Window, ExternalOrigin[mut=True]]) raises:
+def create_window(var title: String, w: c_int, h: c_int, flags: WindowFlags, out ret: Ptr[Window, UntrackedOrigin[mut=True]]) raises:
     """Create a window with the specified dimensions and flags.
 
     The window size is a request and may be different than expected based on
@@ -1385,13 +1402,13 @@ def create_window(var title: String, w: c_int, h: c_int, flags: WindowFlags, out
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateWindow.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_CreateWindow", def(title: Ptr[mut=False, c_char, origin_of(title)], w: c_int, h: c_int, flags: WindowFlags) thin abi("C") -> OptPtr[Window, ExternalOrigin[mut=True]]]()(title.as_c_string_slice().unsafe_ptr(), w, h, flags)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_CreateWindow", def(title: Ptr[mut=False, c_char, origin_of(title)], w: c_int, h: c_int, flags: WindowFlags) thin abi("C") -> OptPtr[Window, UntrackedOrigin[mut=True]]]()(title.as_c_string_slice().ptr(), w, h, flags)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
 
 
-def create_popup_window[O_parent: Origin, //](parent: Ptr[Window, O_parent], offset_x: c_int, offset_y: c_int, w: c_int, h: c_int, flags: WindowFlags, out ret: Ptr[Window, ExternalOrigin[mut=True]]) raises:
+def create_popup_window[O_parent: Origin, //](parent: Ptr[Window, O_parent], offset_x: c_int, offset_y: c_int, w: c_int, h: c_int, flags: WindowFlags, out ret: Ptr[Window, UntrackedOrigin[mut=True]]) raises:
     """Create a child popup window of the specified parent window.
 
     The window size is a request and may be different than expected based on
@@ -1464,13 +1481,13 @@ def create_popup_window[O_parent: Origin, //](parent: Ptr[Window, O_parent], off
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreatePopupWindow.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_CreatePopupWindow", def(parent: Ptr[Window, O_parent], offset_x: c_int, offset_y: c_int, w: c_int, h: c_int, flags: WindowFlags) thin abi("C") -> OptPtr[Window, ExternalOrigin[mut=True]]]()(parent, offset_x, offset_y, w, h, flags)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_CreatePopupWindow", def(parent: Ptr[Window, O_parent], offset_x: c_int, offset_y: c_int, w: c_int, h: c_int, flags: WindowFlags) thin abi("C") -> OptPtr[Window, UntrackedOrigin[mut=True]]]()(parent, offset_x, offset_y, w, h, flags)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
 
 
-def create_window_with_properties(props: PropertiesID, out ret: Ptr[Window, ExternalOrigin[mut=True]]) raises:
+def create_window_with_properties(props: PropertiesID, out ret: Ptr[Window, UntrackedOrigin[mut=True]]) raises:
     """Create a window with the specified properties.
 
     The window size is a request and may be different than expected based on
@@ -1597,7 +1614,7 @@ def create_window_with_properties(props: PropertiesID, out ret: Ptr[Window, Exte
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateWindowWithProperties.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_CreateWindowWithProperties", def(props: PropertiesID) thin abi("C") -> OptPtr[Window, ExternalOrigin[mut=True]]]()(props)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_CreateWindowWithProperties", def(props: PropertiesID) thin abi("C") -> OptPtr[Window, UntrackedOrigin[mut=True]]]()(props)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
@@ -1625,7 +1642,7 @@ def get_window_id[O_window: Origin, //](window: Ptr[Window, O_window]) raises ->
     return _get_dylib_function[lib, "SDL_GetWindowID", def(window: Ptr[Window, O_window]) thin abi("C") -> WindowID]()(window)
 
 
-def get_window_from_id(id: WindowID) raises -> Ptr[Window, ExternalOrigin[mut=True]]:
+def get_window_from_id(id: WindowID) raises -> Ptr[Window, UntrackedOrigin[mut=True]]:
     """Get a window from a stored ID.
 
     The numeric ID is what SDL_WindowEvent references, and is necessary to map
@@ -1644,10 +1661,10 @@ def get_window_from_id(id: WindowID) raises -> Ptr[Window, ExternalOrigin[mut=Tr
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetWindowFromID.
     """
 
-    return _get_dylib_function[lib, "SDL_GetWindowFromID", def(id: WindowID) thin abi("C") -> OptPtr[Window, ExternalOrigin[mut=True]]]()(id).value()
+    return _get_dylib_function[lib, "SDL_GetWindowFromID", def(id: WindowID) thin abi("C") -> OptPtr[Window, UntrackedOrigin[mut=True]]]()(id).value()
 
 
-def get_window_parent[O_window: Origin, //](window: Ptr[Window, O_window]) raises -> Ptr[Window, ExternalOrigin[mut=True]]:
+def get_window_parent[O_window: Origin, //](window: Ptr[Window, O_window]) raises -> Ptr[Window, UntrackedOrigin[mut=True]]:
     """Get parent of a window.
 
     Args:
@@ -1663,7 +1680,7 @@ def get_window_parent[O_window: Origin, //](window: Ptr[Window, O_window]) raise
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetWindowParent.
     """
 
-    return _get_dylib_function[lib, "SDL_GetWindowParent", def(window: Ptr[Window, O_window]) thin abi("C") -> OptPtr[Window, ExternalOrigin[mut=True]]]()(window).value()
+    return _get_dylib_function[lib, "SDL_GetWindowParent", def(window: Ptr[Window, O_window]) thin abi("C") -> OptPtr[Window, UntrackedOrigin[mut=True]]]()(window).value()
 
 
 def get_window_properties[O_window: Origin, //](window: Ptr[Window, O_window]) raises -> PropertiesID:
@@ -1831,12 +1848,12 @@ def set_window_title[O_window: Origin, //](window: Ptr[Window, O_window], var ti
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetWindowTitle.
     """
 
-    var _ffi_ret = _get_dylib_function[lib, "SDL_SetWindowTitle", def(window: Ptr[Window, O_window], title: Ptr[mut=False, c_char, origin_of(title)]) thin abi("C") -> Bool]()(window, title.as_c_string_slice().unsafe_ptr())
+    var _ffi_ret = _get_dylib_function[lib, "SDL_SetWindowTitle", def(window: Ptr[Window, O_window], title: Ptr[mut=False, c_char, origin_of(title)]) thin abi("C") -> Bool]()(window, title.as_c_string_slice().ptr())
     if not _ffi_ret:
         raise Error(get_error())
 
 
-def get_window_title[O_window: Origin, //](window: Ptr[Window, O_window]) raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
+def get_window_title[O_window: Origin, //](window: Ptr[Window, O_window]) raises -> String:
     """Get the title of a window.
 
     Args:
@@ -1852,7 +1869,7 @@ def get_window_title[O_window: Origin, //](window: Ptr[Window, O_window]) raises
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetWindowTitle.
     """
 
-    return _get_dylib_function[lib, "SDL_GetWindowTitle", def(window: Ptr[Window, O_window]) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(window).value()
+    return c_string(_get_dylib_function[lib, "SDL_GetWindowTitle", def(window: Ptr[Window, O_window]) thin abi("C") -> OptPtr[c_char, UntrackedOrigin[mut=False]]]()(window).value())
 
 
 def set_window_icon[O_window: Origin, O_icon: Origin, //](window: Ptr[Window, O_window], icon: Ptr[Surface, O_icon]) raises:
@@ -2638,7 +2655,7 @@ def window_has_surface[O_window: Origin, //](window: Ptr[Window, O_window]) rais
     return _get_dylib_function[lib, "SDL_WindowHasSurface", def(window: Ptr[Window, O_window]) thin abi("C") -> Bool]()(window)
 
 
-def get_window_surface[O_window: Origin, //](window: Ptr[Window, O_window], out ret: Ptr[Surface, ExternalOrigin[mut=True]]) raises:
+def get_window_surface[O_window: Origin, //](window: Ptr[Window, O_window], out ret: Ptr[Surface, UntrackedOrigin[mut=True]]) raises:
     """Get the SDL surface associated with the window.
 
     A new surface will be created with the optimal format for the window, if
@@ -2665,7 +2682,7 @@ def get_window_surface[O_window: Origin, //](window: Ptr[Window, O_window], out 
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetWindowSurface.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_GetWindowSurface", def(window: Ptr[Window, O_window]) thin abi("C") -> OptPtr[Surface, ExternalOrigin[mut=True]]]()(window)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_GetWindowSurface", def(window: Ptr[Window, O_window]) thin abi("C") -> OptPtr[Surface, UntrackedOrigin[mut=True]]]()(window)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
@@ -2905,7 +2922,7 @@ def get_window_mouse_grab[O_window: Origin, //](window: Ptr[Window, O_window]) r
     return _get_dylib_function[lib, "SDL_GetWindowMouseGrab", def(window: Ptr[Window, O_window]) thin abi("C") -> Bool]()(window)
 
 
-def get_grabbed_window() raises -> Ptr[Window, ExternalOrigin[mut=True]]:
+def get_grabbed_window() raises -> Ptr[Window, UntrackedOrigin[mut=True]]:
     """Get the window that currently has an input grab enabled.
 
     Returns:
@@ -2917,7 +2934,7 @@ def get_grabbed_window() raises -> Ptr[Window, ExternalOrigin[mut=True]]:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetGrabbedWindow.
     """
 
-    return _get_dylib_function[lib, "SDL_GetGrabbedWindow", def() thin abi("C") -> OptPtr[Window, ExternalOrigin[mut=True]]]()().value()
+    return _get_dylib_function[lib, "SDL_GetGrabbedWindow", def() thin abi("C") -> OptPtr[Window, UntrackedOrigin[mut=True]]]()().value()
 
 
 def set_window_mouse_rect[O_window: Origin, O_rect: Origin, //](window: Ptr[Window, O_window], rect: Ptr[Rect, O_rect]) raises:
@@ -2946,7 +2963,7 @@ def set_window_mouse_rect[O_window: Origin, O_rect: Origin, //](window: Ptr[Wind
         raise Error(get_error())
 
 
-def get_window_mouse_rect[O_window: Origin, //](window: Ptr[Window, O_window]) raises -> Ptr[Rect, ExternalOrigin[mut=False]]:
+def get_window_mouse_rect[O_window: Origin, //](window: Ptr[Window, O_window]) raises -> Ptr[Rect, UntrackedOrigin[mut=False]]:
     """Get the mouse confinement rectangle of a window.
 
     Args:
@@ -2962,7 +2979,7 @@ def get_window_mouse_rect[O_window: Origin, //](window: Ptr[Window, O_window]) r
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetWindowMouseRect.
     """
 
-    return _get_dylib_function[lib, "SDL_GetWindowMouseRect", def(window: Ptr[Window, O_window]) thin abi("C") -> OptPtr[Rect, ExternalOrigin[mut=False]]]()(window).value()
+    return _get_dylib_function[lib, "SDL_GetWindowMouseRect", def(window: Ptr[Window, O_window]) thin abi("C") -> OptPtr[Rect, UntrackedOrigin[mut=False]]]()(window).value()
 
 
 def set_window_opacity[O_window: Origin, //](window: Ptr[Window, O_window], opacity: c_float) raises:
@@ -3183,7 +3200,7 @@ struct HitTestResult(Indexer, Intable, TrivialRegisterPassable):
     """Region is the resizable left border."""
 
 
-comptime HitTest = def(win: OptPtr[Window, ExternalOrigin[mut=True]], area: OptPtr[Point, ExternalOrigin[mut=False]], data: OptPtr[NoneType, ExternalOrigin[mut=True]]) thin abi("C") -> HitTestResult
+comptime HitTest = def(win: OptPtr[Window, UntrackedOrigin[mut=True]], area: OptPtr[Point, UntrackedOrigin[mut=False]], data: OptPtr[NoneType, UntrackedOrigin[mut=True]]) thin abi("C") -> HitTestResult
 """Callback used for hit-testing.
     
     Args:
@@ -3415,7 +3432,7 @@ def gl_load_library(var path: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GL_LoadLibrary.
     """
 
-    var _ffi_ret = _get_dylib_function[lib, "SDL_GL_LoadLibrary", def(path: Ptr[mut=False, c_char, origin_of(path)]) thin abi("C") -> Bool]()(path.as_c_string_slice().unsafe_ptr())
+    var _ffi_ret = _get_dylib_function[lib, "SDL_GL_LoadLibrary", def(path: Ptr[mut=False, c_char, origin_of(path)]) thin abi("C") -> Bool]()(path.as_c_string_slice().ptr())
     if not _ffi_ret:
         raise Error(get_error())
 
@@ -3474,7 +3491,7 @@ def gl_get_proc_address(var proc: String) raises -> def() thin abi("C") -> None:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GL_GetProcAddress.
     """
 
-    return _get_dylib_function[lib, "SDL_GL_GetProcAddress", def(proc: Ptr[mut=False, c_char, origin_of(proc)]) thin abi("C") -> def() thin abi("C") -> None]()(proc.as_c_string_slice().unsafe_ptr())
+    return _get_dylib_function[lib, "SDL_GL_GetProcAddress", def(proc: Ptr[mut=False, c_char, origin_of(proc)]) thin abi("C") -> def() thin abi("C") -> None]()(proc.as_c_string_slice().ptr())
 
 
 def egl_get_proc_address(var proc: String) raises -> def() thin abi("C") -> None:
@@ -3497,7 +3514,7 @@ def egl_get_proc_address(var proc: String) raises -> def() thin abi("C") -> None
     Docs: https://wiki.libsdl.org/SDL3/SDL_EGL_GetProcAddress.
     """
 
-    return _get_dylib_function[lib, "SDL_EGL_GetProcAddress", def(proc: Ptr[mut=False, c_char, origin_of(proc)]) thin abi("C") -> def() thin abi("C") -> None]()(proc.as_c_string_slice().unsafe_ptr())
+    return _get_dylib_function[lib, "SDL_EGL_GetProcAddress", def(proc: Ptr[mut=False, c_char, origin_of(proc)]) thin abi("C") -> def() thin abi("C") -> None]()(proc.as_c_string_slice().ptr())
 
 
 def gl_unload_library() raises -> None:
@@ -3538,7 +3555,7 @@ def gl_extension_supported(var extension: String) raises -> Bool:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GL_ExtensionSupported.
     """
 
-    return _get_dylib_function[lib, "SDL_GL_ExtensionSupported", def(extension: Ptr[mut=False, c_char, origin_of(extension)]) thin abi("C") -> Bool]()(extension.as_c_string_slice().unsafe_ptr())
+    return _get_dylib_function[lib, "SDL_GL_ExtensionSupported", def(extension: Ptr[mut=False, c_char, origin_of(extension)]) thin abi("C") -> Bool]()(extension.as_c_string_slice().ptr())
 
 
 def gl_reset_attributes() raises -> None:
@@ -3658,7 +3675,7 @@ def gl_make_current[O_window: Origin, //](window: Ptr[Window, O_window], context
         raise Error(get_error())
 
 
-def gl_get_current_window(out ret: Ptr[Window, ExternalOrigin[mut=True]]) raises:
+def gl_get_current_window(out ret: Ptr[Window, UntrackedOrigin[mut=True]]) raises:
     """Get the currently active OpenGL window.
 
     Returns:
@@ -3671,7 +3688,7 @@ def gl_get_current_window(out ret: Ptr[Window, ExternalOrigin[mut=True]]) raises
     Docs: https://wiki.libsdl.org/SDL3/SDL_GL_GetCurrentWindow.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_GL_GetCurrentWindow", def() thin abi("C") -> OptPtr[Window, ExternalOrigin[mut=True]]]()()
+    var _ffi_ret = _get_dylib_function[lib, "SDL_GL_GetCurrentWindow", def() thin abi("C") -> OptPtr[Window, UntrackedOrigin[mut=True]]]()()
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()

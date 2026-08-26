@@ -31,6 +31,25 @@ best to accept keyboard input in various types of programs:
 https://wiki.libsdl.org/SDL3/BestKeyboardPractices
 """
 
+from std.ffi import _get_dylib_function, c_char, c_int
+from ._core import OptPtr, Ptr, c_string, lib
+from .sdl_error import get_error
+from .sdl_keycode import Keycode, Keymod
+from .sdl_properties import PropertiesID
+from .sdl_rect import Rect
+from .sdl_scancode import Scancode
+from .sdl_video import Window
+
+
+from std.ffi import _get_dylib_function, c_char, c_int
+from ._core import OptPtr, Ptr, c_string, lib
+from .sdl_error import get_error
+from .sdl_keycode import Keycode, Keymod
+from .sdl_properties import PropertiesID
+from .sdl_rect import Rect
+from .sdl_scancode import Scancode
+from .sdl_video import Window
+
 
 struct KeyboardID(Intable, TrivialRegisterPassable):
     """This is a unique ID for a keyboard for the time it is connected to the
@@ -73,7 +92,7 @@ def has_keyboard() raises -> Bool:
     return _get_dylib_function[lib, "SDL_HasKeyboard", def() thin abi("C") -> Bool]()()
 
 
-def get_keyboards[O_count: Origin, //](count: Ptr[c_int, O_count], out ret: Ptr[KeyboardID, ExternalOrigin[mut=True]]) raises:
+def get_keyboards[O_count: Origin, //](count: Ptr[c_int, O_count], out ret: Ptr[KeyboardID, UntrackedOrigin[mut=True]]) raises:
     """Get a list of currently connected keyboards.
 
     Note that this will include any device or virtual driver that includes
@@ -96,13 +115,13 @@ def get_keyboards[O_count: Origin, //](count: Ptr[c_int, O_count], out ret: Ptr[
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetKeyboards.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_GetKeyboards", def(count: Ptr[c_int, O_count]) thin abi("C") -> OptPtr[KeyboardID, ExternalOrigin[mut=True]]]()(count)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_GetKeyboards", def(count: Ptr[c_int, O_count]) thin abi("C") -> OptPtr[KeyboardID, UntrackedOrigin[mut=True]]]()(count)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
 
 
-def get_keyboard_name_for_id(instance_id: KeyboardID, out ret: Ptr[c_char, ExternalOrigin[mut=False]]) raises:
+def get_keyboard_name_for_id(instance_id: KeyboardID, out ret: String) raises:
     """Get the name of a keyboard.
 
     This function returns "" if the keyboard doesn't have a name.
@@ -120,13 +139,13 @@ def get_keyboard_name_for_id(instance_id: KeyboardID, out ret: Ptr[c_char, Exter
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetKeyboardNameForID.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_GetKeyboardNameForID", def(instance_id: KeyboardID) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(instance_id)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_GetKeyboardNameForID", def(instance_id: KeyboardID) thin abi("C") -> OptPtr[c_char, UntrackedOrigin[mut=False]]]()(instance_id)
     if not _ffi_ret:
         raise Error(get_error())
-    ret = _ffi_ret.value()
+    ret = c_string(_ffi_ret.value())
 
 
-def get_keyboard_focus() raises -> Ptr[Window, ExternalOrigin[mut=True]]:
+def get_keyboard_focus() raises -> Ptr[Window, UntrackedOrigin[mut=True]]:
     """Query the window which currently has keyboard focus.
 
     Returns:
@@ -138,10 +157,10 @@ def get_keyboard_focus() raises -> Ptr[Window, ExternalOrigin[mut=True]]:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetKeyboardFocus.
     """
 
-    return _get_dylib_function[lib, "SDL_GetKeyboardFocus", def() thin abi("C") -> OptPtr[Window, ExternalOrigin[mut=True]]]()().value()
+    return _get_dylib_function[lib, "SDL_GetKeyboardFocus", def() thin abi("C") -> OptPtr[Window, UntrackedOrigin[mut=True]]]()().value()
 
 
-def get_keyboard_state[O_numkeys: Origin, //](numkeys: Ptr[c_int, O_numkeys]) raises -> Ptr[Bool, ExternalOrigin[mut=False]]:
+def get_keyboard_state[O_numkeys: Origin, //](numkeys: Ptr[c_int, O_numkeys]) raises -> Ptr[Bool, UntrackedOrigin[mut=False]]:
     """Get a snapshot of the current state of the keyboard.
 
     The pointer returned is a pointer to an internal SDL array. It will be
@@ -174,7 +193,7 @@ def get_keyboard_state[O_numkeys: Origin, //](numkeys: Ptr[c_int, O_numkeys]) ra
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetKeyboardState.
     """
 
-    return _get_dylib_function[lib, "SDL_GetKeyboardState", def(numkeys: Ptr[c_int, O_numkeys]) thin abi("C") -> OptPtr[Bool, ExternalOrigin[mut=False]]]()(numkeys).value()
+    return _get_dylib_function[lib, "SDL_GetKeyboardState", def(numkeys: Ptr[c_int, O_numkeys]) thin abi("C") -> OptPtr[Bool, UntrackedOrigin[mut=False]]]()(numkeys).value()
 
 
 def reset_keyboard() raises -> None:
@@ -300,12 +319,12 @@ def set_scancode_name(scancode: Scancode, var name: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetScancodeName.
     """
 
-    var _ffi_ret = _get_dylib_function[lib, "SDL_SetScancodeName", def(scancode: Scancode, name: Ptr[mut=False, c_char, origin_of(name)]) thin abi("C") -> Bool]()(scancode, name.as_c_string_slice().unsafe_ptr())
+    var _ffi_ret = _get_dylib_function[lib, "SDL_SetScancodeName", def(scancode: Scancode, name: Ptr[mut=False, c_char, origin_of(name)]) thin abi("C") -> Bool]()(scancode, name.as_c_string_slice().ptr())
     if not _ffi_ret:
         raise Error(get_error())
 
 
-def get_scancode_name(scancode: Scancode) raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
+def get_scancode_name(scancode: Scancode) raises -> String:
     """Get a human-readable name for a scancode.
 
     **Warning**: The returned name is by design not stable across platforms,
@@ -330,7 +349,7 @@ def get_scancode_name(scancode: Scancode) raises -> Ptr[c_char, ExternalOrigin[m
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetScancodeName.
     """
 
-    return _get_dylib_function[lib, "SDL_GetScancodeName", def(scancode: Scancode) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(scancode).value()
+    return c_string(_get_dylib_function[lib, "SDL_GetScancodeName", def(scancode: Scancode) thin abi("C") -> OptPtr[c_char, UntrackedOrigin[mut=False]]]()(scancode).value())
 
 
 def get_scancode_from_name(var name: String) raises -> Scancode:
@@ -349,10 +368,10 @@ def get_scancode_from_name(var name: String) raises -> Scancode:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetScancodeFromName.
     """
 
-    return _get_dylib_function[lib, "SDL_GetScancodeFromName", def(name: Ptr[mut=False, c_char, origin_of(name)]) thin abi("C") -> Scancode]()(name.as_c_string_slice().unsafe_ptr())
+    return _get_dylib_function[lib, "SDL_GetScancodeFromName", def(name: Ptr[mut=False, c_char, origin_of(name)]) thin abi("C") -> Scancode]()(name.as_c_string_slice().ptr())
 
 
-def get_key_name(key: Keycode) raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
+def get_key_name(key: Keycode) raises -> String:
     """Get a human-readable name for a key.
 
     If the key doesn't have a name, this function returns an empty string ("").
@@ -371,7 +390,7 @@ def get_key_name(key: Keycode) raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetKeyName.
     """
 
-    return _get_dylib_function[lib, "SDL_GetKeyName", def(key: Keycode) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(key).value()
+    return c_string(_get_dylib_function[lib, "SDL_GetKeyName", def(key: Keycode) thin abi("C") -> OptPtr[c_char, UntrackedOrigin[mut=False]]]()(key).value())
 
 
 def get_key_from_name(var name: String) raises -> Keycode:
@@ -390,7 +409,7 @@ def get_key_from_name(var name: String) raises -> Keycode:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetKeyFromName.
     """
 
-    return _get_dylib_function[lib, "SDL_GetKeyFromName", def(name: Ptr[mut=False, c_char, origin_of(name)]) thin abi("C") -> Keycode]()(name.as_c_string_slice().unsafe_ptr())
+    return _get_dylib_function[lib, "SDL_GetKeyFromName", def(name: Ptr[mut=False, c_char, origin_of(name)]) thin abi("C") -> Keycode]()(name.as_c_string_slice().ptr())
 
 
 def start_text_input[O_window: Origin, //](window: Ptr[Window, O_window]) raises:

@@ -47,6 +47,17 @@ provide a _lot_ of information should look at the more-detailed
 SDL_SetAppMetadataProperty().
 """
 
+from std.ffi import _get_dylib_function, c_char, c_int
+from ._core import OptPtr, Ptr, c_string, lib
+from .sdl_error import get_error
+from .sdl_events import Event
+
+
+from std.ffi import _get_dylib_function, c_char, c_int
+from ._core import OptPtr, Ptr, c_string, lib
+from .sdl_error import get_error
+from .sdl_events import Event
+
 
 struct InitFlags(Intable, TrivialRegisterPassable):
     """Initialization flags for SDL_Init and/or SDL_InitSubSystem.
@@ -134,7 +145,7 @@ struct AppResult(Indexer, Intable, TrivialRegisterPassable):
     """Value that requests termination with error from the main callbacks."""
 
 
-comptime AppInit_func = def(appstate: OptPtr[OptPtr[NoneType, ExternalOrigin[mut=True]], ExternalOrigin[mut=True]], argc: c_int, argv: OptPtr[c_char, ExternalOrigin[mut=True]]) thin abi("C") -> AppResult
+comptime AppInit_func = def(appstate: OptPtr[OptPtr[NoneType, UntrackedOrigin[mut=True]], UntrackedOrigin[mut=True]], argc: c_int, argv: OptPtr[c_char, UntrackedOrigin[mut=True]]) thin abi("C") -> AppResult
 """Function pointer typedef for SDL_AppInit.
     
     These are used by SDL_EnterAppMainCallbacks. This mechanism operates behind
@@ -156,7 +167,7 @@ Docs: https://wiki.libsdl.org/SDL3/SDL_AppInit_func.
 """
 
 
-comptime AppIterate_func = def(appstate: OptPtr[NoneType, ExternalOrigin[mut=True]]) thin abi("C") -> AppResult
+comptime AppIterate_func = def(appstate: OptPtr[NoneType, UntrackedOrigin[mut=True]]) thin abi("C") -> AppResult
 """Function pointer typedef for SDL_AppIterate.
     
     These are used by SDL_EnterAppMainCallbacks. This mechanism operates behind
@@ -174,7 +185,7 @@ Docs: https://wiki.libsdl.org/SDL3/SDL_AppIterate_func.
 """
 
 
-comptime AppEvent_func = def(appstate: OptPtr[NoneType, ExternalOrigin[mut=True]], event: OptPtr[Event, ExternalOrigin[mut=True]]) thin abi("C") -> AppResult
+comptime AppEvent_func = def(appstate: OptPtr[NoneType, UntrackedOrigin[mut=True]], event: OptPtr[Event, UntrackedOrigin[mut=True]]) thin abi("C") -> AppResult
 """Function pointer typedef for SDL_AppEvent.
     
     These are used by SDL_EnterAppMainCallbacks. This mechanism operates behind
@@ -193,7 +204,7 @@ Docs: https://wiki.libsdl.org/SDL3/SDL_AppEvent_func.
 """
 
 
-comptime AppQuit_func = def(appstate: OptPtr[NoneType, ExternalOrigin[mut=True]], result: AppResult) thin abi("C") -> None
+comptime AppQuit_func = def(appstate: OptPtr[NoneType, UntrackedOrigin[mut=True]], result: AppResult) thin abi("C") -> None
 """Function pointer typedef for SDL_AppQuit.
     
     These are used by SDL_EnterAppMainCallbacks. This mechanism operates behind
@@ -355,7 +366,7 @@ def is_main_thread() raises -> Bool:
     return _get_dylib_function[lib, "SDL_IsMainThread", def() thin abi("C") -> Bool]()()
 
 
-comptime MainThreadCallback = def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]]) thin abi("C") -> None
+comptime MainThreadCallback = def(userdata: OptPtr[NoneType, UntrackedOrigin[mut=True]]) thin abi("C") -> None
 """Callback run on the main thread.
     
     Args:
@@ -436,7 +447,7 @@ def set_app_metadata(var appname: String, var appversion: String, var appidentif
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetAppMetadata.
     """
 
-    var _ffi_ret = _get_dylib_function[lib, "SDL_SetAppMetadata", def(appname: Ptr[mut=False, c_char, origin_of(appname)], appversion: Ptr[mut=False, c_char, origin_of(appversion)], appidentifier: Ptr[mut=False, c_char, origin_of(appidentifier)]) thin abi("C") -> Bool]()(appname.as_c_string_slice().unsafe_ptr(), appversion.as_c_string_slice().unsafe_ptr(), appidentifier.as_c_string_slice().unsafe_ptr())
+    var _ffi_ret = _get_dylib_function[lib, "SDL_SetAppMetadata", def(appname: Ptr[mut=False, c_char, origin_of(appname)], appversion: Ptr[mut=False, c_char, origin_of(appversion)], appidentifier: Ptr[mut=False, c_char, origin_of(appidentifier)]) thin abi("C") -> Bool]()(appname.as_c_string_slice().ptr(), appversion.as_c_string_slice().ptr(), appidentifier.as_c_string_slice().ptr())
     if not _ffi_ret:
         raise Error(get_error())
 
@@ -504,12 +515,12 @@ def set_app_metadata_property(var name: String, var value: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetAppMetadataProperty.
     """
 
-    var _ffi_ret = _get_dylib_function[lib, "SDL_SetAppMetadataProperty", def(name: Ptr[mut=False, c_char, origin_of(name)], value: Ptr[mut=False, c_char, origin_of(value)]) thin abi("C") -> Bool]()(name.as_c_string_slice().unsafe_ptr(), value.as_c_string_slice().unsafe_ptr())
+    var _ffi_ret = _get_dylib_function[lib, "SDL_SetAppMetadataProperty", def(name: Ptr[mut=False, c_char, origin_of(name)], value: Ptr[mut=False, c_char, origin_of(value)]) thin abi("C") -> Bool]()(name.as_c_string_slice().ptr(), value.as_c_string_slice().ptr())
     if not _ffi_ret:
         raise Error(get_error())
 
 
-def get_app_metadata_property(var name: String) raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
+def get_app_metadata_property(var name: String) raises -> String:
     """Get metadata about your app.
 
     This returns metadata previously set using SDL_SetAppMetadata() or
@@ -532,4 +543,4 @@ def get_app_metadata_property(var name: String) raises -> Ptr[c_char, ExternalOr
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetAppMetadataProperty.
     """
 
-    return _get_dylib_function[lib, "SDL_GetAppMetadataProperty", def(name: Ptr[mut=False, c_char, origin_of(name)]) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(name.as_c_string_slice().unsafe_ptr()).value()
+    return c_string(_get_dylib_function[lib, "SDL_GetAppMetadataProperty", def(name: Ptr[mut=False, c_char, origin_of(name)]) thin abi("C") -> OptPtr[c_char, UntrackedOrigin[mut=False]]]()(name.as_c_string_slice().ptr()).value())

@@ -29,6 +29,13 @@ identifiable by this value: "globally unique."
 SDL provides functions to convert a GUID to/from a string.
 """
 
+from std.ffi import _get_dylib_function, c_char, c_int
+from ._core import ArrayHelper, Ptr, lib
+
+
+from std.ffi import _get_dylib_function, c_char, c_int
+from ._core import ArrayHelper, Ptr, lib
+
 
 @fieldwise_init
 struct GUID(ImplicitlyCopyable, Movable):
@@ -49,7 +56,7 @@ struct GUID(ImplicitlyCopyable, Movable):
     Docs: https://wiki.libsdl.org/SDL3/GUID.
     """
 
-    var data: ArrayHelper[UInt8, 16, ExternalOrigin[mut=True]]
+    var data: ArrayHelper[UInt8, 16, UntrackedOrigin[mut=True]]
 
 
 def guid_to_string[O_psz_guid: Origin, //](guid: GUID, psz_guid: Ptr[c_char, O_psz_guid], cb_guid: c_int) raises -> None:
@@ -88,4 +95,4 @@ def string_to_guid(var pch_guid: String) raises -> GUID:
     Docs: https://wiki.libsdl.org/SDL3/SDL_StringToGUID.
     """
 
-    return _get_dylib_function[lib, "SDL_StringToGUID", def(pch_guid: Ptr[mut=False, c_char, origin_of(pch_guid)]) thin abi("C") -> GUID]()(pch_guid.as_c_string_slice().unsafe_ptr())
+    return _get_dylib_function[lib, "SDL_StringToGUID", def(pch_guid: Ptr[mut=False, c_char, origin_of(pch_guid)]) thin abi("C") -> GUID]()(pch_guid.as_c_string_slice().ptr())

@@ -302,6 +302,25 @@ section of data that has already been referenced will produce unexpected
 results.
 """
 
+from std.ffi import _get_dylib_function, c_char, c_float, c_int, c_size_t
+from ._core import OptPtr, Ptr, c_string, lib
+from .sdl_error import get_error
+from .sdl_pixels import FColor
+from .sdl_properties import PropertiesID
+from .sdl_rect import Rect
+from .sdl_surface import FlipMode
+from .sdl_video import Window
+
+
+from std.ffi import _get_dylib_function, c_char, c_float, c_int, c_size_t
+from ._core import OptPtr, Ptr, c_string, lib
+from .sdl_error import get_error
+from .sdl_pixels import FColor
+from .sdl_properties import PropertiesID
+from .sdl_rect import Rect
+from .sdl_surface import FlipMode
+from .sdl_video import Window
+
 
 @fieldwise_init
 struct GPUDevice(ImplicitlyCopyable, Movable):
@@ -1766,7 +1785,7 @@ struct GPUTextureTransferInfo(ImplicitlyCopyable, Movable):
     Docs: https://wiki.libsdl.org/SDL3/GPUTextureTransferInfo.
     """
 
-    var transfer_buffer: OptPtr[GPUTransferBuffer, ExternalOrigin[mut=True]]
+    var transfer_buffer: OptPtr[GPUTransferBuffer, UntrackedOrigin[mut=True]]
     """The transfer buffer used in the transfer operation."""
     var offset: UInt32
     """The starting byte of the image data in the transfer buffer."""
@@ -1785,7 +1804,7 @@ struct GPUTransferBufferLocation(ImplicitlyCopyable, Movable):
     Docs: https://wiki.libsdl.org/SDL3/GPUTransferBufferLocation.
     """
 
-    var transfer_buffer: OptPtr[GPUTransferBuffer, ExternalOrigin[mut=True]]
+    var transfer_buffer: OptPtr[GPUTransferBuffer, UntrackedOrigin[mut=True]]
     """The transfer buffer used in the transfer operation."""
     var offset: UInt32
     """The starting byte of the buffer data in the transfer buffer."""
@@ -1800,7 +1819,7 @@ struct GPUTextureLocation(ImplicitlyCopyable, Movable):
     Docs: https://wiki.libsdl.org/SDL3/GPUTextureLocation.
     """
 
-    var texture: OptPtr[GPUTexture, ExternalOrigin[mut=True]]
+    var texture: OptPtr[GPUTexture, UntrackedOrigin[mut=True]]
     """The texture used in the copy operation."""
     var mip_level: UInt32
     """The mip level index of the location."""
@@ -1823,7 +1842,7 @@ struct GPUTextureRegion(ImplicitlyCopyable, Movable):
     Docs: https://wiki.libsdl.org/SDL3/GPUTextureRegion.
     """
 
-    var texture: OptPtr[GPUTexture, ExternalOrigin[mut=True]]
+    var texture: OptPtr[GPUTexture, UntrackedOrigin[mut=True]]
     """The texture used in the copy operation."""
     var mip_level: UInt32
     """The mip level index to transfer."""
@@ -1850,7 +1869,7 @@ struct GPUBlitRegion(ImplicitlyCopyable, Movable):
     Docs: https://wiki.libsdl.org/SDL3/GPUBlitRegion.
     """
 
-    var texture: OptPtr[GPUTexture, ExternalOrigin[mut=True]]
+    var texture: OptPtr[GPUTexture, UntrackedOrigin[mut=True]]
     """The texture."""
     var mip_level: UInt32
     """The mip level index of the region."""
@@ -1875,7 +1894,7 @@ struct GPUBufferLocation(ImplicitlyCopyable, Movable):
     Docs: https://wiki.libsdl.org/SDL3/GPUBufferLocation.
     """
 
-    var buffer: OptPtr[GPUBuffer, ExternalOrigin[mut=True]]
+    var buffer: OptPtr[GPUBuffer, UntrackedOrigin[mut=True]]
     """The buffer."""
     var offset: UInt32
     """The starting byte within the buffer."""
@@ -1890,7 +1909,7 @@ struct GPUBufferRegion(ImplicitlyCopyable, Movable):
     Docs: https://wiki.libsdl.org/SDL3/GPUBufferRegion.
     """
 
-    var buffer: OptPtr[GPUBuffer, ExternalOrigin[mut=True]]
+    var buffer: OptPtr[GPUBuffer, UntrackedOrigin[mut=True]]
     """The buffer."""
     var offset: UInt32
     """The starting byte within the buffer."""
@@ -2061,11 +2080,11 @@ struct GPUVertexInputState(ImplicitlyCopyable, Movable):
     Docs: https://wiki.libsdl.org/SDL3/GPUVertexInputState.
     """
 
-    var vertex_buffer_descriptions: OptPtr[GPUVertexBufferDescription, ExternalOrigin[mut=False]]
+    var vertex_buffer_descriptions: OptPtr[GPUVertexBufferDescription, UntrackedOrigin[mut=False]]
     """A pointer to an array of vertex buffer descriptions."""
     var num_vertex_buffers: UInt32
     """The number of vertex buffer descriptions in the above array."""
-    var vertex_attributes: OptPtr[GPUVertexAttribute, ExternalOrigin[mut=False]]
+    var vertex_attributes: OptPtr[GPUVertexAttribute, UntrackedOrigin[mut=False]]
     """A pointer to an array of vertex attribute descriptions."""
     var num_vertex_attributes: UInt32
     """The number of vertex attribute descriptions in the above array."""
@@ -2126,9 +2145,9 @@ struct GPUShaderCreateInfo(ImplicitlyCopyable, Movable):
 
     var code_size: c_size_t
     """The size in bytes of the code pointed to."""
-    var code: OptPtr[UInt8, ExternalOrigin[mut=False]]
+    var code: OptPtr[UInt8, UntrackedOrigin[mut=False]]
     """A pointer to shader code."""
-    var entrypoint: OptPtr[c_char, ExternalOrigin[mut=False]]
+    var entrypoint: OptPtr[c_char, UntrackedOrigin[mut=False]]
     """A pointer to a null-terminated UTF-8 string specifying the entry point function name for the shader."""
     var format: GPUShaderFormat
     """The format of the shader code."""
@@ -2320,7 +2339,7 @@ struct GPUGraphicsPipelineTargetInfo(ImplicitlyCopyable, Movable):
     Docs: https://wiki.libsdl.org/SDL3/GPUGraphicsPipelineTargetInfo.
     """
 
-    var color_target_descriptions: OptPtr[GPUColorTargetDescription, ExternalOrigin[mut=False]]
+    var color_target_descriptions: OptPtr[GPUColorTargetDescription, UntrackedOrigin[mut=False]]
     """A pointer to an array of color target descriptions."""
     var num_color_targets: UInt32
     """The number of color target descriptions in the above array."""
@@ -2340,9 +2359,9 @@ struct GPUGraphicsPipelineCreateInfo(ImplicitlyCopyable, Movable):
     Docs: https://wiki.libsdl.org/SDL3/GPUGraphicsPipelineCreateInfo.
     """
 
-    var vertex_shader: OptPtr[GPUShader, ExternalOrigin[mut=True]]
+    var vertex_shader: OptPtr[GPUShader, UntrackedOrigin[mut=True]]
     """The vertex shader used by the graphics pipeline."""
-    var fragment_shader: OptPtr[GPUShader, ExternalOrigin[mut=True]]
+    var fragment_shader: OptPtr[GPUShader, UntrackedOrigin[mut=True]]
     """The fragment shader used by the graphics pipeline."""
     var vertex_input_state: GPUVertexInputState
     """The vertex layout of the graphics pipeline."""
@@ -2370,9 +2389,9 @@ struct GPUComputePipelineCreateInfo(ImplicitlyCopyable, Movable):
 
     var code_size: c_size_t
     """The size in bytes of the compute shader code pointed to."""
-    var code: OptPtr[UInt8, ExternalOrigin[mut=False]]
+    var code: OptPtr[UInt8, UntrackedOrigin[mut=False]]
     """A pointer to compute shader code."""
-    var entrypoint: OptPtr[c_char, ExternalOrigin[mut=False]]
+    var entrypoint: OptPtr[c_char, UntrackedOrigin[mut=False]]
     """A pointer to a null-terminated UTF-8 string specifying the entry point function name for the shader."""
     var format: GPUShaderFormat
     """The format of the compute shader code."""
@@ -2434,7 +2453,7 @@ struct GPUColorTargetInfo(ImplicitlyCopyable, Movable):
     Docs: https://wiki.libsdl.org/SDL3/GPUColorTargetInfo.
     """
 
-    var texture: OptPtr[GPUTexture, ExternalOrigin[mut=True]]
+    var texture: OptPtr[GPUTexture, UntrackedOrigin[mut=True]]
     """The texture that will be used as a color target by a render pass."""
     var mip_level: UInt32
     """The mip level to use as a color target."""
@@ -2446,7 +2465,7 @@ struct GPUColorTargetInfo(ImplicitlyCopyable, Movable):
     """What is done with the contents of the color target at the beginning of the render pass."""
     var store_op: GPUStoreOp
     """What is done with the results of the render pass."""
-    var resolve_texture: OptPtr[GPUTexture, ExternalOrigin[mut=True]]
+    var resolve_texture: OptPtr[GPUTexture, UntrackedOrigin[mut=True]]
     """The texture that will receive the results of a multisample resolve operation. Ignored if a RESOLVE* store_op is not used."""
     var resolve_mip_level: UInt32
     """The mip level of the resolve texture to use for the resolve operation. Ignored if a RESOLVE* store_op is not used."""
@@ -2504,7 +2523,7 @@ struct GPUDepthStencilTargetInfo(ImplicitlyCopyable, Movable):
     Docs: https://wiki.libsdl.org/SDL3/GPUDepthStencilTargetInfo.
     """
 
-    var texture: OptPtr[GPUTexture, ExternalOrigin[mut=True]]
+    var texture: OptPtr[GPUTexture, UntrackedOrigin[mut=True]]
     """The texture that will be used as the depth stencil target by the render pass."""
     var clear_depth: c_float
     """The value to clear the depth component to at the beginning of the render pass. Ignored if SDL_GPU_LOADOP_CLEAR is not used."""
@@ -2557,7 +2576,7 @@ struct GPUBufferBinding(ImplicitlyCopyable, Movable):
     Docs: https://wiki.libsdl.org/SDL3/GPUBufferBinding.
     """
 
-    var buffer: OptPtr[GPUBuffer, ExternalOrigin[mut=True]]
+    var buffer: OptPtr[GPUBuffer, UntrackedOrigin[mut=True]]
     """The buffer to bind. Must have been created with SDL_GPU_BUFFERUSAGE_VERTEX for SDL_BindGPUVertexBuffers, or SDL_GPU_BUFFERUSAGE_INDEX for SDL_BindGPUIndexBuffer."""
     var offset: UInt32
     """The starting byte of the data to bind in the buffer."""
@@ -2570,9 +2589,9 @@ struct GPUTextureSamplerBinding(ImplicitlyCopyable, Movable):
     Docs: https://wiki.libsdl.org/SDL3/GPUTextureSamplerBinding.
     """
 
-    var texture: OptPtr[GPUTexture, ExternalOrigin[mut=True]]
+    var texture: OptPtr[GPUTexture, UntrackedOrigin[mut=True]]
     """The texture to bind. Must have been created with SDL_GPU_TEXTUREUSAGE_SAMPLER."""
-    var sampler: OptPtr[GPUSampler, ExternalOrigin[mut=True]]
+    var sampler: OptPtr[GPUSampler, UntrackedOrigin[mut=True]]
     """The sampler to bind."""
 
 
@@ -2584,7 +2603,7 @@ struct GPUStorageBufferReadWriteBinding(ImplicitlyCopyable, Movable):
     Docs: https://wiki.libsdl.org/SDL3/GPUStorageBufferReadWriteBinding.
     """
 
-    var buffer: OptPtr[GPUBuffer, ExternalOrigin[mut=True]]
+    var buffer: OptPtr[GPUBuffer, UntrackedOrigin[mut=True]]
     """The buffer to bind. Must have been created with SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_WRITE."""
     var cycle: Bool
     """True cycles the buffer if it is already bound."""
@@ -2601,7 +2620,7 @@ struct GPUStorageTextureReadWriteBinding(ImplicitlyCopyable, Movable):
     Docs: https://wiki.libsdl.org/SDL3/GPUStorageTextureReadWriteBinding.
     """
 
-    var texture: OptPtr[GPUTexture, ExternalOrigin[mut=True]]
+    var texture: OptPtr[GPUTexture, UntrackedOrigin[mut=True]]
     """The texture to bind. Must have been created with SDL_GPU_TEXTUREUSAGE_COMPUTE_STORAGE_WRITE or SDL_GPU_TEXTUREUSAGE_COMPUTE_STORAGE_SIMULTANEOUS_READ_WRITE."""
     var mip_level: UInt32
     """The mip level index to bind."""
@@ -2629,7 +2648,7 @@ def gpu_supports_shader_formats(format_flags: GPUShaderFormat, var name: String)
     Docs: https://wiki.libsdl.org/SDL3/SDL_GPUSupportsShaderFormats.
     """
 
-    return _get_dylib_function[lib, "SDL_GPUSupportsShaderFormats", def(format_flags: GPUShaderFormat, name: Ptr[mut=False, c_char, origin_of(name)]) thin abi("C") -> Bool]()(format_flags, name.as_c_string_slice().unsafe_ptr())
+    return _get_dylib_function[lib, "SDL_GPUSupportsShaderFormats", def(format_flags: GPUShaderFormat, name: Ptr[mut=False, c_char, origin_of(name)]) thin abi("C") -> Bool]()(format_flags, name.as_c_string_slice().ptr())
 
 
 def gpu_supports_properties(props: PropertiesID) raises -> Bool:
@@ -2647,7 +2666,7 @@ def gpu_supports_properties(props: PropertiesID) raises -> Bool:
     return _get_dylib_function[lib, "SDL_GPUSupportsProperties", def(props: PropertiesID) thin abi("C") -> Bool]()(props)
 
 
-def create_gpu_device(format_flags: GPUShaderFormat, debug_mode: Bool, var name: String, out ret: Ptr[GPUDevice, ExternalOrigin[mut=True]]) raises:
+def create_gpu_device(format_flags: GPUShaderFormat, debug_mode: Bool, var name: String, out ret: Ptr[GPUDevice, UntrackedOrigin[mut=True]]) raises:
     """Creates a GPU context.
 
     Args:
@@ -2664,13 +2683,13 @@ def create_gpu_device(format_flags: GPUShaderFormat, debug_mode: Bool, var name:
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateGPUDevice.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_CreateGPUDevice", def(format_flags: GPUShaderFormat, debug_mode: Bool, name: Ptr[mut=False, c_char, origin_of(name)]) thin abi("C") -> OptPtr[GPUDevice, ExternalOrigin[mut=True]]]()(format_flags, debug_mode, name.as_c_string_slice().unsafe_ptr())
+    var _ffi_ret = _get_dylib_function[lib, "SDL_CreateGPUDevice", def(format_flags: GPUShaderFormat, debug_mode: Bool, name: Ptr[mut=False, c_char, origin_of(name)]) thin abi("C") -> OptPtr[GPUDevice, UntrackedOrigin[mut=True]]]()(format_flags, debug_mode, name.as_c_string_slice().ptr())
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
 
 
-def create_gpu_device_with_properties(props: PropertiesID, out ret: Ptr[GPUDevice, ExternalOrigin[mut=True]]) raises:
+def create_gpu_device_with_properties(props: PropertiesID, out ret: Ptr[GPUDevice, UntrackedOrigin[mut=True]]) raises:
     """Creates a GPU context.
 
     These are the supported properties:
@@ -2712,7 +2731,7 @@ def create_gpu_device_with_properties(props: PropertiesID, out ret: Ptr[GPUDevic
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateGPUDeviceWithProperties.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_CreateGPUDeviceWithProperties", def(props: PropertiesID) thin abi("C") -> OptPtr[GPUDevice, ExternalOrigin[mut=True]]]()(props)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_CreateGPUDeviceWithProperties", def(props: PropertiesID) thin abi("C") -> OptPtr[GPUDevice, UntrackedOrigin[mut=True]]]()(props)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
@@ -2742,7 +2761,7 @@ def get_num_gpu_drivers() raises -> c_int:
     return _get_dylib_function[lib, "SDL_GetNumGPUDrivers", def() thin abi("C") -> c_int]()()
 
 
-def get_gpu_driver(index: c_int) raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
+def get_gpu_driver(index: c_int) raises -> String:
     """Get the name of a built in GPU driver.
 
     The GPU drivers are presented in the order in which they are normally
@@ -2761,10 +2780,10 @@ def get_gpu_driver(index: c_int) raises -> Ptr[c_char, ExternalOrigin[mut=False]
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetGPUDriver.
     """
 
-    return _get_dylib_function[lib, "SDL_GetGPUDriver", def(index: c_int) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(index).value()
+    return c_string(_get_dylib_function[lib, "SDL_GetGPUDriver", def(index: c_int) thin abi("C") -> OptPtr[c_char, UntrackedOrigin[mut=False]]]()(index).value())
 
 
-def get_gpu_device_driver[O_device: Origin, //](device: Ptr[GPUDevice, O_device]) raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
+def get_gpu_device_driver[O_device: Origin, //](device: Ptr[GPUDevice, O_device]) raises -> String:
     """Returns the name of the backend used to create this GPU context.
 
     Args:
@@ -2776,7 +2795,7 @@ def get_gpu_device_driver[O_device: Origin, //](device: Ptr[GPUDevice, O_device]
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetGPUDeviceDriver.
     """
 
-    return _get_dylib_function[lib, "SDL_GetGPUDeviceDriver", def(device: Ptr[GPUDevice, O_device]) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(device).value()
+    return c_string(_get_dylib_function[lib, "SDL_GetGPUDeviceDriver", def(device: Ptr[GPUDevice, O_device]) thin abi("C") -> OptPtr[c_char, UntrackedOrigin[mut=False]]]()(device).value())
 
 
 def get_gpu_shader_formats[O_device: Origin, //](device: Ptr[GPUDevice, O_device]) raises -> GPUShaderFormat:
@@ -2795,7 +2814,7 @@ def get_gpu_shader_formats[O_device: Origin, //](device: Ptr[GPUDevice, O_device
     return _get_dylib_function[lib, "SDL_GetGPUShaderFormats", def(device: Ptr[GPUDevice, O_device]) thin abi("C") -> GPUShaderFormat]()(device)
 
 
-def create_gpu_compute_pipeline[O_device: Origin, O_createinfo: Origin, //](device: Ptr[GPUDevice, O_device], createinfo: Ptr[GPUComputePipelineCreateInfo, O_createinfo], out ret: Ptr[GPUComputePipeline, ExternalOrigin[mut=True]]) raises:
+def create_gpu_compute_pipeline[O_device: Origin, O_createinfo: Origin, //](device: Ptr[GPUDevice, O_device], createinfo: Ptr[GPUComputePipelineCreateInfo, O_createinfo], out ret: Ptr[GPUComputePipeline, UntrackedOrigin[mut=True]]) raises:
     """Creates a pipeline object to be used in a compute workflow.
 
     Shader resource bindings must be authored to follow a particular order
@@ -2841,13 +2860,13 @@ def create_gpu_compute_pipeline[O_device: Origin, O_createinfo: Origin, //](devi
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateGPUComputePipeline.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_CreateGPUComputePipeline", def(device: Ptr[GPUDevice, O_device], createinfo: Ptr[GPUComputePipelineCreateInfo, O_createinfo]) thin abi("C") -> OptPtr[GPUComputePipeline, ExternalOrigin[mut=True]]]()(device, createinfo)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_CreateGPUComputePipeline", def(device: Ptr[GPUDevice, O_device], createinfo: Ptr[GPUComputePipelineCreateInfo, O_createinfo]) thin abi("C") -> OptPtr[GPUComputePipeline, UntrackedOrigin[mut=True]]]()(device, createinfo)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
 
 
-def create_gpu_graphics_pipeline[O_device: Origin, O_createinfo: Origin, //](device: Ptr[GPUDevice, O_device], createinfo: Ptr[GPUGraphicsPipelineCreateInfo, O_createinfo], out ret: Ptr[GPUGraphicsPipeline, ExternalOrigin[mut=True]]) raises:
+def create_gpu_graphics_pipeline[O_device: Origin, O_createinfo: Origin, //](device: Ptr[GPUDevice, O_device], createinfo: Ptr[GPUGraphicsPipelineCreateInfo, O_createinfo], out ret: Ptr[GPUGraphicsPipeline, UntrackedOrigin[mut=True]]) raises:
     """Creates a pipeline object to be used in a graphics workflow.
 
     There are optional properties that can be provided through `props`. These
@@ -2868,13 +2887,13 @@ def create_gpu_graphics_pipeline[O_device: Origin, O_createinfo: Origin, //](dev
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateGPUGraphicsPipeline.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_CreateGPUGraphicsPipeline", def(device: Ptr[GPUDevice, O_device], createinfo: Ptr[GPUGraphicsPipelineCreateInfo, O_createinfo]) thin abi("C") -> OptPtr[GPUGraphicsPipeline, ExternalOrigin[mut=True]]]()(device, createinfo)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_CreateGPUGraphicsPipeline", def(device: Ptr[GPUDevice, O_device], createinfo: Ptr[GPUGraphicsPipelineCreateInfo, O_createinfo]) thin abi("C") -> OptPtr[GPUGraphicsPipeline, UntrackedOrigin[mut=True]]]()(device, createinfo)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
 
 
-def create_gpu_sampler[O_device: Origin, O_createinfo: Origin, //](device: Ptr[GPUDevice, O_device], createinfo: Ptr[GPUSamplerCreateInfo, O_createinfo], out ret: Ptr[GPUSampler, ExternalOrigin[mut=True]]) raises:
+def create_gpu_sampler[O_device: Origin, O_createinfo: Origin, //](device: Ptr[GPUDevice, O_device], createinfo: Ptr[GPUSamplerCreateInfo, O_createinfo], out ret: Ptr[GPUSampler, UntrackedOrigin[mut=True]]) raises:
     """Creates a sampler object to be used when binding textures in a graphics
     workflow.
 
@@ -2895,13 +2914,13 @@ def create_gpu_sampler[O_device: Origin, O_createinfo: Origin, //](device: Ptr[G
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateGPUSampler.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_CreateGPUSampler", def(device: Ptr[GPUDevice, O_device], createinfo: Ptr[GPUSamplerCreateInfo, O_createinfo]) thin abi("C") -> OptPtr[GPUSampler, ExternalOrigin[mut=True]]]()(device, createinfo)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_CreateGPUSampler", def(device: Ptr[GPUDevice, O_device], createinfo: Ptr[GPUSamplerCreateInfo, O_createinfo]) thin abi("C") -> OptPtr[GPUSampler, UntrackedOrigin[mut=True]]]()(device, createinfo)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
 
 
-def create_gpu_shader[O_device: Origin, O_createinfo: Origin, //](device: Ptr[GPUDevice, O_device], createinfo: Ptr[GPUShaderCreateInfo, O_createinfo], out ret: Ptr[GPUShader, ExternalOrigin[mut=True]]) raises:
+def create_gpu_shader[O_device: Origin, O_createinfo: Origin, //](device: Ptr[GPUDevice, O_device], createinfo: Ptr[GPUShaderCreateInfo, O_createinfo], out ret: Ptr[GPUShader, UntrackedOrigin[mut=True]]) raises:
     """Creates a shader to be used when creating a graphics pipeline.
 
     Shader resource bindings must be authored to follow a particular order
@@ -2975,13 +2994,13 @@ def create_gpu_shader[O_device: Origin, O_createinfo: Origin, //](device: Ptr[GP
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateGPUShader.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_CreateGPUShader", def(device: Ptr[GPUDevice, O_device], createinfo: Ptr[GPUShaderCreateInfo, O_createinfo]) thin abi("C") -> OptPtr[GPUShader, ExternalOrigin[mut=True]]]()(device, createinfo)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_CreateGPUShader", def(device: Ptr[GPUDevice, O_device], createinfo: Ptr[GPUShaderCreateInfo, O_createinfo]) thin abi("C") -> OptPtr[GPUShader, UntrackedOrigin[mut=True]]]()(device, createinfo)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
 
 
-def create_gpu_texture[O_device: Origin, O_createinfo: Origin, //](device: Ptr[GPUDevice, O_device], createinfo: Ptr[GPUTextureCreateInfo, O_createinfo], out ret: Ptr[GPUTexture, ExternalOrigin[mut=True]]) raises:
+def create_gpu_texture[O_device: Origin, O_createinfo: Origin, //](device: Ptr[GPUDevice, O_device], createinfo: Ptr[GPUTextureCreateInfo, O_createinfo], out ret: Ptr[GPUTexture, UntrackedOrigin[mut=True]]) raises:
     """Creates a texture object to be used in graphics or compute workflows.
 
     The contents of this texture are undefined until data is written to the
@@ -3029,13 +3048,13 @@ def create_gpu_texture[O_device: Origin, O_createinfo: Origin, //](device: Ptr[G
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateGPUTexture.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_CreateGPUTexture", def(device: Ptr[GPUDevice, O_device], createinfo: Ptr[GPUTextureCreateInfo, O_createinfo]) thin abi("C") -> OptPtr[GPUTexture, ExternalOrigin[mut=True]]]()(device, createinfo)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_CreateGPUTexture", def(device: Ptr[GPUDevice, O_device], createinfo: Ptr[GPUTextureCreateInfo, O_createinfo]) thin abi("C") -> OptPtr[GPUTexture, UntrackedOrigin[mut=True]]]()(device, createinfo)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
 
 
-def create_gpu_buffer[O_device: Origin, O_createinfo: Origin, //](device: Ptr[GPUDevice, O_device], createinfo: Ptr[GPUBufferCreateInfo, O_createinfo], out ret: Ptr[GPUBuffer, ExternalOrigin[mut=True]]) raises:
+def create_gpu_buffer[O_device: Origin, O_createinfo: Origin, //](device: Ptr[GPUDevice, O_device], createinfo: Ptr[GPUBufferCreateInfo, O_createinfo], out ret: Ptr[GPUBuffer, UntrackedOrigin[mut=True]]) raises:
     """Creates a buffer object to be used in graphics or compute workflows.
 
     The contents of this buffer are undefined until data is written to the
@@ -3070,13 +3089,13 @@ def create_gpu_buffer[O_device: Origin, O_createinfo: Origin, //](device: Ptr[GP
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateGPUBuffer.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_CreateGPUBuffer", def(device: Ptr[GPUDevice, O_device], createinfo: Ptr[GPUBufferCreateInfo, O_createinfo]) thin abi("C") -> OptPtr[GPUBuffer, ExternalOrigin[mut=True]]]()(device, createinfo)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_CreateGPUBuffer", def(device: Ptr[GPUDevice, O_device], createinfo: Ptr[GPUBufferCreateInfo, O_createinfo]) thin abi("C") -> OptPtr[GPUBuffer, UntrackedOrigin[mut=True]]]()(device, createinfo)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
 
 
-def create_gpu_transfer_buffer[O_device: Origin, O_createinfo: Origin, //](device: Ptr[GPUDevice, O_device], createinfo: Ptr[GPUTransferBufferCreateInfo, O_createinfo], out ret: Ptr[GPUTransferBuffer, ExternalOrigin[mut=True]]) raises:
+def create_gpu_transfer_buffer[O_device: Origin, O_createinfo: Origin, //](device: Ptr[GPUDevice, O_device], createinfo: Ptr[GPUTransferBufferCreateInfo, O_createinfo], out ret: Ptr[GPUTransferBuffer, UntrackedOrigin[mut=True]]) raises:
     """Creates a transfer buffer to be used when uploading to or downloading from
     graphics resources.
 
@@ -3101,7 +3120,7 @@ def create_gpu_transfer_buffer[O_device: Origin, O_createinfo: Origin, //](devic
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateGPUTransferBuffer.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_CreateGPUTransferBuffer", def(device: Ptr[GPUDevice, O_device], createinfo: Ptr[GPUTransferBufferCreateInfo, O_createinfo]) thin abi("C") -> OptPtr[GPUTransferBuffer, ExternalOrigin[mut=True]]]()(device, createinfo)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_CreateGPUTransferBuffer", def(device: Ptr[GPUDevice, O_device], createinfo: Ptr[GPUTransferBufferCreateInfo, O_createinfo]) thin abi("C") -> OptPtr[GPUTransferBuffer, UntrackedOrigin[mut=True]]]()(device, createinfo)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
@@ -3125,7 +3144,7 @@ def set_gpu_buffer_name[O_device: Origin, O_buffer: Origin, //](device: Ptr[GPUD
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetGPUBufferName.
     """
 
-    return _get_dylib_function[lib, "SDL_SetGPUBufferName", def(device: Ptr[GPUDevice, O_device], buffer: Ptr[GPUBuffer, O_buffer], text: Ptr[mut=False, c_char, origin_of(text)]) thin abi("C") -> None]()(device, buffer, text.as_c_string_slice().unsafe_ptr())
+    return _get_dylib_function[lib, "SDL_SetGPUBufferName", def(device: Ptr[GPUDevice, O_device], buffer: Ptr[GPUBuffer, O_buffer], text: Ptr[mut=False, c_char, origin_of(text)]) thin abi("C") -> None]()(device, buffer, text.as_c_string_slice().ptr())
 
 
 def set_gpu_texture_name[O_device: Origin, O_texture: Origin, //](device: Ptr[GPUDevice, O_device], texture: Ptr[GPUTexture, O_texture], var text: String) raises -> None:
@@ -3147,7 +3166,7 @@ def set_gpu_texture_name[O_device: Origin, O_texture: Origin, //](device: Ptr[GP
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetGPUTextureName.
     """
 
-    return _get_dylib_function[lib, "SDL_SetGPUTextureName", def(device: Ptr[GPUDevice, O_device], texture: Ptr[GPUTexture, O_texture], text: Ptr[mut=False, c_char, origin_of(text)]) thin abi("C") -> None]()(device, texture, text.as_c_string_slice().unsafe_ptr())
+    return _get_dylib_function[lib, "SDL_SetGPUTextureName", def(device: Ptr[GPUDevice, O_device], texture: Ptr[GPUTexture, O_texture], text: Ptr[mut=False, c_char, origin_of(text)]) thin abi("C") -> None]()(device, texture, text.as_c_string_slice().ptr())
 
 
 def insert_gpu_debug_label[O_command_buffer: Origin, //](command_buffer: Ptr[GPUCommandBuffer, O_command_buffer], var text: String) raises -> None:
@@ -3162,7 +3181,7 @@ def insert_gpu_debug_label[O_command_buffer: Origin, //](command_buffer: Ptr[GPU
     Docs: https://wiki.libsdl.org/SDL3/SDL_InsertGPUDebugLabel.
     """
 
-    return _get_dylib_function[lib, "SDL_InsertGPUDebugLabel", def(command_buffer: Ptr[GPUCommandBuffer, O_command_buffer], text: Ptr[mut=False, c_char, origin_of(text)]) thin abi("C") -> None]()(command_buffer, text.as_c_string_slice().unsafe_ptr())
+    return _get_dylib_function[lib, "SDL_InsertGPUDebugLabel", def(command_buffer: Ptr[GPUCommandBuffer, O_command_buffer], text: Ptr[mut=False, c_char, origin_of(text)]) thin abi("C") -> None]()(command_buffer, text.as_c_string_slice().ptr())
 
 
 def push_gpu_debug_group[O_command_buffer: Origin, //](command_buffer: Ptr[GPUCommandBuffer, O_command_buffer], var name: String) raises -> None:
@@ -3186,7 +3205,7 @@ def push_gpu_debug_group[O_command_buffer: Origin, //](command_buffer: Ptr[GPUCo
     Docs: https://wiki.libsdl.org/SDL3/SDL_PushGPUDebugGroup.
     """
 
-    return _get_dylib_function[lib, "SDL_PushGPUDebugGroup", def(command_buffer: Ptr[GPUCommandBuffer, O_command_buffer], name: Ptr[mut=False, c_char, origin_of(name)]) thin abi("C") -> None]()(command_buffer, name.as_c_string_slice().unsafe_ptr())
+    return _get_dylib_function[lib, "SDL_PushGPUDebugGroup", def(command_buffer: Ptr[GPUCommandBuffer, O_command_buffer], name: Ptr[mut=False, c_char, origin_of(name)]) thin abi("C") -> None]()(command_buffer, name.as_c_string_slice().ptr())
 
 
 def pop_gpu_debug_group[O_command_buffer: Origin, //](command_buffer: Ptr[GPUCommandBuffer, O_command_buffer]) raises -> None:
@@ -3306,7 +3325,7 @@ def release_gpu_graphics_pipeline[O_device: Origin, O_graphics_pipeline: Origin,
     return _get_dylib_function[lib, "SDL_ReleaseGPUGraphicsPipeline", def(device: Ptr[GPUDevice, O_device], graphics_pipeline: Ptr[GPUGraphicsPipeline, O_graphics_pipeline]) thin abi("C") -> None]()(device, graphics_pipeline)
 
 
-def acquire_gpu_command_buffer[O_device: Origin, //](device: Ptr[GPUDevice, O_device], out ret: Ptr[GPUCommandBuffer, ExternalOrigin[mut=True]]) raises:
+def acquire_gpu_command_buffer[O_device: Origin, //](device: Ptr[GPUDevice, O_device], out ret: Ptr[GPUCommandBuffer, UntrackedOrigin[mut=True]]) raises:
     """Acquire a command buffer.
 
     This command buffer is managed by the implementation and should not be
@@ -3331,7 +3350,7 @@ def acquire_gpu_command_buffer[O_device: Origin, //](device: Ptr[GPUDevice, O_de
     Docs: https://wiki.libsdl.org/SDL3/SDL_AcquireGPUCommandBuffer.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_AcquireGPUCommandBuffer", def(device: Ptr[GPUDevice, O_device]) thin abi("C") -> OptPtr[GPUCommandBuffer, ExternalOrigin[mut=True]]]()(device)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_AcquireGPUCommandBuffer", def(device: Ptr[GPUDevice, O_device]) thin abi("C") -> OptPtr[GPUCommandBuffer, UntrackedOrigin[mut=True]]]()(device)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
@@ -3400,7 +3419,7 @@ def push_gpu_compute_uniform_data[O_command_buffer: Origin, O_data: Origin, //](
     return _get_dylib_function[lib, "SDL_PushGPUComputeUniformData", def(command_buffer: Ptr[GPUCommandBuffer, O_command_buffer], slot_index: UInt32, data: Ptr[NoneType, O_data], length: UInt32) thin abi("C") -> None]()(command_buffer, slot_index, data, length)
 
 
-def begin_gpu_render_pass[O_command_buffer: Origin, O_color_target_infos: Origin, O_depth_stencil_target_info: Origin, //](command_buffer: Ptr[GPUCommandBuffer, O_command_buffer], color_target_infos: Ptr[GPUColorTargetInfo, O_color_target_infos], num_color_targets: UInt32, depth_stencil_target_info: Ptr[GPUDepthStencilTargetInfo, O_depth_stencil_target_info]) raises -> Ptr[GPURenderPass, ExternalOrigin[mut=True]]:
+def begin_gpu_render_pass[O_command_buffer: Origin, O_color_target_infos: Origin, O_depth_stencil_target_info: Origin, //](command_buffer: Ptr[GPUCommandBuffer, O_command_buffer], color_target_infos: Ptr[GPUColorTargetInfo, O_color_target_infos], num_color_targets: UInt32, depth_stencil_target_info: Ptr[GPUDepthStencilTargetInfo, O_depth_stencil_target_info]) raises -> Ptr[GPURenderPass, UntrackedOrigin[mut=True]]:
     """Begins a render pass on a command buffer.
 
     A render pass consists of a set of texture subresources (or depth slices in
@@ -3427,7 +3446,7 @@ def begin_gpu_render_pass[O_command_buffer: Origin, O_color_target_infos: Origin
     Docs: https://wiki.libsdl.org/SDL3/SDL_BeginGPURenderPass.
     """
 
-    return _get_dylib_function[lib, "SDL_BeginGPURenderPass", def(command_buffer: Ptr[GPUCommandBuffer, O_command_buffer], color_target_infos: Ptr[GPUColorTargetInfo, O_color_target_infos], num_color_targets: UInt32, depth_stencil_target_info: Ptr[GPUDepthStencilTargetInfo, O_depth_stencil_target_info]) thin abi("C") -> OptPtr[GPURenderPass, ExternalOrigin[mut=True]]]()(command_buffer, color_target_infos, num_color_targets, depth_stencil_target_info).value()
+    return _get_dylib_function[lib, "SDL_BeginGPURenderPass", def(command_buffer: Ptr[GPUCommandBuffer, O_command_buffer], color_target_infos: Ptr[GPUColorTargetInfo, O_color_target_infos], num_color_targets: UInt32, depth_stencil_target_info: Ptr[GPUDepthStencilTargetInfo, O_depth_stencil_target_info]) thin abi("C") -> OptPtr[GPURenderPass, UntrackedOrigin[mut=True]]]()(command_buffer, color_target_infos, num_color_targets, depth_stencil_target_info).value()
 
 
 def bind_gpu_graphics_pipeline[O_render_pass: Origin, O_graphics_pipeline: Origin, //](render_pass: Ptr[GPURenderPass, O_render_pass], graphics_pipeline: Ptr[GPUGraphicsPipeline, O_graphics_pipeline]) raises -> None:
@@ -3768,7 +3787,7 @@ def end_gpu_render_pass[O_render_pass: Origin, //](render_pass: Ptr[GPURenderPas
     return _get_dylib_function[lib, "SDL_EndGPURenderPass", def(render_pass: Ptr[GPURenderPass, O_render_pass]) thin abi("C") -> None]()(render_pass)
 
 
-def begin_gpu_compute_pass[O_command_buffer: Origin, O_storage_texture_bindings: Origin, O_storage_buffer_bindings: Origin, //](command_buffer: Ptr[GPUCommandBuffer, O_command_buffer], storage_texture_bindings: Ptr[GPUStorageTextureReadWriteBinding, O_storage_texture_bindings], num_storage_texture_bindings: UInt32, storage_buffer_bindings: Ptr[GPUStorageBufferReadWriteBinding, O_storage_buffer_bindings], num_storage_buffer_bindings: UInt32) raises -> Ptr[GPUComputePass, ExternalOrigin[mut=True]]:
+def begin_gpu_compute_pass[O_command_buffer: Origin, O_storage_texture_bindings: Origin, O_storage_buffer_bindings: Origin, //](command_buffer: Ptr[GPUCommandBuffer, O_command_buffer], storage_texture_bindings: Ptr[GPUStorageTextureReadWriteBinding, O_storage_texture_bindings], num_storage_texture_bindings: UInt32, storage_buffer_bindings: Ptr[GPUStorageBufferReadWriteBinding, O_storage_buffer_bindings], num_storage_buffer_bindings: UInt32) raises -> Ptr[GPUComputePass, UntrackedOrigin[mut=True]]:
     """Begins a compute pass on a command buffer.
 
     A compute pass is defined by a set of texture subresources and buffers that
@@ -3807,7 +3826,7 @@ def begin_gpu_compute_pass[O_command_buffer: Origin, O_storage_texture_bindings:
     Docs: https://wiki.libsdl.org/SDL3/SDL_BeginGPUComputePass.
     """
 
-    return _get_dylib_function[lib, "SDL_BeginGPUComputePass", def(command_buffer: Ptr[GPUCommandBuffer, O_command_buffer], storage_texture_bindings: Ptr[GPUStorageTextureReadWriteBinding, O_storage_texture_bindings], num_storage_texture_bindings: UInt32, storage_buffer_bindings: Ptr[GPUStorageBufferReadWriteBinding, O_storage_buffer_bindings], num_storage_buffer_bindings: UInt32) thin abi("C") -> OptPtr[GPUComputePass, ExternalOrigin[mut=True]]]()(command_buffer, storage_texture_bindings, num_storage_texture_bindings, storage_buffer_bindings, num_storage_buffer_bindings).value()
+    return _get_dylib_function[lib, "SDL_BeginGPUComputePass", def(command_buffer: Ptr[GPUCommandBuffer, O_command_buffer], storage_texture_bindings: Ptr[GPUStorageTextureReadWriteBinding, O_storage_texture_bindings], num_storage_texture_bindings: UInt32, storage_buffer_bindings: Ptr[GPUStorageBufferReadWriteBinding, O_storage_buffer_bindings], num_storage_buffer_bindings: UInt32) thin abi("C") -> OptPtr[GPUComputePass, UntrackedOrigin[mut=True]]]()(command_buffer, storage_texture_bindings, num_storage_texture_bindings, storage_buffer_bindings, num_storage_buffer_bindings).value()
 
 
 def bind_gpu_compute_pipeline[O_compute_pass: Origin, O_compute_pipeline: Origin, //](compute_pass: Ptr[GPUComputePass, O_compute_pass], compute_pipeline: Ptr[GPUComputePipeline, O_compute_pipeline]) raises -> None:
@@ -3950,7 +3969,7 @@ def end_gpu_compute_pass[O_compute_pass: Origin, //](compute_pass: Ptr[GPUComput
     return _get_dylib_function[lib, "SDL_EndGPUComputePass", def(compute_pass: Ptr[GPUComputePass, O_compute_pass]) thin abi("C") -> None]()(compute_pass)
 
 
-def map_gpu_transfer_buffer[O_device: Origin, O_transfer_buffer: Origin, //](device: Ptr[GPUDevice, O_device], transfer_buffer: Ptr[GPUTransferBuffer, O_transfer_buffer], cycle: Bool) raises -> Ptr[NoneType, ExternalOrigin[mut=True]]:
+def map_gpu_transfer_buffer[O_device: Origin, O_transfer_buffer: Origin, //](device: Ptr[GPUDevice, O_device], transfer_buffer: Ptr[GPUTransferBuffer, O_transfer_buffer], cycle: Bool) raises -> Ptr[NoneType, UntrackedOrigin[mut=True]]:
     """Maps a transfer buffer into application address space.
 
     You must unmap the transfer buffer before encoding upload commands. The
@@ -3969,7 +3988,7 @@ def map_gpu_transfer_buffer[O_device: Origin, O_transfer_buffer: Origin, //](dev
     Docs: https://wiki.libsdl.org/SDL3/SDL_MapGPUTransferBuffer.
     """
 
-    return _get_dylib_function[lib, "SDL_MapGPUTransferBuffer", def(device: Ptr[GPUDevice, O_device], transfer_buffer: Ptr[GPUTransferBuffer, O_transfer_buffer], cycle: Bool) thin abi("C") -> OptPtr[NoneType, ExternalOrigin[mut=True]]]()(device, transfer_buffer, cycle).value()
+    return _get_dylib_function[lib, "SDL_MapGPUTransferBuffer", def(device: Ptr[GPUDevice, O_device], transfer_buffer: Ptr[GPUTransferBuffer, O_transfer_buffer], cycle: Bool) thin abi("C") -> OptPtr[NoneType, UntrackedOrigin[mut=True]]]()(device, transfer_buffer, cycle).value()
 
 
 def unmap_gpu_transfer_buffer[O_device: Origin, O_transfer_buffer: Origin, //](device: Ptr[GPUDevice, O_device], transfer_buffer: Ptr[GPUTransferBuffer, O_transfer_buffer]) raises -> None:
@@ -3985,7 +4004,7 @@ def unmap_gpu_transfer_buffer[O_device: Origin, O_transfer_buffer: Origin, //](d
     return _get_dylib_function[lib, "SDL_UnmapGPUTransferBuffer", def(device: Ptr[GPUDevice, O_device], transfer_buffer: Ptr[GPUTransferBuffer, O_transfer_buffer]) thin abi("C") -> None]()(device, transfer_buffer)
 
 
-def begin_gpu_copy_pass[O_command_buffer: Origin, //](command_buffer: Ptr[GPUCommandBuffer, O_command_buffer]) raises -> Ptr[GPUCopyPass, ExternalOrigin[mut=True]]:
+def begin_gpu_copy_pass[O_command_buffer: Origin, //](command_buffer: Ptr[GPUCommandBuffer, O_command_buffer]) raises -> Ptr[GPUCopyPass, UntrackedOrigin[mut=True]]:
     """Begins a copy pass on a command buffer.
 
     All operations related to copying to or from buffers or textures take place
@@ -4001,7 +4020,7 @@ def begin_gpu_copy_pass[O_command_buffer: Origin, //](command_buffer: Ptr[GPUCom
     Docs: https://wiki.libsdl.org/SDL3/SDL_BeginGPUCopyPass.
     """
 
-    return _get_dylib_function[lib, "SDL_BeginGPUCopyPass", def(command_buffer: Ptr[GPUCommandBuffer, O_command_buffer]) thin abi("C") -> OptPtr[GPUCopyPass, ExternalOrigin[mut=True]]]()(command_buffer).value()
+    return _get_dylib_function[lib, "SDL_BeginGPUCopyPass", def(command_buffer: Ptr[GPUCommandBuffer, O_command_buffer]) thin abi("C") -> OptPtr[GPUCopyPass, UntrackedOrigin[mut=True]]]()(command_buffer).value()
 
 
 def upload_to_gpu_texture[O_copy_pass: Origin, O_source: Origin, O_destination: Origin, //](copy_pass: Ptr[GPUCopyPass, O_copy_pass], source: Ptr[GPUTextureTransferInfo, O_source], destination: Ptr[GPUTextureRegion, O_destination], cycle: Bool) raises -> None:
@@ -4324,7 +4343,7 @@ def get_gpu_swapchain_texture_format[O_device: Origin, O_window: Origin, //](dev
     return _get_dylib_function[lib, "SDL_GetGPUSwapchainTextureFormat", def(device: Ptr[GPUDevice, O_device], window: Ptr[Window, O_window]) thin abi("C") -> GPUTextureFormat]()(device, window)
 
 
-def acquire_gpu_swapchain_texture[O_command_buffer: Origin, O_window: Origin, O_swapchain_texture: Origin, O_swapchain_texture_width: Origin, O_swapchain_texture_height: Origin, //](command_buffer: Ptr[GPUCommandBuffer, O_command_buffer], window: Ptr[Window, O_window], swapchain_texture: Ptr[OptPtr[GPUTexture, ExternalOrigin[mut=True]], O_swapchain_texture], swapchain_texture_width: Ptr[UInt32, O_swapchain_texture_width], swapchain_texture_height: Ptr[UInt32, O_swapchain_texture_height]) raises:
+def acquire_gpu_swapchain_texture[O_command_buffer: Origin, O_window: Origin, O_swapchain_texture: Origin, O_swapchain_texture_width: Origin, O_swapchain_texture_height: Origin, //](command_buffer: Ptr[GPUCommandBuffer, O_command_buffer], window: Ptr[Window, O_window], swapchain_texture: Ptr[OptPtr[GPUTexture, UntrackedOrigin[mut=True]], O_swapchain_texture], swapchain_texture_width: Ptr[UInt32, O_swapchain_texture_width], swapchain_texture_height: Ptr[UInt32, O_swapchain_texture_height]) raises:
     """Acquire a texture to use in presentation.
 
     When a swapchain texture is acquired on a command buffer, it will
@@ -4366,7 +4385,7 @@ def acquire_gpu_swapchain_texture[O_command_buffer: Origin, O_window: Origin, O_
     Docs: https://wiki.libsdl.org/SDL3/SDL_AcquireGPUSwapchainTexture.
     """
 
-    var _ffi_ret = _get_dylib_function[lib, "SDL_AcquireGPUSwapchainTexture", def(command_buffer: Ptr[GPUCommandBuffer, O_command_buffer], window: Ptr[Window, O_window], swapchain_texture: Ptr[OptPtr[GPUTexture, ExternalOrigin[mut=True]], O_swapchain_texture], swapchain_texture_width: Ptr[UInt32, O_swapchain_texture_width], swapchain_texture_height: Ptr[UInt32, O_swapchain_texture_height]) thin abi("C") -> Bool]()(command_buffer, window, swapchain_texture, swapchain_texture_width, swapchain_texture_height)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_AcquireGPUSwapchainTexture", def(command_buffer: Ptr[GPUCommandBuffer, O_command_buffer], window: Ptr[Window, O_window], swapchain_texture: Ptr[OptPtr[GPUTexture, UntrackedOrigin[mut=True]], O_swapchain_texture], swapchain_texture_width: Ptr[UInt32, O_swapchain_texture_width], swapchain_texture_height: Ptr[UInt32, O_swapchain_texture_height]) thin abi("C") -> Bool]()(command_buffer, window, swapchain_texture, swapchain_texture_width, swapchain_texture_height)
     if not _ffi_ret:
         raise Error(get_error())
 
@@ -4394,7 +4413,7 @@ def wait_for_gpu_swapchain[O_device: Origin, O_window: Origin, //](device: Ptr[G
         raise Error(get_error())
 
 
-def wait_and_acquire_gpu_swapchain_texture[O_command_buffer: Origin, O_window: Origin, O_swapchain_texture: Origin, O_swapchain_texture_width: Origin, O_swapchain_texture_height: Origin, //](command_buffer: Ptr[GPUCommandBuffer, O_command_buffer], window: Ptr[Window, O_window], swapchain_texture: Ptr[OptPtr[GPUTexture, ExternalOrigin[mut=True]], O_swapchain_texture], swapchain_texture_width: Ptr[UInt32, O_swapchain_texture_width], swapchain_texture_height: Ptr[UInt32, O_swapchain_texture_height]) raises:
+def wait_and_acquire_gpu_swapchain_texture[O_command_buffer: Origin, O_window: Origin, O_swapchain_texture: Origin, O_swapchain_texture_width: Origin, O_swapchain_texture_height: Origin, //](command_buffer: Ptr[GPUCommandBuffer, O_command_buffer], window: Ptr[Window, O_window], swapchain_texture: Ptr[OptPtr[GPUTexture, UntrackedOrigin[mut=True]], O_swapchain_texture], swapchain_texture_width: Ptr[UInt32, O_swapchain_texture_width], swapchain_texture_height: Ptr[UInt32, O_swapchain_texture_height]) raises:
     """Blocks the thread until a swapchain texture is available to be acquired,
     and then acquires it.
 
@@ -4437,7 +4456,7 @@ def wait_and_acquire_gpu_swapchain_texture[O_command_buffer: Origin, O_window: O
     Docs: https://wiki.libsdl.org/SDL3/SDL_WaitAndAcquireGPUSwapchainTexture.
     """
 
-    var _ffi_ret = _get_dylib_function[lib, "SDL_WaitAndAcquireGPUSwapchainTexture", def(command_buffer: Ptr[GPUCommandBuffer, O_command_buffer], window: Ptr[Window, O_window], swapchain_texture: Ptr[OptPtr[GPUTexture, ExternalOrigin[mut=True]], O_swapchain_texture], swapchain_texture_width: Ptr[UInt32, O_swapchain_texture_width], swapchain_texture_height: Ptr[UInt32, O_swapchain_texture_height]) thin abi("C") -> Bool]()(command_buffer, window, swapchain_texture, swapchain_texture_width, swapchain_texture_height)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_WaitAndAcquireGPUSwapchainTexture", def(command_buffer: Ptr[GPUCommandBuffer, O_command_buffer], window: Ptr[Window, O_window], swapchain_texture: Ptr[OptPtr[GPUTexture, UntrackedOrigin[mut=True]], O_swapchain_texture], swapchain_texture_width: Ptr[UInt32, O_swapchain_texture_width], swapchain_texture_height: Ptr[UInt32, O_swapchain_texture_height]) thin abi("C") -> Bool]()(command_buffer, window, swapchain_texture, swapchain_texture_width, swapchain_texture_height)
     if not _ffi_ret:
         raise Error(get_error())
 
@@ -4467,7 +4486,7 @@ def submit_gpu_command_buffer[O_command_buffer: Origin, //](command_buffer: Ptr[
         raise Error(get_error())
 
 
-def submit_gpu_command_buffer_and_acquire_fence[O_command_buffer: Origin, //](command_buffer: Ptr[GPUCommandBuffer, O_command_buffer], out ret: Ptr[GPUFence, ExternalOrigin[mut=True]]) raises:
+def submit_gpu_command_buffer_and_acquire_fence[O_command_buffer: Origin, //](command_buffer: Ptr[GPUCommandBuffer, O_command_buffer], out ret: Ptr[GPUFence, UntrackedOrigin[mut=True]]) raises:
     """Submits a command buffer so its commands can be processed on the GPU, and
     acquires a fence associated with the command buffer.
 
@@ -4489,7 +4508,7 @@ def submit_gpu_command_buffer_and_acquire_fence[O_command_buffer: Origin, //](co
     Docs: https://wiki.libsdl.org/SDL3/SDL_SubmitGPUCommandBufferAndAcquireFence.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_SubmitGPUCommandBufferAndAcquireFence", def(command_buffer: Ptr[GPUCommandBuffer, O_command_buffer]) thin abi("C") -> OptPtr[GPUFence, ExternalOrigin[mut=True]]]()(command_buffer)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_SubmitGPUCommandBufferAndAcquireFence", def(command_buffer: Ptr[GPUCommandBuffer, O_command_buffer]) thin abi("C") -> OptPtr[GPUFence, UntrackedOrigin[mut=True]]]()(command_buffer)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()

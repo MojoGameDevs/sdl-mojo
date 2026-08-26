@@ -51,6 +51,23 @@ the background, you should set the following hint before calling
 SDL_Init(): SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS
 """
 
+from std.ffi import _get_dylib_function, c_char, c_float, c_int
+from ._core import ArrayHelper, OptPtr, Ptr, c_string, lib
+from .sdl_error import get_error
+from .sdl_guid import GUID
+from .sdl_power import PowerState
+from .sdl_properties import PropertiesID
+from .sdl_sensor import SensorType
+
+
+from std.ffi import _get_dylib_function, c_char, c_float, c_int
+from ._core import ArrayHelper, OptPtr, Ptr, c_string, lib
+from .sdl_error import get_error
+from .sdl_guid import GUID
+from .sdl_power import PowerState
+from .sdl_properties import PropertiesID
+from .sdl_sensor import SensorType
+
 
 @fieldwise_init
 struct Joystick(ImplicitlyCopyable, Movable):
@@ -201,7 +218,7 @@ def has_joystick() raises -> Bool:
     return _get_dylib_function[lib, "SDL_HasJoystick", def() thin abi("C") -> Bool]()()
 
 
-def get_joysticks[O_count: Origin, //](count: Ptr[c_int, O_count], out ret: Ptr[JoystickID, ExternalOrigin[mut=True]]) raises:
+def get_joysticks[O_count: Origin, //](count: Ptr[c_int, O_count], out ret: Ptr[JoystickID, UntrackedOrigin[mut=True]]) raises:
     """Get a list of currently connected joysticks.
 
     Args:
@@ -216,13 +233,13 @@ def get_joysticks[O_count: Origin, //](count: Ptr[c_int, O_count], out ret: Ptr[
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoysticks.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_GetJoysticks", def(count: Ptr[c_int, O_count]) thin abi("C") -> OptPtr[JoystickID, ExternalOrigin[mut=True]]]()(count)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_GetJoysticks", def(count: Ptr[c_int, O_count]) thin abi("C") -> OptPtr[JoystickID, UntrackedOrigin[mut=True]]]()(count)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
 
 
-def get_joystick_name_for_id(instance_id: JoystickID) raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
+def get_joystick_name_for_id(instance_id: JoystickID) raises -> String:
     """Get the implementation dependent name of a joystick.
 
     This can be called before any joysticks are opened.
@@ -237,10 +254,10 @@ def get_joystick_name_for_id(instance_id: JoystickID) raises -> Ptr[c_char, Exte
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickNameForID.
     """
 
-    return _get_dylib_function[lib, "SDL_GetJoystickNameForID", def(instance_id: JoystickID) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(instance_id).value()
+    return c_string(_get_dylib_function[lib, "SDL_GetJoystickNameForID", def(instance_id: JoystickID) thin abi("C") -> OptPtr[c_char, UntrackedOrigin[mut=False]]]()(instance_id).value())
 
 
-def get_joystick_path_for_id(instance_id: JoystickID) raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
+def get_joystick_path_for_id(instance_id: JoystickID) raises -> String:
     """Get the implementation dependent path of a joystick.
 
     This can be called before any joysticks are opened.
@@ -255,7 +272,7 @@ def get_joystick_path_for_id(instance_id: JoystickID) raises -> Ptr[c_char, Exte
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickPathForID.
     """
 
-    return _get_dylib_function[lib, "SDL_GetJoystickPathForID", def(instance_id: JoystickID) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(instance_id).value()
+    return c_string(_get_dylib_function[lib, "SDL_GetJoystickPathForID", def(instance_id: JoystickID) thin abi("C") -> OptPtr[c_char, UntrackedOrigin[mut=False]]]()(instance_id).value())
 
 
 def get_joystick_player_index_for_id(instance_id: JoystickID) raises -> c_int:
@@ -369,7 +386,7 @@ def get_joystick_type_for_id(instance_id: JoystickID) raises -> JoystickType:
     return _get_dylib_function[lib, "SDL_GetJoystickTypeForID", def(instance_id: JoystickID) thin abi("C") -> JoystickType]()(instance_id)
 
 
-def open_joystick(instance_id: JoystickID, out ret: Ptr[Joystick, ExternalOrigin[mut=True]]) raises:
+def open_joystick(instance_id: JoystickID, out ret: Ptr[Joystick, UntrackedOrigin[mut=True]]) raises:
     """Open a joystick for use.
 
     The joystick subsystem must be initialized before a joystick can be opened
@@ -385,13 +402,13 @@ def open_joystick(instance_id: JoystickID, out ret: Ptr[Joystick, ExternalOrigin
     Docs: https://wiki.libsdl.org/SDL3/SDL_OpenJoystick.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_OpenJoystick", def(instance_id: JoystickID) thin abi("C") -> OptPtr[Joystick, ExternalOrigin[mut=True]]]()(instance_id)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_OpenJoystick", def(instance_id: JoystickID) thin abi("C") -> OptPtr[Joystick, UntrackedOrigin[mut=True]]]()(instance_id)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
 
 
-def get_joystick_from_id(instance_id: JoystickID) raises -> Ptr[Joystick, ExternalOrigin[mut=True]]:
+def get_joystick_from_id(instance_id: JoystickID) raises -> Ptr[Joystick, UntrackedOrigin[mut=True]]:
     """Get the SDL_Joystick associated with an instance ID, if it has been opened.
 
     Args:
@@ -404,10 +421,10 @@ def get_joystick_from_id(instance_id: JoystickID) raises -> Ptr[Joystick, Extern
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickFromID.
     """
 
-    return _get_dylib_function[lib, "SDL_GetJoystickFromID", def(instance_id: JoystickID) thin abi("C") -> OptPtr[Joystick, ExternalOrigin[mut=True]]]()(instance_id).value()
+    return _get_dylib_function[lib, "SDL_GetJoystickFromID", def(instance_id: JoystickID) thin abi("C") -> OptPtr[Joystick, UntrackedOrigin[mut=True]]]()(instance_id).value()
 
 
-def get_joystick_from_player_index(player_index: c_int, out ret: Ptr[Joystick, ExternalOrigin[mut=True]]) raises:
+def get_joystick_from_player_index(player_index: c_int, out ret: Ptr[Joystick, UntrackedOrigin[mut=True]]) raises:
     """Get the SDL_Joystick associated with a player index.
 
     Args:
@@ -420,7 +437,7 @@ def get_joystick_from_player_index(player_index: c_int, out ret: Ptr[Joystick, E
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickFromPlayerIndex.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_GetJoystickFromPlayerIndex", def(player_index: c_int) thin abi("C") -> OptPtr[Joystick, ExternalOrigin[mut=True]]]()(player_index)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_GetJoystickFromPlayerIndex", def(player_index: c_int) thin abi("C") -> OptPtr[Joystick, UntrackedOrigin[mut=True]]]()(player_index)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
@@ -435,7 +452,7 @@ struct VirtualJoystickTouchpadDesc(ImplicitlyCopyable, Movable):
 
     var nfingers: UInt16
     """The number of simultaneous fingers on this touchpad."""
-    var padding: ArrayHelper[UInt16, 3, ExternalOrigin[mut=True]]
+    var padding: ArrayHelper[UInt16, 3, UntrackedOrigin[mut=True]]
 
 
 @fieldwise_init
@@ -483,7 +500,7 @@ struct VirtualJoystickDesc(ImplicitlyCopyable, Movable):
     """The number of touchpads on this joystick, requires `touchpads` to point at valid descriptions."""
     var nsensors: UInt16
     """The number of sensors on this joystick, requires `sensors` to point at valid descriptions."""
-    var padding2: ArrayHelper[UInt16, 2, ExternalOrigin[mut=True]]
+    var padding2: ArrayHelper[UInt16, 2, UntrackedOrigin[mut=True]]
     """Unused."""
     var button_mask: UInt32
     """A mask of which buttons are valid for this controller
@@ -491,30 +508,30 @@ struct VirtualJoystickDesc(ImplicitlyCopyable, Movable):
     var axis_mask: UInt32
     """A mask of which axes are valid for this controller
                                  e.g. (1 << SDL_GAMEPAD_AXIS_LEFTX)."""
-    var name: OptPtr[c_char, ExternalOrigin[mut=False]]
+    var name: OptPtr[c_char, UntrackedOrigin[mut=False]]
     """The name of the joystick."""
-    var touchpads: OptPtr[VirtualJoystickTouchpadDesc, ExternalOrigin[mut=False]]
+    var touchpads: OptPtr[VirtualJoystickTouchpadDesc, UntrackedOrigin[mut=False]]
     """A pointer to an array of touchpad descriptions, required if `ntouchpads` is > 0."""
-    var sensors: OptPtr[VirtualJoystickSensorDesc, ExternalOrigin[mut=False]]
+    var sensors: OptPtr[VirtualJoystickSensorDesc, UntrackedOrigin[mut=False]]
     """A pointer to an array of sensor descriptions, required if `nsensors` is > 0."""
 
-    var userdata: OptPtr[NoneType, ExternalOrigin[mut=True]]
+    var userdata: OptPtr[NoneType, UntrackedOrigin[mut=True]]
     """User data pointer passed to callbacks."""
-    var update: def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]]) thin -> None
+    var update: def(userdata: OptPtr[NoneType, UntrackedOrigin[mut=True]]) thin -> None
     """Called when the joystick state should be updated."""
-    var set_player_index: def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]], player_index: c_int) thin -> None
+    var set_player_index: def(userdata: OptPtr[NoneType, UntrackedOrigin[mut=True]], player_index: c_int) thin -> None
     """Called when the player index is set."""
-    var rumble: def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]], low_frequency_rumble: UInt16, high_frequency_rumble: UInt16) thin -> Bool
+    var rumble: def(userdata: OptPtr[NoneType, UntrackedOrigin[mut=True]], low_frequency_rumble: UInt16, high_frequency_rumble: UInt16) thin -> Bool
     """Implements SDL_RumbleJoystick()."""
-    var rumble_triggers: def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]], left_rumble: UInt16, right_rumble: UInt16) thin -> Bool
+    var rumble_triggers: def(userdata: OptPtr[NoneType, UntrackedOrigin[mut=True]], left_rumble: UInt16, right_rumble: UInt16) thin -> Bool
     """Implements SDL_RumbleJoystickTriggers()."""
-    var set_led: def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]], red: UInt8, green: UInt8, blue: UInt8) thin -> Bool
+    var set_led: def(userdata: OptPtr[NoneType, UntrackedOrigin[mut=True]], red: UInt8, green: UInt8, blue: UInt8) thin -> Bool
     """Implements SDL_SetJoystickLED()."""
-    var send_effect: def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]], data: OptPtr[NoneType, ExternalOrigin[mut=False]], size: c_int) thin -> Bool
+    var send_effect: def(userdata: OptPtr[NoneType, UntrackedOrigin[mut=True]], data: OptPtr[NoneType, UntrackedOrigin[mut=False]], size: c_int) thin -> Bool
     """Implements SDL_SendJoystickEffect()."""
-    var set_sensors_enabled: def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]], enabled: Bool) thin -> Bool
+    var set_sensors_enabled: def(userdata: OptPtr[NoneType, UntrackedOrigin[mut=True]], enabled: Bool) thin -> Bool
     """Implements SDL_SetGamepadSensorEnabled()."""
-    var cleanup: def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]]) thin -> None
+    var cleanup: def(userdata: OptPtr[NoneType, UntrackedOrigin[mut=True]]) thin -> None
     """Cleans up the userdata when the joystick is detached."""
 
 
@@ -768,7 +785,7 @@ def get_joystick_properties[O_joystick: Origin, //](joystick: Ptr[Joystick, O_jo
     return _get_dylib_function[lib, "SDL_GetJoystickProperties", def(joystick: Ptr[Joystick, O_joystick]) thin abi("C") -> PropertiesID]()(joystick)
 
 
-def get_joystick_name[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick]) raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
+def get_joystick_name[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick]) raises -> String:
     """Get the implementation dependent name of a joystick.
 
     Args:
@@ -781,10 +798,10 @@ def get_joystick_name[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickName.
     """
 
-    return _get_dylib_function[lib, "SDL_GetJoystickName", def(joystick: Ptr[Joystick, O_joystick]) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(joystick).value()
+    return c_string(_get_dylib_function[lib, "SDL_GetJoystickName", def(joystick: Ptr[Joystick, O_joystick]) thin abi("C") -> OptPtr[c_char, UntrackedOrigin[mut=False]]]()(joystick).value())
 
 
-def get_joystick_path[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick]) raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
+def get_joystick_path[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick]) raises -> String:
     """Get the implementation dependent path of a joystick.
 
     Args:
@@ -797,7 +814,7 @@ def get_joystick_path[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickPath.
     """
 
-    return _get_dylib_function[lib, "SDL_GetJoystickPath", def(joystick: Ptr[Joystick, O_joystick]) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(joystick).value()
+    return c_string(_get_dylib_function[lib, "SDL_GetJoystickPath", def(joystick: Ptr[Joystick, O_joystick]) thin abi("C") -> OptPtr[c_char, UntrackedOrigin[mut=False]]]()(joystick).value())
 
 
 def get_joystick_player_index[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick]) raises -> c_int:
@@ -926,7 +943,7 @@ def get_joystick_firmware_version[O_joystick: Origin, //](joystick: Ptr[Joystick
     return _get_dylib_function[lib, "SDL_GetJoystickFirmwareVersion", def(joystick: Ptr[Joystick, O_joystick]) thin abi("C") -> UInt16]()(joystick)
 
 
-def get_joystick_serial[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick]) raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
+def get_joystick_serial[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick]) raises -> String:
     """Get the serial number of an opened joystick, if available.
 
     Returns the serial number of the joystick, or NULL if it is not available.
@@ -941,7 +958,7 @@ def get_joystick_serial[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joysti
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetJoystickSerial.
     """
 
-    return _get_dylib_function[lib, "SDL_GetJoystickSerial", def(joystick: Ptr[Joystick, O_joystick]) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(joystick).value()
+    return c_string(_get_dylib_function[lib, "SDL_GetJoystickSerial", def(joystick: Ptr[Joystick, O_joystick]) thin abi("C") -> OptPtr[c_char, UntrackedOrigin[mut=False]]]()(joystick).value())
 
 
 def get_joystick_type[O_joystick: Origin, //](joystick: Ptr[Joystick, O_joystick]) raises -> JoystickType:

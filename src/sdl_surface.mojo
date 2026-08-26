@@ -38,6 +38,25 @@ SDL_image:
 https://github.com/libsdl-org/SDL_image
 """
 
+from std.ffi import _get_dylib_function, c_char, c_float, c_int
+from ._core import OptPtr, Ptr, lib
+from .sdl_blendmode import BlendMode
+from .sdl_error import get_error
+from .sdl_iostream import IOStream
+from .sdl_pixels import Colorspace, Palette, PixelFormat
+from .sdl_properties import PropertiesID
+from .sdl_rect import Rect
+
+
+from std.ffi import _get_dylib_function, c_char, c_float, c_int
+from ._core import OptPtr, Ptr, lib
+from .sdl_blendmode import BlendMode
+from .sdl_error import get_error
+from .sdl_iostream import IOStream
+from .sdl_pixels import Colorspace, Palette, PixelFormat
+from .sdl_properties import PropertiesID
+from .sdl_rect import Rect
+
 
 struct SurfaceFlags(Intable, TrivialRegisterPassable):
     """The flags on an SDL_Surface.
@@ -171,17 +190,17 @@ struct Surface(ImplicitlyCopyable, Movable):
     """The height of the surface, read-only."""
     var pitch: c_int
     """The distance in bytes between rows of pixels, read-only."""
-    var pixels: OptPtr[NoneType, ExternalOrigin[mut=True]]
+    var pixels: OptPtr[NoneType, UntrackedOrigin[mut=True]]
     """A pointer to the pixels of the surface, the pixels are writeable if non-NULL."""
 
     var refcount: c_int
     """Application reference count, used when freeing surface."""
 
-    var reserved: OptPtr[NoneType, ExternalOrigin[mut=True]]
+    var reserved: OptPtr[NoneType, UntrackedOrigin[mut=True]]
     """Reserved for internal use."""
 
 
-def create_surface(width: c_int, height: c_int, format: PixelFormat, out ret: Ptr[Surface, ExternalOrigin[mut=True]]) raises:
+def create_surface(width: c_int, height: c_int, format: PixelFormat, out ret: Ptr[Surface, UntrackedOrigin[mut=True]]) raises:
     """Allocate a new surface with a specific pixel format.
 
     The pixels of the new surface are initialized to zero.
@@ -201,13 +220,13 @@ def create_surface(width: c_int, height: c_int, format: PixelFormat, out ret: Pt
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateSurface.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_CreateSurface", def(width: c_int, height: c_int, format: PixelFormat) thin abi("C") -> OptPtr[Surface, ExternalOrigin[mut=True]]]()(width, height, format)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_CreateSurface", def(width: c_int, height: c_int, format: PixelFormat) thin abi("C") -> OptPtr[Surface, UntrackedOrigin[mut=True]]]()(width, height, format)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
 
 
-def create_surface_from[O_pixels: Origin, //](width: c_int, height: c_int, format: PixelFormat, pixels: Ptr[NoneType, O_pixels], pitch: c_int, out ret: Ptr[Surface, ExternalOrigin[mut=True]]) raises:
+def create_surface_from[O_pixels: Origin, //](width: c_int, height: c_int, format: PixelFormat, pixels: Ptr[NoneType, O_pixels], pitch: c_int, out ret: Ptr[Surface, UntrackedOrigin[mut=True]]) raises:
     """Allocate a new surface with a specific pixel format and existing pixel
     data.
 
@@ -237,7 +256,7 @@ def create_surface_from[O_pixels: Origin, //](width: c_int, height: c_int, forma
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateSurfaceFrom.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_CreateSurfaceFrom", def(width: c_int, height: c_int, format: PixelFormat, pixels: Ptr[NoneType, O_pixels], pitch: c_int) thin abi("C") -> OptPtr[Surface, ExternalOrigin[mut=True]]]()(width, height, format, pixels, pitch)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_CreateSurfaceFrom", def(width: c_int, height: c_int, format: PixelFormat, pixels: Ptr[NoneType, O_pixels], pitch: c_int) thin abi("C") -> OptPtr[Surface, UntrackedOrigin[mut=True]]]()(width, height, format, pixels, pitch)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
@@ -349,7 +368,7 @@ def get_surface_colorspace[O_surface: Origin, //](surface: Ptr[Surface, O_surfac
     return _get_dylib_function[lib, "SDL_GetSurfaceColorspace", def(surface: Ptr[Surface, O_surface]) thin abi("C") -> Colorspace]()(surface)
 
 
-def create_surface_palette[O_surface: Origin, //](surface: Ptr[Surface, O_surface]) raises -> Ptr[Palette, ExternalOrigin[mut=True]]:
+def create_surface_palette[O_surface: Origin, //](surface: Ptr[Surface, O_surface]) raises -> Ptr[Palette, UntrackedOrigin[mut=True]]:
     """Create a palette and associate it with a surface.
 
     This function creates a palette compatible with the provided surface. The
@@ -380,7 +399,7 @@ def create_surface_palette[O_surface: Origin, //](surface: Ptr[Surface, O_surfac
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateSurfacePalette.
     """
 
-    return _get_dylib_function[lib, "SDL_CreateSurfacePalette", def(surface: Ptr[Surface, O_surface]) thin abi("C") -> OptPtr[Palette, ExternalOrigin[mut=True]]]()(surface).value()
+    return _get_dylib_function[lib, "SDL_CreateSurfacePalette", def(surface: Ptr[Surface, O_surface]) thin abi("C") -> OptPtr[Palette, UntrackedOrigin[mut=True]]]()(surface).value()
 
 
 def set_surface_palette[O_surface: Origin, O_palette: Origin, //](surface: Ptr[Surface, O_surface], palette: Ptr[Palette, O_palette]) raises:
@@ -407,7 +426,7 @@ def set_surface_palette[O_surface: Origin, O_palette: Origin, //](surface: Ptr[S
         raise Error(get_error())
 
 
-def get_surface_palette[O_surface: Origin, //](surface: Ptr[Surface, O_surface]) raises -> Ptr[Palette, ExternalOrigin[mut=True]]:
+def get_surface_palette[O_surface: Origin, //](surface: Ptr[Surface, O_surface]) raises -> Ptr[Palette, UntrackedOrigin[mut=True]]:
     """Get the palette used by a surface.
 
     Args:
@@ -423,7 +442,7 @@ def get_surface_palette[O_surface: Origin, //](surface: Ptr[Surface, O_surface])
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetSurfacePalette.
     """
 
-    return _get_dylib_function[lib, "SDL_GetSurfacePalette", def(surface: Ptr[Surface, O_surface]) thin abi("C") -> OptPtr[Palette, ExternalOrigin[mut=True]]]()(surface).value()
+    return _get_dylib_function[lib, "SDL_GetSurfacePalette", def(surface: Ptr[Surface, O_surface]) thin abi("C") -> OptPtr[Palette, UntrackedOrigin[mut=True]]]()(surface).value()
 
 
 def add_surface_alternate_image[O_surface: Origin, O_image: Origin, //](surface: Ptr[Surface, O_surface], image: Ptr[Surface, O_image]) raises:
@@ -475,7 +494,7 @@ def surface_has_alternate_images[O_surface: Origin, //](surface: Ptr[Surface, O_
     return _get_dylib_function[lib, "SDL_SurfaceHasAlternateImages", def(surface: Ptr[Surface, O_surface]) thin abi("C") -> Bool]()(surface)
 
 
-def get_surface_images[O_surface: Origin, O_count: Origin, //](surface: Ptr[Surface, O_surface], count: Ptr[c_int, O_count]) raises -> Ptr[OptPtr[Surface, ExternalOrigin[mut=True]], ExternalOrigin[mut=True]]:
+def get_surface_images[O_surface: Origin, O_count: Origin, //](surface: Ptr[Surface, O_surface], count: Ptr[c_int, O_count]) raises -> Ptr[OptPtr[Surface, UntrackedOrigin[mut=True]], UntrackedOrigin[mut=True]]:
     """Get an array including all versions of a surface.
 
     This returns all versions of a surface, with the surface being queried as
@@ -501,7 +520,7 @@ def get_surface_images[O_surface: Origin, O_count: Origin, //](surface: Ptr[Surf
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetSurfaceImages.
     """
 
-    return _get_dylib_function[lib, "SDL_GetSurfaceImages", def(surface: Ptr[Surface, O_surface], count: Ptr[c_int, O_count]) thin abi("C") -> OptPtr[OptPtr[Surface, ExternalOrigin[mut=True]], ExternalOrigin[mut=True]]]()(surface, count).value()
+    return _get_dylib_function[lib, "SDL_GetSurfaceImages", def(surface: Ptr[Surface, O_surface], count: Ptr[c_int, O_count]) thin abi("C") -> OptPtr[OptPtr[Surface, UntrackedOrigin[mut=True]], UntrackedOrigin[mut=True]]]()(surface, count).value()
 
 
 def remove_surface_alternate_images[O_surface: Origin, //](surface: Ptr[Surface, O_surface]) raises -> None:
@@ -571,7 +590,7 @@ def unlock_surface[O_surface: Origin, //](surface: Ptr[Surface, O_surface]) rais
     return _get_dylib_function[lib, "SDL_UnlockSurface", def(surface: Ptr[Surface, O_surface]) thin abi("C") -> None]()(surface)
 
 
-def load_bmp_io[O_src: Origin, //](src: Ptr[IOStream, O_src], closeio: Bool, out ret: Ptr[Surface, ExternalOrigin[mut=True]]) raises:
+def load_bmp_io[O_src: Origin, //](src: Ptr[IOStream, O_src], closeio: Bool, out ret: Ptr[Surface, UntrackedOrigin[mut=True]]) raises:
     """Load a BMP image from a seekable SDL data stream.
 
     The new surface should be freed with SDL_DestroySurface(). Not doing so
@@ -592,13 +611,13 @@ def load_bmp_io[O_src: Origin, //](src: Ptr[IOStream, O_src], closeio: Bool, out
     Docs: https://wiki.libsdl.org/SDL3/SDL_LoadBMP_IO.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_LoadBMP_IO", def(src: Ptr[IOStream, O_src], closeio: Bool) thin abi("C") -> OptPtr[Surface, ExternalOrigin[mut=True]]]()(src, closeio)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_LoadBMP_IO", def(src: Ptr[IOStream, O_src], closeio: Bool) thin abi("C") -> OptPtr[Surface, UntrackedOrigin[mut=True]]]()(src, closeio)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
 
 
-def load_bmp(var file: String, out ret: Ptr[Surface, ExternalOrigin[mut=True]]) raises:
+def load_bmp(var file: String, out ret: Ptr[Surface, UntrackedOrigin[mut=True]]) raises:
     """Load a BMP image from a file.
 
     The new surface should be freed with SDL_DestroySurface(). Not doing so
@@ -617,7 +636,7 @@ def load_bmp(var file: String, out ret: Ptr[Surface, ExternalOrigin[mut=True]]) 
     Docs: https://wiki.libsdl.org/SDL3/SDL_LoadBMP.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_LoadBMP", def(file: Ptr[mut=False, c_char, origin_of(file)]) thin abi("C") -> OptPtr[Surface, ExternalOrigin[mut=True]]]()(file.as_c_string_slice().unsafe_ptr())
+    var _ffi_ret = _get_dylib_function[lib, "SDL_LoadBMP", def(file: Ptr[mut=False, c_char, origin_of(file)]) thin abi("C") -> OptPtr[Surface, UntrackedOrigin[mut=True]]]()(file.as_c_string_slice().ptr())
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
@@ -676,7 +695,7 @@ def save_bmp[O_surface: Origin, //](surface: Ptr[Surface, O_surface], var file: 
     Docs: https://wiki.libsdl.org/SDL3/SDL_SaveBMP.
     """
 
-    var _ffi_ret = _get_dylib_function[lib, "SDL_SaveBMP", def(surface: Ptr[Surface, O_surface], file: Ptr[mut=False, c_char, origin_of(file)]) thin abi("C") -> Bool]()(surface, file.as_c_string_slice().unsafe_ptr())
+    var _ffi_ret = _get_dylib_function[lib, "SDL_SaveBMP", def(surface: Ptr[Surface, O_surface], file: Ptr[mut=False, c_char, origin_of(file)]) thin abi("C") -> Bool]()(surface, file.as_c_string_slice().ptr())
     if not _ffi_ret:
         raise Error(get_error())
 
@@ -1030,7 +1049,7 @@ def flip_surface[O_surface: Origin, //](surface: Ptr[Surface, O_surface], flip: 
         raise Error(get_error())
 
 
-def duplicate_surface[O_surface: Origin, //](surface: Ptr[Surface, O_surface], out ret: Ptr[Surface, ExternalOrigin[mut=True]]) raises:
+def duplicate_surface[O_surface: Origin, //](surface: Ptr[Surface, O_surface], out ret: Ptr[Surface, UntrackedOrigin[mut=True]]) raises:
     """Creates a new surface identical to the existing surface.
 
     If the original surface has alternate images, the new surface will have a
@@ -1051,13 +1070,13 @@ def duplicate_surface[O_surface: Origin, //](surface: Ptr[Surface, O_surface], o
     Docs: https://wiki.libsdl.org/SDL3/SDL_DuplicateSurface.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_DuplicateSurface", def(surface: Ptr[Surface, O_surface]) thin abi("C") -> OptPtr[Surface, ExternalOrigin[mut=True]]]()(surface)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_DuplicateSurface", def(surface: Ptr[Surface, O_surface]) thin abi("C") -> OptPtr[Surface, UntrackedOrigin[mut=True]]]()(surface)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
 
 
-def scale_surface[O_surface: Origin, //](surface: Ptr[Surface, O_surface], width: c_int, height: c_int, scale_mode: ScaleMode, out ret: Ptr[Surface, ExternalOrigin[mut=True]]) raises:
+def scale_surface[O_surface: Origin, //](surface: Ptr[Surface, O_surface], width: c_int, height: c_int, scale_mode: ScaleMode, out ret: Ptr[Surface, UntrackedOrigin[mut=True]]) raises:
     """Creates a new surface identical to the existing surface, scaled to the
     desired size.
 
@@ -1079,13 +1098,13 @@ def scale_surface[O_surface: Origin, //](surface: Ptr[Surface, O_surface], width
     Docs: https://wiki.libsdl.org/SDL3/SDL_ScaleSurface.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_ScaleSurface", def(surface: Ptr[Surface, O_surface], width: c_int, height: c_int, scale_mode: ScaleMode) thin abi("C") -> OptPtr[Surface, ExternalOrigin[mut=True]]]()(surface, width, height, scale_mode)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_ScaleSurface", def(surface: Ptr[Surface, O_surface], width: c_int, height: c_int, scale_mode: ScaleMode) thin abi("C") -> OptPtr[Surface, UntrackedOrigin[mut=True]]]()(surface, width, height, scale_mode)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
 
 
-def convert_surface[O_surface: Origin, //](surface: Ptr[Surface, O_surface], format: PixelFormat, out ret: Ptr[Surface, ExternalOrigin[mut=True]]) raises:
+def convert_surface[O_surface: Origin, //](surface: Ptr[Surface, O_surface], format: PixelFormat, out ret: Ptr[Surface, UntrackedOrigin[mut=True]]) raises:
     """Copy an existing surface to a new surface of the specified format.
 
     This function is used to optimize images for faster *repeat* blitting. This
@@ -1113,13 +1132,13 @@ def convert_surface[O_surface: Origin, //](surface: Ptr[Surface, O_surface], for
     Docs: https://wiki.libsdl.org/SDL3/SDL_ConvertSurface.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_ConvertSurface", def(surface: Ptr[Surface, O_surface], format: PixelFormat) thin abi("C") -> OptPtr[Surface, ExternalOrigin[mut=True]]]()(surface, format)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_ConvertSurface", def(surface: Ptr[Surface, O_surface], format: PixelFormat) thin abi("C") -> OptPtr[Surface, UntrackedOrigin[mut=True]]]()(surface, format)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
 
 
-def convert_surface_and_colorspace[O_surface: Origin, O_palette: Origin, //](surface: Ptr[Surface, O_surface], format: PixelFormat, palette: Ptr[Palette, O_palette], colorspace: Colorspace, props: PropertiesID, out ret: Ptr[Surface, ExternalOrigin[mut=True]]) raises:
+def convert_surface_and_colorspace[O_surface: Origin, O_palette: Origin, //](surface: Ptr[Surface, O_surface], format: PixelFormat, palette: Ptr[Palette, O_palette], colorspace: Colorspace, props: PropertiesID, out ret: Ptr[Surface, UntrackedOrigin[mut=True]]) raises:
     """Copy an existing surface to a new surface of the specified format and
     colorspace.
 
@@ -1147,7 +1166,7 @@ def convert_surface_and_colorspace[O_surface: Origin, O_palette: Origin, //](sur
     Docs: https://wiki.libsdl.org/SDL3/SDL_ConvertSurfaceAndColorspace.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_ConvertSurfaceAndColorspace", def(surface: Ptr[Surface, O_surface], format: PixelFormat, palette: Ptr[Palette, O_palette], colorspace: Colorspace, props: PropertiesID) thin abi("C") -> OptPtr[Surface, ExternalOrigin[mut=True]]]()(surface, format, palette, colorspace, props)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_ConvertSurfaceAndColorspace", def(surface: Ptr[Surface, O_surface], format: PixelFormat, palette: Ptr[Palette, O_palette], colorspace: Colorspace, props: PropertiesID) thin abi("C") -> OptPtr[Surface, UntrackedOrigin[mut=True]]]()(surface, format, palette, colorspace, props)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()

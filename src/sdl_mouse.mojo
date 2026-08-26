@@ -55,6 +55,19 @@ care about touch/pen separately from mouse input should filter out events
 with a `which` field of SDL_TOUCH_MOUSEID/SDL_PEN_MOUSEID.
 """
 
+from std.ffi import _get_dylib_function, c_char, c_float, c_int
+from ._core import OptPtr, Ptr, c_string, lib
+from .sdl_error import get_error
+from .sdl_surface import Surface
+from .sdl_video import Window
+
+
+from std.ffi import _get_dylib_function, c_char, c_float, c_int
+from ._core import OptPtr, Ptr, c_string, lib
+from .sdl_error import get_error
+from .sdl_surface import Surface
+from .sdl_video import Window
+
 
 struct MouseID(Intable, TrivialRegisterPassable):
     """This is a unique ID for a mouse for the time it is connected to the system,
@@ -239,7 +252,7 @@ def has_mouse() raises -> Bool:
     return _get_dylib_function[lib, "SDL_HasMouse", def() thin abi("C") -> Bool]()()
 
 
-def get_mice[O_count: Origin, //](count: Ptr[c_int, O_count], out ret: Ptr[MouseID, ExternalOrigin[mut=True]]) raises:
+def get_mice[O_count: Origin, //](count: Ptr[c_int, O_count], out ret: Ptr[MouseID, UntrackedOrigin[mut=True]]) raises:
     """Get a list of currently connected mice.
 
     Note that this will include any device or virtual driver that includes
@@ -262,13 +275,13 @@ def get_mice[O_count: Origin, //](count: Ptr[c_int, O_count], out ret: Ptr[Mouse
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetMice.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_GetMice", def(count: Ptr[c_int, O_count]) thin abi("C") -> OptPtr[MouseID, ExternalOrigin[mut=True]]]()(count)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_GetMice", def(count: Ptr[c_int, O_count]) thin abi("C") -> OptPtr[MouseID, UntrackedOrigin[mut=True]]]()(count)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
 
 
-def get_mouse_name_for_id(instance_id: MouseID, out ret: Ptr[c_char, ExternalOrigin[mut=False]]) raises:
+def get_mouse_name_for_id(instance_id: MouseID, out ret: String) raises:
     """Get the name of a mouse.
 
     This function returns "" if the mouse doesn't have a name.
@@ -286,13 +299,13 @@ def get_mouse_name_for_id(instance_id: MouseID, out ret: Ptr[c_char, ExternalOri
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetMouseNameForID.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_GetMouseNameForID", def(instance_id: MouseID) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(instance_id)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_GetMouseNameForID", def(instance_id: MouseID) thin abi("C") -> OptPtr[c_char, UntrackedOrigin[mut=False]]]()(instance_id)
     if not _ffi_ret:
         raise Error(get_error())
-    ret = _ffi_ret.value()
+    ret = c_string(_ffi_ret.value())
 
 
-def get_mouse_focus() raises -> Ptr[Window, ExternalOrigin[mut=True]]:
+def get_mouse_focus() raises -> Ptr[Window, UntrackedOrigin[mut=True]]:
     """Get the window which currently has mouse focus.
 
     Returns:
@@ -304,7 +317,7 @@ def get_mouse_focus() raises -> Ptr[Window, ExternalOrigin[mut=True]]:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetMouseFocus.
     """
 
-    return _get_dylib_function[lib, "SDL_GetMouseFocus", def() thin abi("C") -> OptPtr[Window, ExternalOrigin[mut=True]]]()().value()
+    return _get_dylib_function[lib, "SDL_GetMouseFocus", def() thin abi("C") -> OptPtr[Window, UntrackedOrigin[mut=True]]]()().value()
 
 
 def get_mouse_state[O_x: Origin, O_y: Origin, //](x: Ptr[c_float, O_x], y: Ptr[c_float, O_y]) raises -> MouseButtonFlags:
@@ -581,7 +594,7 @@ def capture_mouse(enabled: Bool) raises:
         raise Error(get_error())
 
 
-def create_cursor[O_data: Origin, O_mask: Origin, //](data: Ptr[UInt8, O_data], mask: Ptr[UInt8, O_mask], w: c_int, h: c_int, hot_x: c_int, hot_y: c_int) raises -> Ptr[Cursor, ExternalOrigin[mut=True]]:
+def create_cursor[O_data: Origin, O_mask: Origin, //](data: Ptr[UInt8, O_data], mask: Ptr[UInt8, O_mask], w: c_int, h: c_int, hot_x: c_int, hot_y: c_int) raises -> Ptr[Cursor, UntrackedOrigin[mut=True]]:
     """Create a cursor using the specified bitmap data and mask (in MSB format).
 
     `mask` has to be in MSB (Most Significant Bit) format.
@@ -625,10 +638,10 @@ def create_cursor[O_data: Origin, O_mask: Origin, //](data: Ptr[UInt8, O_data], 
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateCursor.
     """
 
-    return _get_dylib_function[lib, "SDL_CreateCursor", def(data: Ptr[UInt8, O_data], mask: Ptr[UInt8, O_mask], w: c_int, h: c_int, hot_x: c_int, hot_y: c_int) thin abi("C") -> OptPtr[Cursor, ExternalOrigin[mut=True]]]()(data, mask, w, h, hot_x, hot_y).value()
+    return _get_dylib_function[lib, "SDL_CreateCursor", def(data: Ptr[UInt8, O_data], mask: Ptr[UInt8, O_mask], w: c_int, h: c_int, hot_x: c_int, hot_y: c_int) thin abi("C") -> OptPtr[Cursor, UntrackedOrigin[mut=True]]]()(data, mask, w, h, hot_x, hot_y).value()
 
 
-def create_color_cursor[O_surface: Origin, //](surface: Ptr[Surface, O_surface], hot_x: c_int, hot_y: c_int, out ret: Ptr[Cursor, ExternalOrigin[mut=True]]) raises:
+def create_color_cursor[O_surface: Origin, //](surface: Ptr[Surface, O_surface], hot_x: c_int, hot_y: c_int, out ret: Ptr[Cursor, UntrackedOrigin[mut=True]]) raises:
     """Create a color cursor.
 
     If this function is passed a surface with alternate representations, the
@@ -656,13 +669,13 @@ def create_color_cursor[O_surface: Origin, //](surface: Ptr[Surface, O_surface],
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateColorCursor.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_CreateColorCursor", def(surface: Ptr[Surface, O_surface], hot_x: c_int, hot_y: c_int) thin abi("C") -> OptPtr[Cursor, ExternalOrigin[mut=True]]]()(surface, hot_x, hot_y)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_CreateColorCursor", def(surface: Ptr[Surface, O_surface], hot_x: c_int, hot_y: c_int) thin abi("C") -> OptPtr[Cursor, UntrackedOrigin[mut=True]]]()(surface, hot_x, hot_y)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
 
 
-def create_system_cursor(id: SystemCursor, out ret: Ptr[Cursor, ExternalOrigin[mut=True]]) raises:
+def create_system_cursor(id: SystemCursor, out ret: Ptr[Cursor, UntrackedOrigin[mut=True]]) raises:
     """Create a system cursor.
 
     Args:
@@ -678,7 +691,7 @@ def create_system_cursor(id: SystemCursor, out ret: Ptr[Cursor, ExternalOrigin[m
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateSystemCursor.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_CreateSystemCursor", def(id: SystemCursor) thin abi("C") -> OptPtr[Cursor, ExternalOrigin[mut=True]]]()(id)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_CreateSystemCursor", def(id: SystemCursor) thin abi("C") -> OptPtr[Cursor, UntrackedOrigin[mut=True]]]()(id)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
@@ -710,7 +723,7 @@ def set_cursor[O_cursor: Origin, //](cursor: Ptr[Cursor, O_cursor]) raises:
         raise Error(get_error())
 
 
-def get_cursor() raises -> Ptr[Cursor, ExternalOrigin[mut=True]]:
+def get_cursor() raises -> Ptr[Cursor, UntrackedOrigin[mut=True]]:
     """Get the active cursor.
 
     This function returns a pointer to the current cursor which is owned by the
@@ -725,10 +738,10 @@ def get_cursor() raises -> Ptr[Cursor, ExternalOrigin[mut=True]]:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetCursor.
     """
 
-    return _get_dylib_function[lib, "SDL_GetCursor", def() thin abi("C") -> OptPtr[Cursor, ExternalOrigin[mut=True]]]()().value()
+    return _get_dylib_function[lib, "SDL_GetCursor", def() thin abi("C") -> OptPtr[Cursor, UntrackedOrigin[mut=True]]]()().value()
 
 
-def get_default_cursor() raises -> Ptr[Cursor, ExternalOrigin[mut=True]]:
+def get_default_cursor() raises -> Ptr[Cursor, UntrackedOrigin[mut=True]]:
     """Get the default cursor.
 
     You do not have to call SDL_DestroyCursor() on the return value, but it is
@@ -744,7 +757,7 @@ def get_default_cursor() raises -> Ptr[Cursor, ExternalOrigin[mut=True]]:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetDefaultCursor.
     """
 
-    return _get_dylib_function[lib, "SDL_GetDefaultCursor", def() thin abi("C") -> OptPtr[Cursor, ExternalOrigin[mut=True]]]()().value()
+    return _get_dylib_function[lib, "SDL_GetDefaultCursor", def() thin abi("C") -> OptPtr[Cursor, UntrackedOrigin[mut=True]]]()().value()
 
 
 def destroy_cursor[O_cursor: Origin, //](cursor: Ptr[Cursor, O_cursor]) raises -> None:

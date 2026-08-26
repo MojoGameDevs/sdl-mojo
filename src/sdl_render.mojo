@@ -48,6 +48,29 @@ These functions must be called from the main thread. See this bug for
 details: https://github.com/libsdl-org/SDL/issues/986
 """
 
+from std.ffi import _get_dylib_function, c_char, c_double, c_float, c_int
+from ._core import OptPtr, Ptr, c_string, lib
+from .sdl_blendmode import BlendMode
+from .sdl_error import get_error
+from .sdl_events import Event
+from .sdl_pixels import FColor, PixelFormat
+from .sdl_properties import PropertiesID
+from .sdl_rect import FPoint, FRect, Rect
+from .sdl_surface import FlipMode, ScaleMode, Surface
+from .sdl_video import Window, WindowFlags
+
+
+from std.ffi import _get_dylib_function, c_char, c_double, c_float, c_int
+from ._core import OptPtr, Ptr, c_string, lib
+from .sdl_blendmode import BlendMode
+from .sdl_error import get_error
+from .sdl_events import Event
+from .sdl_pixels import FColor, PixelFormat
+from .sdl_properties import PropertiesID
+from .sdl_rect import FPoint, FRect, Rect
+from .sdl_surface import FlipMode, ScaleMode, Surface
+from .sdl_video import Window, WindowFlags
+
 
 @fieldwise_init
 struct Vertex(ImplicitlyCopyable, Movable):
@@ -181,7 +204,7 @@ def get_num_render_drivers() raises -> c_int:
     return _get_dylib_function[lib, "SDL_GetNumRenderDrivers", def() thin abi("C") -> c_int]()()
 
 
-def get_render_driver(index: c_int) raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
+def get_render_driver(index: c_int) raises -> String:
     """Use this function to get the name of a built in 2D rendering driver.
 
     The list of rendering drivers is given in the order that they are normally
@@ -206,10 +229,10 @@ def get_render_driver(index: c_int) raises -> Ptr[c_char, ExternalOrigin[mut=Fal
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetRenderDriver.
     """
 
-    return _get_dylib_function[lib, "SDL_GetRenderDriver", def(index: c_int) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(index).value()
+    return c_string(_get_dylib_function[lib, "SDL_GetRenderDriver", def(index: c_int) thin abi("C") -> OptPtr[c_char, UntrackedOrigin[mut=False]]]()(index).value())
 
 
-def create_window_and_renderer[O_window: Origin, O_renderer: Origin, //](var title: String, width: c_int, height: c_int, window_flags: WindowFlags, window: Ptr[OptPtr[Window, ExternalOrigin[mut=True]], O_window], renderer: Ptr[OptPtr[Renderer, ExternalOrigin[mut=True]], O_renderer]) raises:
+def create_window_and_renderer[O_window: Origin, O_renderer: Origin, //](var title: String, width: c_int, height: c_int, window_flags: WindowFlags, window: Ptr[OptPtr[Window, UntrackedOrigin[mut=True]], O_window], renderer: Ptr[OptPtr[Renderer, UntrackedOrigin[mut=True]], O_renderer]) raises:
     """Create a window and default renderer.
 
     Args:
@@ -231,12 +254,12 @@ def create_window_and_renderer[O_window: Origin, O_renderer: Origin, //](var tit
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateWindowAndRenderer.
     """
 
-    var _ffi_ret = _get_dylib_function[lib, "SDL_CreateWindowAndRenderer", def(title: Ptr[mut=False, c_char, origin_of(title)], width: c_int, height: c_int, window_flags: WindowFlags, window: Ptr[OptPtr[Window, ExternalOrigin[mut=True]], O_window], renderer: Ptr[OptPtr[Renderer, ExternalOrigin[mut=True]], O_renderer]) thin abi("C") -> Bool]()(title.as_c_string_slice().unsafe_ptr(), width, height, window_flags, window, renderer)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_CreateWindowAndRenderer", def(title: Ptr[mut=False, c_char, origin_of(title)], width: c_int, height: c_int, window_flags: WindowFlags, window: Ptr[OptPtr[Window, UntrackedOrigin[mut=True]], O_window], renderer: Ptr[OptPtr[Renderer, UntrackedOrigin[mut=True]], O_renderer]) thin abi("C") -> Bool]()(title.as_c_string_slice().ptr(), width, height, window_flags, window, renderer)
     if not _ffi_ret:
         raise Error(get_error())
 
 
-def create_renderer[O_window: Origin, //](window: Ptr[Window, O_window], var name: String) raises -> Ptr[Renderer, ExternalOrigin[mut=True]]:
+def create_renderer[O_window: Origin, //](window: Ptr[Window, O_window], var name: String) raises -> Ptr[Renderer, UntrackedOrigin[mut=True]]:
     """Create a 2D rendering context for a window.
 
     If you want a specific renderer, you can specify its name here. A list of
@@ -267,10 +290,10 @@ def create_renderer[O_window: Origin, //](window: Ptr[Window, O_window], var nam
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateRenderer.
     """
 
-    return _get_dylib_function[lib, "SDL_CreateRenderer", def(window: Ptr[Window, O_window], name: Ptr[mut=False, c_char, origin_of(name)]) thin abi("C") -> OptPtr[Renderer, ExternalOrigin[mut=True]]]()(window, name.as_c_string_slice().unsafe_ptr()).value()
+    return _get_dylib_function[lib, "SDL_CreateRenderer", def(window: Ptr[Window, O_window], name: Ptr[mut=False, c_char, origin_of(name)]) thin abi("C") -> OptPtr[Renderer, UntrackedOrigin[mut=True]]]()(window, name.as_c_string_slice().ptr()).value()
 
 
-def create_renderer_with_properties(props: PropertiesID) raises -> Ptr[Renderer, ExternalOrigin[mut=True]]:
+def create_renderer_with_properties(props: PropertiesID) raises -> Ptr[Renderer, UntrackedOrigin[mut=True]]:
     """Create a 2D rendering context for a window, with the specified properties.
 
     These are the supported properties:
@@ -320,10 +343,10 @@ def create_renderer_with_properties(props: PropertiesID) raises -> Ptr[Renderer,
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateRendererWithProperties.
     """
 
-    return _get_dylib_function[lib, "SDL_CreateRendererWithProperties", def(props: PropertiesID) thin abi("C") -> OptPtr[Renderer, ExternalOrigin[mut=True]]]()(props).value()
+    return _get_dylib_function[lib, "SDL_CreateRendererWithProperties", def(props: PropertiesID) thin abi("C") -> OptPtr[Renderer, UntrackedOrigin[mut=True]]]()(props).value()
 
 
-def create_software_renderer[O_surface: Origin, //](surface: Ptr[Surface, O_surface]) raises -> Ptr[Renderer, ExternalOrigin[mut=True]]:
+def create_software_renderer[O_surface: Origin, //](surface: Ptr[Surface, O_surface]) raises -> Ptr[Renderer, UntrackedOrigin[mut=True]]:
     """Create a 2D software rendering context for a surface.
 
     Two other API which can be used to create SDL_Renderer:
@@ -345,10 +368,10 @@ def create_software_renderer[O_surface: Origin, //](surface: Ptr[Surface, O_surf
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateSoftwareRenderer.
     """
 
-    return _get_dylib_function[lib, "SDL_CreateSoftwareRenderer", def(surface: Ptr[Surface, O_surface]) thin abi("C") -> OptPtr[Renderer, ExternalOrigin[mut=True]]]()(surface).value()
+    return _get_dylib_function[lib, "SDL_CreateSoftwareRenderer", def(surface: Ptr[Surface, O_surface]) thin abi("C") -> OptPtr[Renderer, UntrackedOrigin[mut=True]]]()(surface).value()
 
 
-def get_renderer[O_window: Origin, //](window: Ptr[Window, O_window], out ret: Ptr[Renderer, ExternalOrigin[mut=True]]) raises:
+def get_renderer[O_window: Origin, //](window: Ptr[Window, O_window], out ret: Ptr[Renderer, UntrackedOrigin[mut=True]]) raises:
     """Get the renderer associated with a window.
 
     Args:
@@ -364,13 +387,13 @@ def get_renderer[O_window: Origin, //](window: Ptr[Window, O_window], out ret: P
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetRenderer.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_GetRenderer", def(window: Ptr[Window, O_window]) thin abi("C") -> OptPtr[Renderer, ExternalOrigin[mut=True]]]()(window)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_GetRenderer", def(window: Ptr[Window, O_window]) thin abi("C") -> OptPtr[Renderer, UntrackedOrigin[mut=True]]]()(window)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
 
 
-def get_render_window[O_renderer: Origin, //](renderer: Ptr[Renderer, O_renderer], out ret: Ptr[Window, ExternalOrigin[mut=True]]) raises:
+def get_render_window[O_renderer: Origin, //](renderer: Ptr[Renderer, O_renderer], out ret: Ptr[Window, UntrackedOrigin[mut=True]]) raises:
     """Get the window associated with a renderer.
 
     Args:
@@ -386,13 +409,13 @@ def get_render_window[O_renderer: Origin, //](renderer: Ptr[Renderer, O_renderer
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetRenderWindow.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_GetRenderWindow", def(renderer: Ptr[Renderer, O_renderer]) thin abi("C") -> OptPtr[Window, ExternalOrigin[mut=True]]]()(renderer)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_GetRenderWindow", def(renderer: Ptr[Renderer, O_renderer]) thin abi("C") -> OptPtr[Window, UntrackedOrigin[mut=True]]]()(renderer)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
 
 
-def get_renderer_name[O_renderer: Origin, //](renderer: Ptr[Renderer, O_renderer], out ret: Ptr[c_char, ExternalOrigin[mut=False]]) raises:
+def get_renderer_name[O_renderer: Origin, //](renderer: Ptr[Renderer, O_renderer], out ret: String) raises:
     """Get the name of a renderer.
 
     Args:
@@ -408,10 +431,10 @@ def get_renderer_name[O_renderer: Origin, //](renderer: Ptr[Renderer, O_renderer
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetRendererName.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_GetRendererName", def(renderer: Ptr[Renderer, O_renderer]) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(renderer)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_GetRendererName", def(renderer: Ptr[Renderer, O_renderer]) thin abi("C") -> OptPtr[c_char, UntrackedOrigin[mut=False]]]()(renderer)
     if not _ffi_ret:
         raise Error(get_error())
-    ret = _ffi_ret.value()
+    ret = c_string(_ffi_ret.value())
 
 
 def get_renderer_properties[O_renderer: Origin, //](renderer: Ptr[Renderer, O_renderer]) raises -> PropertiesID:
@@ -564,7 +587,7 @@ def get_current_render_output_size[O_renderer: Origin, O_w: Origin, O_h: Origin,
         raise Error(get_error())
 
 
-def create_texture[O_renderer: Origin, //](renderer: Ptr[Renderer, O_renderer], format: PixelFormat, access: TextureAccess, w: c_int, h: c_int, out ret: Ptr[Texture, ExternalOrigin[mut=True]]) raises:
+def create_texture[O_renderer: Origin, //](renderer: Ptr[Renderer, O_renderer], format: PixelFormat, access: TextureAccess, w: c_int, h: c_int, out ret: Ptr[Texture, UntrackedOrigin[mut=True]]) raises:
     """Create a texture for a rendering context.
 
     The contents of a texture when first created are not defined.
@@ -586,13 +609,13 @@ def create_texture[O_renderer: Origin, //](renderer: Ptr[Renderer, O_renderer], 
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateTexture.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_CreateTexture", def(renderer: Ptr[Renderer, O_renderer], format: PixelFormat, access: TextureAccess, w: c_int, h: c_int) thin abi("C") -> OptPtr[Texture, ExternalOrigin[mut=True]]]()(renderer, format, access, w, h)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_CreateTexture", def(renderer: Ptr[Renderer, O_renderer], format: PixelFormat, access: TextureAccess, w: c_int, h: c_int) thin abi("C") -> OptPtr[Texture, UntrackedOrigin[mut=True]]]()(renderer, format, access, w, h)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
 
 
-def create_texture_from_surface[O_renderer: Origin, O_surface: Origin, //](renderer: Ptr[Renderer, O_renderer], surface: Ptr[Surface, O_surface], out ret: Ptr[Texture, ExternalOrigin[mut=True]]) raises:
+def create_texture_from_surface[O_renderer: Origin, O_surface: Origin, //](renderer: Ptr[Renderer, O_renderer], surface: Ptr[Surface, O_surface], out ret: Ptr[Texture, UntrackedOrigin[mut=True]]) raises:
     """Create a texture from an existing surface.
 
     The surface is not modified or freed by this function.
@@ -619,13 +642,13 @@ def create_texture_from_surface[O_renderer: Origin, O_surface: Origin, //](rende
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateTextureFromSurface.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_CreateTextureFromSurface", def(renderer: Ptr[Renderer, O_renderer], surface: Ptr[Surface, O_surface]) thin abi("C") -> OptPtr[Texture, ExternalOrigin[mut=True]]]()(renderer, surface)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_CreateTextureFromSurface", def(renderer: Ptr[Renderer, O_renderer], surface: Ptr[Surface, O_surface]) thin abi("C") -> OptPtr[Texture, UntrackedOrigin[mut=True]]]()(renderer, surface)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
 
 
-def create_texture_with_properties[O_renderer: Origin, //](renderer: Ptr[Renderer, O_renderer], props: PropertiesID, out ret: Ptr[Texture, ExternalOrigin[mut=True]]) raises:
+def create_texture_with_properties[O_renderer: Origin, //](renderer: Ptr[Renderer, O_renderer], props: PropertiesID, out ret: Ptr[Texture, UntrackedOrigin[mut=True]]) raises:
     """Create a texture for a rendering context with the specified properties.
 
     These are the supported properties:
@@ -733,7 +756,7 @@ def create_texture_with_properties[O_renderer: Origin, //](renderer: Ptr[Rendere
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreateTextureWithProperties.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_CreateTextureWithProperties", def(renderer: Ptr[Renderer, O_renderer], props: PropertiesID) thin abi("C") -> OptPtr[Texture, ExternalOrigin[mut=True]]]()(renderer, props)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_CreateTextureWithProperties", def(renderer: Ptr[Renderer, O_renderer], props: PropertiesID) thin abi("C") -> OptPtr[Texture, UntrackedOrigin[mut=True]]]()(renderer, props)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
@@ -833,7 +856,7 @@ def get_texture_properties[O_texture: Origin, //](texture: Ptr[Texture, O_textur
     return _get_dylib_function[lib, "SDL_GetTextureProperties", def(texture: Ptr[Texture, O_texture]) thin abi("C") -> PropertiesID]()(texture)
 
 
-def get_renderer_from_texture[O_texture: Origin, //](texture: Ptr[Texture, O_texture]) raises -> Ptr[Renderer, ExternalOrigin[mut=True]]:
+def get_renderer_from_texture[O_texture: Origin, //](texture: Ptr[Texture, O_texture]) raises -> Ptr[Renderer, UntrackedOrigin[mut=True]]:
     """Get the renderer that created an SDL_Texture.
 
     Args:
@@ -849,7 +872,7 @@ def get_renderer_from_texture[O_texture: Origin, //](texture: Ptr[Texture, O_tex
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetRendererFromTexture.
     """
 
-    return _get_dylib_function[lib, "SDL_GetRendererFromTexture", def(texture: Ptr[Texture, O_texture]) thin abi("C") -> OptPtr[Renderer, ExternalOrigin[mut=True]]]()(texture).value()
+    return _get_dylib_function[lib, "SDL_GetRendererFromTexture", def(texture: Ptr[Texture, O_texture]) thin abi("C") -> OptPtr[Renderer, UntrackedOrigin[mut=True]]]()(texture).value()
 
 
 def get_texture_size[O_texture: Origin, O_w: Origin, O_h: Origin, //](texture: Ptr[Texture, O_texture], w: Ptr[c_float, O_w], h: Ptr[c_float, O_h]) raises:
@@ -1297,7 +1320,7 @@ def update_nv_texture[O_texture: Origin, O_rect: Origin, O_y_plane: Origin, O_uv
         raise Error(get_error())
 
 
-def lock_texture[O_texture: Origin, O_rect: Origin, O_pixels: Origin, O_pitch: Origin, //](texture: Ptr[Texture, O_texture], rect: Ptr[Rect, O_rect], pixels: Ptr[OptPtr[NoneType, ExternalOrigin[mut=True]], O_pixels], pitch: Ptr[c_int, O_pitch]) raises:
+def lock_texture[O_texture: Origin, O_rect: Origin, O_pixels: Origin, O_pitch: Origin, //](texture: Ptr[Texture, O_texture], rect: Ptr[Rect, O_rect], pixels: Ptr[OptPtr[NoneType, UntrackedOrigin[mut=True]], O_pixels], pitch: Ptr[c_int, O_pitch]) raises:
     """Lock a portion of the texture for **write-only** pixel access.
 
     As an optimization, the pixels made available for editing don't necessarily
@@ -1329,12 +1352,12 @@ def lock_texture[O_texture: Origin, O_rect: Origin, O_pixels: Origin, O_pitch: O
     Docs: https://wiki.libsdl.org/SDL3/SDL_LockTexture.
     """
 
-    var _ffi_ret = _get_dylib_function[lib, "SDL_LockTexture", def(texture: Ptr[Texture, O_texture], rect: Ptr[Rect, O_rect], pixels: Ptr[OptPtr[NoneType, ExternalOrigin[mut=True]], O_pixels], pitch: Ptr[c_int, O_pitch]) thin abi("C") -> Bool]()(texture, rect, pixels, pitch)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_LockTexture", def(texture: Ptr[Texture, O_texture], rect: Ptr[Rect, O_rect], pixels: Ptr[OptPtr[NoneType, UntrackedOrigin[mut=True]], O_pixels], pitch: Ptr[c_int, O_pitch]) thin abi("C") -> Bool]()(texture, rect, pixels, pitch)
     if not _ffi_ret:
         raise Error(get_error())
 
 
-def lock_texture_to_surface[O_texture: Origin, O_rect: Origin, O_surface: Origin, //](texture: Ptr[Texture, O_texture], rect: Ptr[Rect, O_rect], surface: Ptr[OptPtr[Surface, ExternalOrigin[mut=True]], O_surface]) raises:
+def lock_texture_to_surface[O_texture: Origin, O_rect: Origin, O_surface: Origin, //](texture: Ptr[Texture, O_texture], rect: Ptr[Rect, O_rect], surface: Ptr[OptPtr[Surface, UntrackedOrigin[mut=True]], O_surface]) raises:
     """Lock a portion of the texture for **write-only** pixel access, and expose
     it as a SDL surface.
 
@@ -1370,7 +1393,7 @@ def lock_texture_to_surface[O_texture: Origin, O_rect: Origin, O_surface: Origin
     Docs: https://wiki.libsdl.org/SDL3/SDL_LockTextureToSurface.
     """
 
-    var _ffi_ret = _get_dylib_function[lib, "SDL_LockTextureToSurface", def(texture: Ptr[Texture, O_texture], rect: Ptr[Rect, O_rect], surface: Ptr[OptPtr[Surface, ExternalOrigin[mut=True]], O_surface]) thin abi("C") -> Bool]()(texture, rect, surface)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_LockTextureToSurface", def(texture: Ptr[Texture, O_texture], rect: Ptr[Rect, O_rect], surface: Ptr[OptPtr[Surface, UntrackedOrigin[mut=True]], O_surface]) thin abi("C") -> Bool]()(texture, rect, surface)
     if not _ffi_ret:
         raise Error(get_error())
 
@@ -1431,7 +1454,7 @@ def set_render_target[O_renderer: Origin, O_texture: Origin, //](renderer: Ptr[R
         raise Error(get_error())
 
 
-def get_render_target[O_renderer: Origin, //](renderer: Ptr[Renderer, O_renderer]) raises -> Ptr[Texture, ExternalOrigin[mut=True]]:
+def get_render_target[O_renderer: Origin, //](renderer: Ptr[Renderer, O_renderer]) raises -> Ptr[Texture, UntrackedOrigin[mut=True]]:
     """Get the current render target.
 
     The default render target is the window for which the renderer was created,
@@ -1449,7 +1472,7 @@ def get_render_target[O_renderer: Origin, //](renderer: Ptr[Renderer, O_renderer
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetRenderTarget.
     """
 
-    return _get_dylib_function[lib, "SDL_GetRenderTarget", def(renderer: Ptr[Renderer, O_renderer]) thin abi("C") -> OptPtr[Texture, ExternalOrigin[mut=True]]]()(renderer).value()
+    return _get_dylib_function[lib, "SDL_GetRenderTarget", def(renderer: Ptr[Renderer, O_renderer]) thin abi("C") -> OptPtr[Texture, UntrackedOrigin[mut=True]]]()(renderer).value()
 
 
 def set_render_logical_presentation[O_renderer: Origin, //](renderer: Ptr[Renderer, O_renderer], w: c_int, h: c_int, mode: RendererLogicalPresentation) raises:
@@ -2591,7 +2614,7 @@ def render_geometry_raw[O_renderer: Origin, O_texture: Origin, O_xy: Origin, O_c
         raise Error(get_error())
 
 
-def render_read_pixels[O_renderer: Origin, O_rect: Origin, //](renderer: Ptr[Renderer, O_renderer], rect: Ptr[Rect, O_rect], out ret: Ptr[Surface, ExternalOrigin[mut=True]]) raises:
+def render_read_pixels[O_renderer: Origin, O_rect: Origin, //](renderer: Ptr[Renderer, O_renderer], rect: Ptr[Rect, O_rect], out ret: Ptr[Surface, UntrackedOrigin[mut=True]]) raises:
     """Read pixels from the current rendering target.
 
     The returned surface contains pixels inside the desired area clipped to the
@@ -2621,7 +2644,7 @@ def render_read_pixels[O_renderer: Origin, O_rect: Origin, //](renderer: Ptr[Ren
     Docs: https://wiki.libsdl.org/SDL3/SDL_RenderReadPixels.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_RenderReadPixels", def(renderer: Ptr[Renderer, O_renderer], rect: Ptr[Rect, O_rect]) thin abi("C") -> OptPtr[Surface, ExternalOrigin[mut=True]]]()(renderer, rect)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_RenderReadPixels", def(renderer: Ptr[Renderer, O_renderer], rect: Ptr[Rect, O_rect]) thin abi("C") -> OptPtr[Surface, UntrackedOrigin[mut=True]]]()(renderer, rect)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
@@ -2749,7 +2772,7 @@ def flush_renderer[O_renderer: Origin, //](renderer: Ptr[Renderer, O_renderer]) 
         raise Error(get_error())
 
 
-def get_render_metal_layer[O_renderer: Origin, //](renderer: Ptr[Renderer, O_renderer]) raises -> Ptr[NoneType, ExternalOrigin[mut=True]]:
+def get_render_metal_layer[O_renderer: Origin, //](renderer: Ptr[Renderer, O_renderer]) raises -> Ptr[NoneType, UntrackedOrigin[mut=True]]:
     """Get the CAMetalLayer associated with the given Metal renderer.
 
     This function returns `void *`, so SDL doesn't have to include Metal's
@@ -2768,10 +2791,10 @@ def get_render_metal_layer[O_renderer: Origin, //](renderer: Ptr[Renderer, O_ren
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetRenderMetalLayer.
     """
 
-    return _get_dylib_function[lib, "SDL_GetRenderMetalLayer", def(renderer: Ptr[Renderer, O_renderer]) thin abi("C") -> OptPtr[NoneType, ExternalOrigin[mut=True]]]()(renderer).value()
+    return _get_dylib_function[lib, "SDL_GetRenderMetalLayer", def(renderer: Ptr[Renderer, O_renderer]) thin abi("C") -> OptPtr[NoneType, UntrackedOrigin[mut=True]]]()(renderer).value()
 
 
-def get_render_metal_command_encoder[O_renderer: Origin, //](renderer: Ptr[Renderer, O_renderer]) raises -> Ptr[NoneType, ExternalOrigin[mut=True]]:
+def get_render_metal_command_encoder[O_renderer: Origin, //](renderer: Ptr[Renderer, O_renderer]) raises -> Ptr[NoneType, UntrackedOrigin[mut=True]]:
     """Get the Metal command encoder for the current frame.
 
     This function returns `void *`, so SDL doesn't have to include Metal's
@@ -2795,7 +2818,7 @@ def get_render_metal_command_encoder[O_renderer: Origin, //](renderer: Ptr[Rende
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetRenderMetalCommandEncoder.
     """
 
-    return _get_dylib_function[lib, "SDL_GetRenderMetalCommandEncoder", def(renderer: Ptr[Renderer, O_renderer]) thin abi("C") -> OptPtr[NoneType, ExternalOrigin[mut=True]]]()(renderer).value()
+    return _get_dylib_function[lib, "SDL_GetRenderMetalCommandEncoder", def(renderer: Ptr[Renderer, O_renderer]) thin abi("C") -> OptPtr[NoneType, UntrackedOrigin[mut=True]]]()(renderer).value()
 
 
 def add_vulkan_render_semaphores[O_renderer: Origin, //](renderer: Ptr[Renderer, O_renderer], wait_stage_mask: UInt32, wait_semaphore: Int64, signal_semaphore: Int64) raises:
@@ -2931,6 +2954,6 @@ def render_debug_text[O_renderer: Origin, //](renderer: Ptr[Renderer, O_renderer
     Docs: https://wiki.libsdl.org/SDL3/SDL_RenderDebugText.
     """
 
-    var _ffi_ret = _get_dylib_function[lib, "SDL_RenderDebugText", def(renderer: Ptr[Renderer, O_renderer], x: c_float, y: c_float, str: Ptr[mut=False, c_char, origin_of(str)]) thin abi("C") -> Bool]()(renderer, x, y, str.as_c_string_slice().unsafe_ptr())
+    var _ffi_ret = _get_dylib_function[lib, "SDL_RenderDebugText", def(renderer: Ptr[Renderer, O_renderer], x: c_float, y: c_float, str: Ptr[mut=False, c_char, origin_of(str)]) thin abi("C") -> Bool]()(renderer, x, y, str.as_c_string_slice().ptr())
     if not _ffi_ret:
         raise Error(get_error())

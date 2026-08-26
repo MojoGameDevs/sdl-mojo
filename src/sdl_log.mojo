@@ -68,6 +68,15 @@ Each log call is atomic, so you won't see log messages cut off one another
 when logging from multiple threads.
 """
 
+from std.ffi import _get_dylib_function, c_char, c_int
+from ._core import OptPtr, Ptr, lib
+from .sdl_error import get_error
+
+
+from std.ffi import _get_dylib_function, c_char, c_int
+from ._core import OptPtr, Ptr, lib
+from .sdl_error import get_error
+
 
 struct LogCategory(Indexer, Intable, TrivialRegisterPassable):
     """The predefined log categories.
@@ -249,12 +258,12 @@ def set_log_priority_prefix(priority: LogPriority, var prefix: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetLogPriorityPrefix.
     """
 
-    var _ffi_ret = _get_dylib_function[lib, "SDL_SetLogPriorityPrefix", def(priority: LogPriority, prefix: Ptr[mut=False, c_char, origin_of(prefix)]) thin abi("C") -> Bool]()(priority, prefix.as_c_string_slice().unsafe_ptr())
+    var _ffi_ret = _get_dylib_function[lib, "SDL_SetLogPriorityPrefix", def(priority: LogPriority, prefix: Ptr[mut=False, c_char, origin_of(prefix)]) thin abi("C") -> Bool]()(priority, prefix.as_c_string_slice().ptr())
     if not _ffi_ret:
         raise Error(get_error())
 
 
-comptime LogOutputFunction = def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]], category: c_int, priority: LogPriority, message: OptPtr[c_char, ExternalOrigin[mut=False]]) thin abi("C") -> None
+comptime LogOutputFunction = def(userdata: OptPtr[NoneType, UntrackedOrigin[mut=True]], category: c_int, priority: LogPriority, message: OptPtr[c_char, UntrackedOrigin[mut=False]]) thin abi("C") -> None
 """The prototype for the log output callback function.
     
     This function is called by SDL when there is new text to be logged. A mutex
@@ -287,7 +296,7 @@ def get_default_log_output_function() raises -> LogOutputFunction:
     return _get_dylib_function[lib, "SDL_GetDefaultLogOutputFunction", def() thin abi("C") -> LogOutputFunction]()()
 
 
-def get_log_output_function[O_callback: Origin, O_userdata: Origin, //](callback: Ptr[LogOutputFunction, O_callback], userdata: Ptr[OptPtr[NoneType, ExternalOrigin[mut=True]], O_userdata]) raises -> None:
+def get_log_output_function[O_callback: Origin, O_userdata: Origin, //](callback: Ptr[LogOutputFunction, O_callback], userdata: Ptr[OptPtr[NoneType, UntrackedOrigin[mut=True]], O_userdata]) raises -> None:
     """Get the current log output function.
 
     Args:
@@ -302,7 +311,7 @@ def get_log_output_function[O_callback: Origin, O_userdata: Origin, //](callback
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetLogOutputFunction.
     """
 
-    return _get_dylib_function[lib, "SDL_GetLogOutputFunction", def(callback: Ptr[LogOutputFunction, O_callback], userdata: Ptr[OptPtr[NoneType, ExternalOrigin[mut=True]], O_userdata]) thin abi("C") -> None]()(callback, userdata)
+    return _get_dylib_function[lib, "SDL_GetLogOutputFunction", def(callback: Ptr[LogOutputFunction, O_callback], userdata: Ptr[OptPtr[NoneType, UntrackedOrigin[mut=True]], O_userdata]) thin abi("C") -> None]()(callback, userdata)
 
 
 def set_log_output_function[O_userdata: Origin, //](callback: LogOutputFunction, userdata: Ptr[NoneType, O_userdata]) raises -> None:

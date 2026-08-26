@@ -17,14 +17,14 @@ def main() raises:
     comptime screen_height = 480
     sdl.init(InitFlags.INIT_VIDEO | InitFlags.INIT_AUDIO | InitFlags.INIT_EVENTS | InitFlags.INIT_JOYSTICK | InitFlags.INIT_GAMEPAD)
 
-    var window = OptPtr[sdl.Window, MutExternalOrigin]()
-    var renderer_empty = OptPtr[sdl.Renderer, MutExternalOrigin]()
+    var window = OptPtr[sdl.Window, MutUntrackedOrigin]()
+    var renderer_empty = OptPtr[sdl.Renderer, MutUntrackedOrigin]()
     sdl.create_window_and_renderer("sdl3 test", screen_width, screen_height, sdl.WindowFlags(0), Ptr(to=window), Ptr(to=renderer_empty))
-    renderer = renderer_empty.value()
+    var renderer = renderer_empty.value()
 
     var running = True
     var numkeys = Int32()
-    var key_state = Span(ptr=sdl.get_keyboard_state(Ptr(to=numkeys)), length=Int(numkeys))
+    var key_state = Span(unsafe_ptr=sdl.get_keyboard_state(Ptr(to=numkeys)), length=Int(numkeys))
     var rect = sdl.FRect(0, 0, 100, 100)
     var thing = sdl.FRect((screen_width / Float32(2)) - 50, (screen_height / Float32(2)) - 50, 100, 100)
     var ticks = monotonic()
@@ -32,8 +32,8 @@ def main() raises:
 
     while running:
         var event = sdl.Event(UInt32(0))
-        while sdl.poll_event(UnsafePointer(to=event)):
-            event_type = sdl.EventType(Int(event.unsafe_get[sdl.CommonEvent]().type))
+        while sdl.poll_event(Ptr(to=event)):
+            var event_type = sdl.EventType(Int(event.unsafe_get[sdl.CommonEvent]().type))
             if event_type == sdl.EventType.EVENT_QUIT:
                 running = False
             elif event_type == sdl.EventType.EVENT_MOUSE_MOTION:
@@ -69,11 +69,11 @@ def main() raises:
             acc.y += 1
         if key_state[sdl.Scancode.SCANCODE_D]:
             acc.x += 1
-        mag = sqrt(acc.x*acc.x + acc.y*acc.y) or 1
+        var mag = sqrt(acc.x*acc.x + acc.y*acc.y) or 1
         thing.x += (acc.x / mag) * delta_time
         thing.y += (acc.y / mag) * delta_time
 
-        zero = Float32(0.0)
+        var zero = Float32(0.0)
         thing.x = min(max(zero, thing.x), screen_width - thing.w)
         thing.y = min(max(zero, thing.y), screen_height - thing.h)
         rect.x = min(max(zero, rect.x), screen_width - rect.w)
@@ -87,7 +87,7 @@ def main() raises:
         sdl.render_fill_rect(renderer, Ptr(to=thing))
         sdl.render_present(renderer)
 
-        new_ticks = monotonic()
+        var new_ticks = monotonic()
         delta_time = Float32()
         while delta_time < 0.01:
             new_ticks = monotonic()

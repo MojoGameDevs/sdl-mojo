@@ -66,6 +66,21 @@ drop the first several frames (if not the first several _seconds_ worth of
 frames!) before using images from a camera.
 """
 
+from std.ffi import _get_dylib_function, c_char, c_int
+from ._core import OptPtr, Ptr, c_string, lib
+from .sdl_error import get_error
+from .sdl_pixels import Colorspace, PixelFormat
+from .sdl_properties import PropertiesID
+from .sdl_surface import Surface
+
+
+from std.ffi import _get_dylib_function, c_char, c_int
+from ._core import OptPtr, Ptr, c_string, lib
+from .sdl_error import get_error
+from .sdl_pixels import Colorspace, PixelFormat
+from .sdl_properties import PropertiesID
+from .sdl_surface import Surface
+
 
 struct CameraID(Intable, TrivialRegisterPassable):
     """This is a unique ID for a camera device for the time it is connected to the
@@ -181,7 +196,7 @@ def get_num_camera_drivers() raises -> c_int:
     return _get_dylib_function[lib, "SDL_GetNumCameraDrivers", def() thin abi("C") -> c_int]()()
 
 
-def get_camera_driver(index: c_int) raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
+def get_camera_driver(index: c_int) raises -> String:
     """Use this function to get the name of a built in camera driver.
 
     The list of camera drivers is given in the order that they are normally
@@ -206,10 +221,10 @@ def get_camera_driver(index: c_int) raises -> Ptr[c_char, ExternalOrigin[mut=Fal
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetCameraDriver.
     """
 
-    return _get_dylib_function[lib, "SDL_GetCameraDriver", def(index: c_int) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(index).value()
+    return c_string(_get_dylib_function[lib, "SDL_GetCameraDriver", def(index: c_int) thin abi("C") -> OptPtr[c_char, UntrackedOrigin[mut=False]]]()(index).value())
 
 
-def get_current_camera_driver() raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
+def get_current_camera_driver() raises -> String:
     """Get the name of the current camera driver.
 
     The names of drivers are all simple, low-ASCII identifiers, like "v4l2",
@@ -226,10 +241,10 @@ def get_current_camera_driver() raises -> Ptr[c_char, ExternalOrigin[mut=False]]
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetCurrentCameraDriver.
     """
 
-    return _get_dylib_function[lib, "SDL_GetCurrentCameraDriver", def() thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()().value()
+    return c_string(_get_dylib_function[lib, "SDL_GetCurrentCameraDriver", def() thin abi("C") -> OptPtr[c_char, UntrackedOrigin[mut=False]]]()().value())
 
 
-def get_cameras[O_count: Origin, //](count: Ptr[c_int, O_count], out ret: Ptr[CameraID, ExternalOrigin[mut=True]]) raises:
+def get_cameras[O_count: Origin, //](count: Ptr[c_int, O_count], out ret: Ptr[CameraID, UntrackedOrigin[mut=True]]) raises:
     """Get a list of currently connected camera devices.
 
     Args:
@@ -247,13 +262,13 @@ def get_cameras[O_count: Origin, //](count: Ptr[c_int, O_count], out ret: Ptr[Ca
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetCameras.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_GetCameras", def(count: Ptr[c_int, O_count]) thin abi("C") -> OptPtr[CameraID, ExternalOrigin[mut=True]]]()(count)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_GetCameras", def(count: Ptr[c_int, O_count]) thin abi("C") -> OptPtr[CameraID, UntrackedOrigin[mut=True]]]()(count)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
 
 
-def get_camera_supported_formats[O_count: Origin, //](instance_id: CameraID, count: Ptr[c_int, O_count]) raises -> Ptr[OptPtr[CameraSpec, ExternalOrigin[mut=True]], ExternalOrigin[mut=True]]:
+def get_camera_supported_formats[O_count: Origin, //](instance_id: CameraID, count: Ptr[c_int, O_count]) raises -> Ptr[OptPtr[CameraSpec, UntrackedOrigin[mut=True]], UntrackedOrigin[mut=True]]:
     """Get the list of native formats/sizes a camera supports.
 
     This returns a list of all formats and frame sizes that a specific camera
@@ -292,10 +307,10 @@ def get_camera_supported_formats[O_count: Origin, //](instance_id: CameraID, cou
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetCameraSupportedFormats.
     """
 
-    return _get_dylib_function[lib, "SDL_GetCameraSupportedFormats", def(instance_id: CameraID, count: Ptr[c_int, O_count]) thin abi("C") -> OptPtr[OptPtr[CameraSpec, ExternalOrigin[mut=True]], ExternalOrigin[mut=True]]]()(instance_id, count).value()
+    return _get_dylib_function[lib, "SDL_GetCameraSupportedFormats", def(instance_id: CameraID, count: Ptr[c_int, O_count]) thin abi("C") -> OptPtr[OptPtr[CameraSpec, UntrackedOrigin[mut=True]], UntrackedOrigin[mut=True]]]()(instance_id, count).value()
 
 
-def get_camera_name(instance_id: CameraID, out ret: Ptr[c_char, ExternalOrigin[mut=False]]) raises:
+def get_camera_name(instance_id: CameraID, out ret: String) raises:
     """Get the human-readable device name for a camera.
 
     Args:
@@ -311,10 +326,10 @@ def get_camera_name(instance_id: CameraID, out ret: Ptr[c_char, ExternalOrigin[m
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetCameraName.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_GetCameraName", def(instance_id: CameraID) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(instance_id)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_GetCameraName", def(instance_id: CameraID) thin abi("C") -> OptPtr[c_char, UntrackedOrigin[mut=False]]]()(instance_id)
     if not _ffi_ret:
         raise Error(get_error())
-    ret = _ffi_ret.value()
+    ret = c_string(_ffi_ret.value())
 
 
 def get_camera_position(instance_id: CameraID) raises -> CameraPosition:
@@ -340,7 +355,7 @@ def get_camera_position(instance_id: CameraID) raises -> CameraPosition:
     return _get_dylib_function[lib, "SDL_GetCameraPosition", def(instance_id: CameraID) thin abi("C") -> CameraPosition]()(instance_id)
 
 
-def open_camera[O_spec: Origin, //](instance_id: CameraID, spec: Ptr[CameraSpec, O_spec], out ret: Ptr[Camera, ExternalOrigin[mut=True]]) raises:
+def open_camera[O_spec: Origin, //](instance_id: CameraID, spec: Ptr[CameraSpec, O_spec], out ret: Ptr[Camera, UntrackedOrigin[mut=True]]) raises:
     """Open a video recording device (a "camera").
 
     You can open the device with any reasonable spec, and if the hardware can't
@@ -387,7 +402,7 @@ def open_camera[O_spec: Origin, //](instance_id: CameraID, spec: Ptr[CameraSpec,
     Docs: https://wiki.libsdl.org/SDL3/SDL_OpenCamera.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_OpenCamera", def(instance_id: CameraID, spec: Ptr[CameraSpec, O_spec]) thin abi("C") -> OptPtr[Camera, ExternalOrigin[mut=True]]]()(instance_id, spec)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_OpenCamera", def(instance_id: CameraID, spec: Ptr[CameraSpec, O_spec]) thin abi("C") -> OptPtr[Camera, UntrackedOrigin[mut=True]]]()(instance_id, spec)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
@@ -499,7 +514,7 @@ def get_camera_format[O_camera: Origin, O_spec: Origin, //](camera: Ptr[Camera, 
         raise Error(get_error())
 
 
-def acquire_camera_frame[O_camera: Origin, O_timestamp_ns: Origin, //](camera: Ptr[Camera, O_camera], timestamp_ns: Ptr[UInt64, O_timestamp_ns]) raises -> Ptr[Surface, ExternalOrigin[mut=True]]:
+def acquire_camera_frame[O_camera: Origin, O_timestamp_ns: Origin, //](camera: Ptr[Camera, O_camera], timestamp_ns: Ptr[UInt64, O_timestamp_ns]) raises -> Ptr[Surface, UntrackedOrigin[mut=True]]:
     """Acquire a frame.
 
     The frame is a memory pointer to the image data, whose size and format are
@@ -543,7 +558,7 @@ def acquire_camera_frame[O_camera: Origin, O_timestamp_ns: Origin, //](camera: P
     Docs: https://wiki.libsdl.org/SDL3/SDL_AcquireCameraFrame.
     """
 
-    return _get_dylib_function[lib, "SDL_AcquireCameraFrame", def(camera: Ptr[Camera, O_camera], timestamp_ns: Ptr[UInt64, O_timestamp_ns]) thin abi("C") -> OptPtr[Surface, ExternalOrigin[mut=True]]]()(camera, timestamp_ns).value()
+    return _get_dylib_function[lib, "SDL_AcquireCameraFrame", def(camera: Ptr[Camera, O_camera], timestamp_ns: Ptr[UInt64, O_timestamp_ns]) thin abi("C") -> OptPtr[Surface, UntrackedOrigin[mut=True]]]()(camera, timestamp_ns).value()
 
 
 def release_camera_frame[O_camera: Origin, O_frame: Origin, //](camera: Ptr[Camera, O_camera], frame: Ptr[Surface, O_frame]) raises -> None:

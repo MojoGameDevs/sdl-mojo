@@ -5,3 +5,9 @@
 # ignore packages
 *.mojopkg
 *.📦
+
+# python caches
+__pycache__/
+
+# precompiled mojo
+*.mojoc

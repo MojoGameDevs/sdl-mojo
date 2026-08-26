@@ -27,6 +27,13 @@ Functionality to query the current SDL version, both as headers the app was
 compiled against, and a library the app is linked to.
 """
 
+from std.ffi import _get_dylib_function, c_char, c_int
+from ._core import OptPtr, c_string, lib
+
+
+from std.ffi import _get_dylib_function, c_char, c_int
+from ._core import OptPtr, c_string, lib
+
 
 def get_version() raises -> c_int:
     """Get the version of SDL that is linked against your program.
@@ -47,7 +54,7 @@ def get_version() raises -> c_int:
     return _get_dylib_function[lib, "SDL_GetVersion", def() thin abi("C") -> c_int]()()
 
 
-def get_revision() raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
+def get_revision() raises -> String:
     """Get the code revision of SDL that is linked against your program.
 
     This value is the revision of the code you are linked with and may be
@@ -71,4 +78,4 @@ def get_revision() raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetRevision.
     """
 
-    return _get_dylib_function[lib, "SDL_GetRevision", def() thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()().value()
+    return c_string(_get_dylib_function[lib, "SDL_GetRevision", def() thin abi("C") -> OptPtr[c_char, UntrackedOrigin[mut=False]]]()().value())

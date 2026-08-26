@@ -34,6 +34,15 @@ Much of the functionality is involved in converting those two types to
 other useful forms.
 """
 
+from std.ffi import _get_dylib_function, c_int
+from ._core import Ptr, lib
+from .sdl_error import get_error
+
+
+from std.ffi import _get_dylib_function, c_int
+from ._core import Ptr, lib
+from .sdl_error import get_error
+
 
 @fieldwise_init
 struct DateTime(ImplicitlyCopyable, Movable):

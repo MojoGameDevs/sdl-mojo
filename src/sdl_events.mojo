@@ -50,6 +50,39 @@ can guarantee that these events have a type that isn't in use by other
 parts of the system.
 """
 
+from std.ffi import UnsafeUnion, _get_dylib_function, c_char, c_float, c_int
+from ._core import ArrayHelper, OptPtr, Ptr, lib
+from .sdl_audio import AudioDeviceID
+from .sdl_camera import CameraID
+from .sdl_error import get_error
+from .sdl_joystick import JoystickID
+from .sdl_keyboard import KeyboardID
+from .sdl_keycode import Keycode, Keymod
+from .sdl_mouse import MouseButtonFlags, MouseID, MouseWheelDirection
+from .sdl_pen import PenAxis, PenID, PenInputFlags
+from .sdl_power import PowerState
+from .sdl_scancode import Scancode
+from .sdl_sensor import SensorID
+from .sdl_touch import FingerID, TouchID
+from .sdl_video import DisplayID, Window, WindowID
+
+
+from std.ffi import UnsafeUnion, _get_dylib_function, c_char, c_float, c_int
+from ._core import ArrayHelper, OptPtr, Ptr, lib
+from .sdl_audio import AudioDeviceID
+from .sdl_camera import CameraID
+from .sdl_error import get_error
+from .sdl_joystick import JoystickID
+from .sdl_keyboard import KeyboardID
+from .sdl_keycode import Keycode, Keymod
+from .sdl_mouse import MouseButtonFlags, MouseID, MouseWheelDirection
+from .sdl_pen import PenAxis, PenID, PenInputFlags
+from .sdl_power import PowerState
+from .sdl_scancode import Scancode
+from .sdl_sensor import SensorID
+from .sdl_touch import FingerID, TouchID
+from .sdl_video import DisplayID, Window, WindowID
+
 
 struct EventType(Indexer, Intable, TrivialRegisterPassable):
     """The types of events that can be delivered.
@@ -488,7 +521,7 @@ struct TextEditingEvent(ImplicitlyCopyable, Movable):
     """In nanoseconds, populated using SDL_GetTicksNS()."""
     var window_id: WindowID
     """The window with keyboard focus, if any."""
-    var text: OptPtr[c_char, ExternalOrigin[mut=False]]
+    var text: OptPtr[c_char, UntrackedOrigin[mut=False]]
     """The editing text."""
     var start: Int32
     """The start cursor of selected editing text, or -1 if not set."""
@@ -510,7 +543,7 @@ struct TextEditingCandidatesEvent(ImplicitlyCopyable, Movable):
     """In nanoseconds, populated using SDL_GetTicksNS()."""
     var window_id: WindowID
     """The window with keyboard focus, if any."""
-    var candidates: OptPtr[c_char, ExternalOrigin[mut=False]]
+    var candidates: OptPtr[c_char, UntrackedOrigin[mut=False]]
     """The list of candidates, or NULL if there are no candidates available."""
     var num_candidates: Int32
     """The number of strings in `candidates`."""
@@ -540,7 +573,7 @@ struct TextInputEvent(ImplicitlyCopyable, Movable):
     """In nanoseconds, populated using SDL_GetTicksNS()."""
     var window_id: WindowID
     """The window with keyboard focus, if any."""
-    var text: OptPtr[c_char, ExternalOrigin[mut=False]]
+    var text: OptPtr[c_char, UntrackedOrigin[mut=False]]
     """The input text, UTF-8 encoded."""
 
 
@@ -897,7 +930,7 @@ struct GamepadSensorEvent(ImplicitlyCopyable, Movable):
     """The joystick instance id."""
     var sensor: Int32
     """The type of the sensor, one of the values of SDL_SensorType."""
-    var data: ArrayHelper[c_float, 3, ExternalOrigin[mut=True]]
+    var data: ArrayHelper[c_float, 3, UntrackedOrigin[mut=True]]
     """Up to 3 values from the sensor, as defined in SDL_sensor.h."""
     var sensor_timestamp: UInt64
     """The timestamp of the sensor reading in nanoseconds, not necessarily synchronized with the system clock."""
@@ -1169,9 +1202,9 @@ struct DropEvent(ImplicitlyCopyable, Movable):
     """X coordinate, relative to window (not on begin)."""
     var y: c_float
     """Y coordinate, relative to window (not on begin)."""
-    var source: OptPtr[c_char, ExternalOrigin[mut=False]]
+    var source: OptPtr[c_char, UntrackedOrigin[mut=False]]
     """The source app that sent this drop event, or NULL if that isn't available."""
-    var data: OptPtr[c_char, ExternalOrigin[mut=False]]
+    var data: OptPtr[c_char, UntrackedOrigin[mut=False]]
     """The text for SDL_EVENT_DROP_TEXT and the file name for SDL_EVENT_DROP_FILE, NULL for other events."""
 
 
@@ -1192,7 +1225,7 @@ struct ClipboardEvent(ImplicitlyCopyable, Movable):
     """Are we owning the clipboard (internal update)."""
     var num_mime_types: Int32
     """Number of mime types."""
-    var mime_types: OptPtr[OptPtr[c_char, ExternalOrigin[mut=False]], ExternalOrigin[mut=False]]
+    var mime_types: OptPtr[OptPtr[c_char, UntrackedOrigin[mut=False]], UntrackedOrigin[mut=False]]
     """Current mime types."""
 
 
@@ -1210,7 +1243,7 @@ struct SensorEvent(ImplicitlyCopyable, Movable):
     """In nanoseconds, populated using SDL_GetTicksNS()."""
     var which: SensorID
     """The instance ID of the sensor."""
-    var data: ArrayHelper[c_float, 6, ExternalOrigin[mut=True]]
+    var data: ArrayHelper[c_float, 6, UntrackedOrigin[mut=True]]
     """Up to 6 values from the sensor - additional values can be queried using SDL_GetSensorData()."""
     var sensor_timestamp: UInt64
     """The timestamp of the sensor reading in nanoseconds, not necessarily synchronized with the system clock."""
@@ -1252,13 +1285,13 @@ struct UserEvent(ImplicitlyCopyable, Movable):
     """The associated window if any."""
     var code: Int32
     """User defined event code."""
-    var data1: OptPtr[NoneType, ExternalOrigin[mut=True]]
+    var data1: OptPtr[NoneType, UntrackedOrigin[mut=True]]
     """User defined data pointer."""
-    var data2: OptPtr[NoneType, ExternalOrigin[mut=True]]
+    var data2: OptPtr[NoneType, UntrackedOrigin[mut=True]]
     """User defined data pointer."""
 
 
-comptime Event = UnsafeUnion[UInt32, CommonEvent, DisplayEvent, WindowEvent, KeyboardDeviceEvent, KeyboardEvent, TextEditingEvent, TextEditingCandidatesEvent, TextInputEvent, MouseDeviceEvent, MouseMotionEvent, MouseButtonEvent, MouseWheelEvent, JoyDeviceEvent, JoyAxisEvent, JoyBallEvent, JoyHatEvent, JoyButtonEvent, JoyBatteryEvent, GamepadDeviceEvent, GamepadAxisEvent, GamepadButtonEvent, GamepadTouchpadEvent, GamepadSensorEvent, AudioDeviceEvent, CameraDeviceEvent, SensorEvent, QuitEvent, UserEvent, TouchFingerEvent, PenProximityEvent, PenTouchEvent, PenMotionEvent, PenButtonEvent, PenAxisEvent, RenderEvent, DropEvent, ClipboardEvent, InlineArray[UInt8, 128]]
+comptime Event = UnsafeUnion[UInt32, CommonEvent, DisplayEvent, WindowEvent, KeyboardDeviceEvent, KeyboardEvent, TextEditingEvent, TextEditingCandidatesEvent, TextInputEvent, MouseDeviceEvent, MouseMotionEvent, MouseButtonEvent, MouseWheelEvent, JoyDeviceEvent, JoyAxisEvent, JoyBallEvent, JoyHatEvent, JoyButtonEvent, JoyBatteryEvent, GamepadDeviceEvent, GamepadAxisEvent, GamepadButtonEvent, GamepadTouchpadEvent, GamepadSensorEvent, AudioDeviceEvent, CameraDeviceEvent, SensorEvent, QuitEvent, UserEvent, TouchFingerEvent, PenProximityEvent, PenTouchEvent, PenMotionEvent, PenButtonEvent, PenAxisEvent, RenderEvent, DropEvent, ClipboardEvent, Array[UInt8, 128]]
 
 
 def pump_events() raises -> None:
@@ -1612,7 +1645,7 @@ def push_event[O_event: Origin, //](event: Ptr[Event, O_event]) raises:
         raise Error(get_error())
 
 
-comptime EventFilter = def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]], event: OptPtr[Event, ExternalOrigin[mut=True]]) thin abi("C") -> Bool
+comptime EventFilter = def(userdata: OptPtr[NoneType, UntrackedOrigin[mut=True]], event: OptPtr[Event, UntrackedOrigin[mut=True]]) thin abi("C") -> Bool
 """A function pointer used for callbacks that watch the event queue.
     
     Args:
@@ -1673,7 +1706,7 @@ def set_event_filter[O_userdata: Origin, //](filter: EventFilter, userdata: Ptr[
     return _get_dylib_function[lib, "SDL_SetEventFilter", def(filter: EventFilter, userdata: Ptr[NoneType, O_userdata]) thin abi("C") -> None]()(filter, userdata)
 
 
-def get_event_filter[O_filter: Origin, O_userdata: Origin, //](filter: Ptr[EventFilter, O_filter], userdata: Ptr[OptPtr[NoneType, ExternalOrigin[mut=True]], O_userdata]) raises:
+def get_event_filter[O_filter: Origin, O_userdata: Origin, //](filter: Ptr[EventFilter, O_filter], userdata: Ptr[OptPtr[NoneType, UntrackedOrigin[mut=True]], O_userdata]) raises:
     """Query the current event filter.
 
     This function can be used to "chain" filters, by saving the existing filter
@@ -1693,7 +1726,7 @@ def get_event_filter[O_filter: Origin, O_userdata: Origin, //](filter: Ptr[Event
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetEventFilter.
     """
 
-    var _ffi_ret = _get_dylib_function[lib, "SDL_GetEventFilter", def(filter: Ptr[EventFilter, O_filter], userdata: Ptr[OptPtr[NoneType, ExternalOrigin[mut=True]], O_userdata]) thin abi("C") -> Bool]()(filter, userdata)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_GetEventFilter", def(filter: Ptr[EventFilter, O_filter], userdata: Ptr[OptPtr[NoneType, UntrackedOrigin[mut=True]], O_userdata]) thin abi("C") -> Bool]()(filter, userdata)
     if not _ffi_ret:
         raise Error(get_error())
 
@@ -1829,7 +1862,7 @@ def register_events(numevents: c_int) raises -> UInt32:
     return _get_dylib_function[lib, "SDL_RegisterEvents", def(numevents: c_int) thin abi("C") -> UInt32]()(numevents)
 
 
-def get_window_from_event[O_event: Origin, //](event: Ptr[Event, O_event]) raises -> Ptr[Window, ExternalOrigin[mut=True]]:
+def get_window_from_event[O_event: Origin, //](event: Ptr[Event, O_event]) raises -> Ptr[Window, UntrackedOrigin[mut=True]]:
     """Get window associated with an event.
 
     Args:
@@ -1844,4 +1877,4 @@ def get_window_from_event[O_event: Origin, //](event: Ptr[Event, O_event]) raise
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetWindowFromEvent.
     """
 
-    return _get_dylib_function[lib, "SDL_GetWindowFromEvent", def(event: Ptr[Event, O_event]) thin abi("C") -> OptPtr[Window, ExternalOrigin[mut=True]]]()(event).value()
+    return _get_dylib_function[lib, "SDL_GetWindowFromEvent", def(event: Ptr[Event, O_event]) thin abi("C") -> OptPtr[Window, UntrackedOrigin[mut=True]]]()(event).value()

@@ -35,6 +35,13 @@ fullscreen, or alert the user when the power is getting extremely low, so
 they can save their game.
 """
 
+from std.ffi import _get_dylib_function, c_int
+from ._core import Ptr, lib
+
+
+from std.ffi import _get_dylib_function, c_int
+from ._core import Ptr, lib
+
 
 struct PowerState(Indexer, Intable, TrivialRegisterPassable):
     """The basic state for the system's power supply.

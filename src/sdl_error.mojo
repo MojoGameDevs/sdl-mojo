@@ -46,6 +46,13 @@ It's also common to just return `false` in this case if the failing thing
 is known to call SDL_SetError(), so errors simply propagate through.
 """
 
+from std.ffi import _get_dylib_function, c_char
+from ._core import OptPtr, c_string, lib
+
+
+from std.ffi import _get_dylib_function, c_char
+from ._core import OptPtr, c_string, lib
+
 
 def out_of_memory() raises -> Bool:
     """Set an error indicating that memory allocation failed.
@@ -64,7 +71,7 @@ def out_of_memory() raises -> Bool:
     return _get_dylib_function[lib, "SDL_OutOfMemory", def() thin abi("C") -> Bool]()()
 
 
-def get_error() raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
+def get_error() raises -> String:
     """Retrieve a message about the last error that occurred on the current
     thread.
 
@@ -99,7 +106,7 @@ def get_error() raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetError.
     """
 
-    return _get_dylib_function[lib, "SDL_GetError", def() thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()().value()
+    return c_string(_get_dylib_function[lib, "SDL_GetError", def() thin abi("C") -> OptPtr[c_char, UntrackedOrigin[mut=False]]]()().value())
 
 
 def clear_error() raises -> Bool:

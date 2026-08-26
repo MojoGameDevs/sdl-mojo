@@ -37,6 +37,15 @@ separately, they should ignore mouse events that have a `which` field of
 SDL_TOUCH_MOUSEID.
 """
 
+from std.ffi import _get_dylib_function, c_char, c_float, c_int
+from ._core import OptPtr, Ptr, c_string, lib
+from .sdl_error import get_error
+
+
+from std.ffi import _get_dylib_function, c_char, c_float, c_int
+from ._core import OptPtr, Ptr, c_string, lib
+from .sdl_error import get_error
+
 
 struct TouchID(Intable, TrivialRegisterPassable):
     """A unique ID for a touch device.
@@ -146,7 +155,7 @@ struct Finger(ImplicitlyCopyable, Movable):
     """The quantity of pressure applied, normalized (0...1)."""
 
 
-def get_touch_devices[O_count: Origin, //](count: Ptr[c_int, O_count], out ret: Ptr[TouchID, ExternalOrigin[mut=True]]) raises:
+def get_touch_devices[O_count: Origin, //](count: Ptr[c_int, O_count], out ret: Ptr[TouchID, UntrackedOrigin[mut=True]]) raises:
     """Get a list of registered touch devices.
 
     On some platforms SDL first sees the touch device if it was actually used.
@@ -165,13 +174,13 @@ def get_touch_devices[O_count: Origin, //](count: Ptr[c_int, O_count], out ret: 
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetTouchDevices.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_GetTouchDevices", def(count: Ptr[c_int, O_count]) thin abi("C") -> OptPtr[TouchID, ExternalOrigin[mut=True]]]()(count)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_GetTouchDevices", def(count: Ptr[c_int, O_count]) thin abi("C") -> OptPtr[TouchID, UntrackedOrigin[mut=True]]]()(count)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
 
 
-def get_touch_device_name(touch_id: TouchID, out ret: Ptr[c_char, ExternalOrigin[mut=False]]) raises:
+def get_touch_device_name(touch_id: TouchID, out ret: String) raises:
     """Get the touch device name as reported from the driver.
 
     Args:
@@ -184,10 +193,10 @@ def get_touch_device_name(touch_id: TouchID, out ret: Ptr[c_char, ExternalOrigin
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetTouchDeviceName.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_GetTouchDeviceName", def(touch_id: TouchID) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(touch_id)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_GetTouchDeviceName", def(touch_id: TouchID) thin abi("C") -> OptPtr[c_char, UntrackedOrigin[mut=False]]]()(touch_id)
     if not _ffi_ret:
         raise Error(get_error())
-    ret = _ffi_ret.value()
+    ret = c_string(_ffi_ret.value())
 
 
 def get_touch_device_type(touch_id: TouchID) raises -> TouchDeviceType:
@@ -205,7 +214,7 @@ def get_touch_device_type(touch_id: TouchID) raises -> TouchDeviceType:
     return _get_dylib_function[lib, "SDL_GetTouchDeviceType", def(touch_id: TouchID) thin abi("C") -> TouchDeviceType]()(touch_id)
 
 
-def get_touch_fingers[O_count: Origin, //](touch_id: TouchID, count: Ptr[c_int, O_count], out ret: Ptr[OptPtr[Finger, ExternalOrigin[mut=True]], ExternalOrigin[mut=True]]) raises:
+def get_touch_fingers[O_count: Origin, //](touch_id: TouchID, count: Ptr[c_int, O_count], out ret: Ptr[OptPtr[Finger, UntrackedOrigin[mut=True]], UntrackedOrigin[mut=True]]) raises:
     """Get a list of active fingers for a given touch device.
 
     Args:
@@ -222,7 +231,7 @@ def get_touch_fingers[O_count: Origin, //](touch_id: TouchID, count: Ptr[c_int, 
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetTouchFingers.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_GetTouchFingers", def(touch_id: TouchID, count: Ptr[c_int, O_count]) thin abi("C") -> OptPtr[OptPtr[Finger, ExternalOrigin[mut=True]], ExternalOrigin[mut=True]]]()(touch_id, count)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_GetTouchFingers", def(touch_id: TouchID, count: Ptr[c_int, O_count]) thin abi("C") -> OptPtr[OptPtr[Finger, UntrackedOrigin[mut=True]], UntrackedOrigin[mut=True]]]()(touch_id, count)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()

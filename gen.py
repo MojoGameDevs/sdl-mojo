@@ -170,13 +170,13 @@ def translate_type(m: re.Match) -> str:
 
     if m.groupdict().get("ptrs"):
         for _ in range(len(m["ptrs"])):
-            result = f"OptPtr[{result}, ExternalOrigin[mut={not bool(m['mut'])}]]"
+            result = f"OptPtr[{result}, UntrackedOrigin[mut={not bool(m['mut'])}]]"
 
     if m.groupdict().get("vecs"):
-        result = f"ArrayHelper[{result}, {m['vecs']}, ExternalOrigin[mut={not bool(m['mut'])}]]"
+        result = f"ArrayHelper[{result}, {m['vecs']}, UntrackedOrigin[mut={not bool(m['mut'])}]]"
 
     if m.groupdict().get("amnt"):
-        result = f"InlineArray[{result}, {m['amnt']}]"
+        result = f"Array[{result}, {m['amnt']}]"
 
     return drop_prefix(result)
 
@@ -298,7 +298,7 @@ def translate_typedef(m: re.Match) -> str:
     ptr = m["td_ptr"]
 
     if ptr:
-        return f"comptime {mojo_name} = Ptr[NoneType, MutExternalOrigin]\n{doc_template(doc, name)}"
+        return f"comptime {mojo_name} = Ptr[NoneType, MutUntrackedOrigin]\n{doc_template(doc, name)}"
 
     def translate_def(m: re.Match) -> str:
         def_name = drop_prefix(m["name"])
@@ -511,7 +511,7 @@ struct {drop_prefix(m["os_name"])}(ImplicitlyCopyable, Movable):
 #
 def translate_ptr_struct(m: re.Match) -> str:
     return f"""
-comptime {drop_prefix(m["ps_name"])} = Ptr[NoneType, MutExternalOrigin]
+comptime {drop_prefix(m["ps_name"])} = Ptr[NoneType, MutUntrackedOrigin]
 {doc_template(format_docblock(m["doc"]), drop_prefix(m["ps_name"]))}
 """
 
@@ -560,7 +560,7 @@ comptime {drop_prefix(name)} = UnsafeUnion[{body}]
 # +------( argument )------+ #
 #
 match_argument = re.compile(r"(?:(?<=,)|^)\s*(.+?)(?:(?=,)|$)")
-match_string_argument = re.compile(r"(\w+): Ptr\[c_char, ExternalOrigin\[mut=False\]\]")
+match_string_argument = re.compile(r"(\w+): Ptr\[c_char, UntrackedOrigin\[mut=False\]\]")
 match_argument_names = re.compile(r"(, ?)?(\w+):.*?(?:(?=, \w*?:)|$)")
 
 
@@ -584,7 +584,7 @@ def {mojo_name}{generics}({args}{", " * bool(args)}out ret: String) raises:
     var _ffi_ret = {call}
     if not _ffi_ret:
         raise Error(get_error())
-    ret = String(unsafe_from_utf8_ptr=_ffi_ret.value())
+    ret = c_string(_ffi_ret.value())
 
 """
     elif ret == "None":
@@ -600,7 +600,7 @@ def {mojo_name}{generics}({args}) raises:
         return f"""
 def {mojo_name}{generics}({args}{", " * bool(args)}out ret: {ret}) raises:
     {doc_template(doc, sdl_name, "    ")}
-    _ffi_ret = {call}
+    var _ffi_ret = {call}
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
@@ -608,29 +608,20 @@ def {mojo_name}{generics}({args}{", " * bool(args)}out ret: {ret}) raises:
 
 
 def fn_template(
-    doc: str, sdl_name: str, mojo_name: str, generics: str, args: str, ret: str, call: str
+    doc: str, sdl_name: str, mojo_name: str, generics: str, args: str, ret: str, call: str, nullable: bool = False
 ) -> str:
-    if ret == "String":
-        return f"""
+    return f"""
 def {mojo_name}{generics}({args}) raises -> {ret}:
     {doc_template(doc, sdl_name, "    ")}
-    return String(unsafe_from_utf8_ptr={call}.value())
+    return {unwrap(call, ret, nullable)}
 
     """
-    elif ret.startswith("Ptr"):
-        return f"""
-def {mojo_name}{generics}({args}) raises -> {ret}:
-    {doc_template(doc, sdl_name, "    ")}
-    return {call}.value()
 
-    """
-    else:
-        return f"""
-def {mojo_name}{generics}({args}) raises -> {ret}:
-    {doc_template(doc, sdl_name, "    ")}
-    return {call}
 
-    """
+def unwrap(call: str, ret: str, nullable: bool) -> str:
+    """Wraps a raw FFI result in whatever the Mojo signature promises."""
+    result = f"{call}.value()" if nullable else call
+    return f"c_string({result})" if ret == "String" else result
 
 
 def fn_nullable_template(
@@ -642,7 +633,7 @@ def {mojo_name}{generics}({args}) raises -> {ret}:
     var result = {call}
     if not result:
         raise Error(get_error())
-    return result.value()
+    return {unwrap("result", ret, True)}
 
     """
 
@@ -656,9 +647,10 @@ def translate_function(m: re.Match):
     mojo_name = snake_case(drop_prefix(sdl_name))
     sdl_ret = translate_return_type(re.match(match_return, m.group("f_ret")))
     
-    # Properly map string returns
+    # SDL owns the immutable char pointers it returns, so hand back an owned String.
     mojo_ret = sdl_ret.replace("OptPtr", "Ptr", 1)
-    if sdl_ret.startswith("Ptr[c_char"):
+    nullable = mojo_ret != sdl_ret
+    if mojo_ret.startswith("Ptr[c_char") and "mut=False" in mojo_ret:
         mojo_ret = "String"
 
     generic_params = []
@@ -688,7 +680,7 @@ def translate_function(m: re.Match):
                 # String argument handling
                 mojo_args_list.append(f"var {name}: String")
                 sdl_args_list.append(f"{name}: Ptr[mut=False, {base_type}, origin_of({name})]")
-                pass_args_list.append(f"{name}.as_c_string_slice().unsafe_ptr()")
+                pass_args_list.append(f"{name}.as_c_string_slice().ptr()")
                 continue
 
             mojo_type = base_type
@@ -698,7 +690,7 @@ def translate_function(m: re.Match):
                 for i in range(num_ptrs):
                     is_outer = (i == num_ptrs - 1)
                     origin_mut = "True" if mut else "False"
-                    origin_str = f"ExternalOrigin[mut={origin_mut}]"
+                    origin_str = f"UntrackedOrigin[mut={origin_mut}]"
 
                     # Dynamically parameterize the outermost origin
                     if is_outer:
@@ -709,7 +701,7 @@ def translate_function(m: re.Match):
                     mojo_type = f"Ptr[{mojo_type}, {origin_str}]"
                     sdl_type = f"Ptr[{sdl_type}, {origin_str}]"
 
-                    if origin_str.startswith("ExternalOrigin"):
+                    if origin_str.startswith("UntrackedOrigin"):
                         mojo_type = "Opt" + mojo_type
                         sdl_type = "Opt" + sdl_type
 
@@ -744,7 +736,7 @@ def translate_function(m: re.Match):
     ):
         return fn_raises_template(doc, sdl_name, mojo_name, generic_str, mojo_args, mojo_ret, call)
     else:
-        return fn_template(doc, sdl_name, mojo_name, generic_str, mojo_args, mojo_ret, call)
+        return fn_template(doc, sdl_name, mojo_name, generic_str, mojo_args, mojo_ret, call, nullable)
 
 
 # +------( typedef function )------+ #
@@ -756,7 +748,7 @@ def translate_typedef_function(m: re.Match):
     args = re.sub(match_argument, translate_argument, m["tf_args"]).removeprefix(" ")
     f_type = f"def ({args}) thin abi(\"C\") -> {ret}"
     if m["tf_ptr"]:
-        f_type = f"Ptr[{f_type}, MutExternalOrigin]"
+        f_type = f"Ptr[{f_type}, MutUntrackedOrigin]"
     return f"""
 comptime {drop_prefix(name)} = {f_type}
 {doc_template(doc, name)}
@@ -870,46 +862,64 @@ def translate_src(src_url: str, out_path: Path):
                 _ = out.write(patterns[str(match.lastgroup)][1](match))
 
 
-out_dir = Path("src/")
-rmtree(out_dir, ignore_errors=True)
-out_dir.mkdir(exist_ok=True)
+CORE_MODULE = "_core"
 
-imports = ""
-for include in includes:
-    out_path = out_dir / (include.lower().removesuffix(".h") + ".mojo")
-    print("translating " + str(out_path))
-    translate_src(repo + include, out_path)
-    imports += f"from .{out_path.stem} import *\n"
+CORE_NAMES = ["ArrayHelper", "OptPtr", "Ptr", "_uninit", "c_string", "lib"]
 
-with open(out_dir / "__init__.mojo", "w") as imp:
-    _ = imp.write(f'''
-# +--------------------------------------------------------------------------+ #
+FFI_NAMES = [
+    "OwnedDLHandle",
+    "UnsafeUnion",
+    "_Global",
+    "_get_dylib_function",
+    "c_char",
+    "c_double",
+    "c_float",
+    "c_int",
+    "c_long",
+    "c_long_long",
+    "c_short",
+    "c_size_t",
+    "c_ssize_t",
+    "c_uchar",
+    "c_uint",
+    "c_ushort",
+]
+
+SYS_NAMES = ["CompilationTarget", "is_big_endian", "is_little_endian"]
+
+CORE_SOURCE = f'''# x--------------------------------------------------------------------------x #
 # | SDL3 Bindings in Mojo
-# +--------------------------------------------------------------------------+ #
+# x--------------------------------------------------------------------------x #
 
-"""SDL3 Bindings in Mojo."""
-from std.memory import UnsafePointer, OptionalUnsafePointer
-{imports}
+"""Shared declarations for the SDL3 bindings."""
 
-comptime Ptr = UnsafePointer
-comptime OptPtr = OptionalUnsafePointer
+from std.ffi import CStringSlice, _Global, OwnedDLHandle, c_char
+from std.os.env import getenv
+from std.sys import CompilationTarget
 
-from std.builtin.globals import global_constant
-from std.sys import CompilationTarget, is_little_endian, is_big_endian
-from std.ffi import _Global, OwnedDLHandle, _get_dylib_function, c_char, c_uchar, c_int, c_uint, c_short, c_ushort, c_long, c_long_long, c_size_t, c_ssize_t, c_float, c_double, UnsafeUnion
+comptime Ptr = Pointer
+comptime OptPtr[mut: Bool, //, type: AnyType, origin: Origin[mut=mut]] = Optional[Ptr[type, origin]]
+comptime ArrayHelper[type: ImplicitlyCopyable, size: Int, origin: Origin] = Ptr[Array[type, size], origin]
 
 comptime lib = _Global["SDL", _init_sdl_handle]()
 
+comptime SDL_LIBRARY = "libSDL3.dylib" if CompilationTarget.is_macos() else "libSDL3.so"
+
+
 def _init_sdl_handle() -> OwnedDLHandle:
+    comptime assert (
+        CompilationTarget.is_macos() or CompilationTarget.is_linux()
+    ), "OS is not supported"
+    var prefix = getenv("CONDA_PREFIX")
+    if prefix:
+        try:
+            return OwnedDLHandle(prefix + "/lib/" + SDL_LIBRARY)
+        except:
+            pass
     try:
-        comptime if CompilationTarget.is_macos():
-            return OwnedDLHandle(".pixi/envs/default/lib/libSDL3.dylib")
-        elif CompilationTarget.is_linux():
-            return OwnedDLHandle(".pixi/envs/default/lib/libSDL3.so")
-        else:
-            comptime assert False, "OS is not supported"
+        return OwnedDLHandle(SDL_LIBRARY)
     except:
-        print("libSDL3 not found at .pixi/envs/default/lib/")
+        print(SDL_LIBRARY, "not found in $CONDA_PREFIX/lib or on the library search path")
         return _uninit[OwnedDLHandle]()
 
 
@@ -919,5 +929,91 @@ def _uninit[T: AnyType](out value: T):
     __mlir_op.`lit.ownership.mark_initialized`(__get_mvalue_as_litref(value))
 
 
-comptime ArrayHelper[type: ImplicitlyCopyable & Movable, size: Int, origin: Origin] = Ptr[InlineArray[type, size], origin]
-''')
+def c_string[origin: ImmOrigin, //](ptr: Ptr[mut=False, c_char, origin]) -> String:
+    """Copies a null terminated C string owned by SDL into an owned String."""
+    return String(StringSpan(unsafe_from_utf8=CStringSlice(unsafe_from_ptr=ptr)))
+'''
+
+definition = re.compile(r"^(?:struct|trait|def|comptime) +(\w+)", flags=re.MULTILINE)
+docstring = re.compile(r'"""(?:.|\n)*?"""')
+comment = re.compile(r"^ *#.*$", flags=re.MULTILINE)
+identifier = re.compile(r"[A-Za-z_]\w*")
+
+
+def defined_names(source: str) -> set[str]:
+    return set(definition.findall(source))
+
+
+def used_names(source: str) -> set[str]:
+    body = comment.sub("", docstring.sub("", source))
+    return set(identifier.findall(body))
+
+
+def import_block(module: str, sources: dict[str, str]) -> str:
+    """Builds the explicit import header a generated module needs."""
+    used = used_names(sources[module]) - defined_names(sources[module])
+    lines = []
+    for names, origin in (
+        (SYS_NAMES, "std.sys"),
+        (FFI_NAMES, "std.ffi"),
+        (CORE_NAMES, "." + CORE_MODULE),
+    ):
+        wanted = sorted(used.intersection(names))
+        if wanted:
+            lines.append(f"from {origin} import {', '.join(wanted)}")
+    for other in sorted(sources):
+        if other == module:
+            continue
+        wanted = sorted(used.intersection(defined_names(sources[other])))
+        if wanted:
+            lines.append(f"from .{other} import {', '.join(wanted)}")
+    return "\n".join(lines) + "\n"
+
+
+def insert_imports(source: str, imports: str) -> str:
+    end = docstring.search(source).end()
+    return source[:end] + "\n\n" + imports + source[end:]
+
+
+def finalize_package(out_dir: Path):
+    """Replaces implicit package-level references with explicit per-module imports."""
+    modules = sorted(p.stem for p in out_dir.glob("sdl_*.mojo"))
+    sources = {m: (out_dir / (m + ".mojo")).read_text() for m in modules}
+    collisions = {}
+    for module in modules:
+        for name in defined_names(sources[module]):
+            collisions.setdefault(name, []).append(module)
+    for name, owners in collisions.items():
+        if len(owners) > 1:
+            print(f"warning: '{name}' is defined in {', '.join(owners)}")
+
+    _ = (out_dir / (CORE_MODULE + ".mojo")).write_text(CORE_SOURCE)
+    for module in modules:
+        _ = (out_dir / (module + ".mojo")).write_text(
+            insert_imports(sources[module], import_block(module, sources))
+        )
+
+    star_imports = "".join(f"from .{module} import *\n" for module in modules)
+    _ = (out_dir / "__init__.mojo").write_text(
+        f'''# x--------------------------------------------------------------------------x #
+# | SDL3 Bindings in Mojo
+# x--------------------------------------------------------------------------x #
+
+"""SDL3 Bindings in Mojo."""
+
+from .{CORE_MODULE} import ArrayHelper, OptPtr, Ptr, c_string
+{star_imports}'''
+    )
+
+
+if __name__ == "__main__":
+    out_dir = Path("src/")
+    rmtree(out_dir, ignore_errors=True)
+    out_dir.mkdir(exist_ok=True)
+
+    for include in includes:
+        out_path = out_dir / (include.lower().removesuffix(".h") + ".mojo")
+        print("translating " + str(out_path))
+        translate_src(repo + include, out_path)
+
+    finalize_package(out_dir)

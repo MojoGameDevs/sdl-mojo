@@ -31,6 +31,17 @@ SDL_IOStream is not related to the standard C++ iostream class, other than
 both are abstract interfaces to read/write data.
 """
 
+from std.ffi import _get_dylib_function, c_char, c_size_t
+from ._core import OptPtr, Ptr, lib
+from .sdl_error import get_error
+from .sdl_properties import PropertiesID
+
+
+from std.ffi import _get_dylib_function, c_char, c_size_t
+from ._core import OptPtr, Ptr, lib
+from .sdl_error import get_error
+from .sdl_properties import PropertiesID
+
 
 struct IOStatus(Indexer, Intable, TrivialRegisterPassable):
     """SDL_IOStream status, set by a read or write operation.
@@ -122,18 +133,18 @@ struct IOStreamInterface(ImplicitlyCopyable, Movable):
     var version: UInt32
     """The version of this interface."""
 
-    var size: def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]]) thin -> Int64
+    var size: def(userdata: OptPtr[NoneType, UntrackedOrigin[mut=True]]) thin -> Int64
     """Return the number of bytes in this SDL_IOStream.
     
      \\return the total size of the data stream, or -1 on error."""
 
-    var seek: def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]], offset: Int64, whence: IOWhence) thin -> Int64
+    var seek: def(userdata: OptPtr[NoneType, UntrackedOrigin[mut=True]], offset: Int64, whence: IOWhence) thin -> Int64
     """Seek to `offset` relative to `whence`, one of stdio's whence values:
      SDL_IO_SEEK_SET, SDL_IO_SEEK_CUR, SDL_IO_SEEK_END.
     
      \\return the final offset in the data stream, or -1 on error."""
 
-    var read: def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]], ptr: OptPtr[NoneType, ExternalOrigin[mut=True]], size: c_size_t, status: OptPtr[IOStatus, ExternalOrigin[mut=True]]) thin -> c_size_t
+    var read: def(userdata: OptPtr[NoneType, UntrackedOrigin[mut=True]], ptr: OptPtr[NoneType, UntrackedOrigin[mut=True]], size: c_size_t, status: OptPtr[IOStatus, UntrackedOrigin[mut=True]]) thin -> c_size_t
     """Read up to `size` bytes from the data stream to the area pointed
      at by `ptr`.
     
@@ -143,7 +154,7 @@ struct IOStreamInterface(ImplicitlyCopyable, Movable):
     
      \\return the number of bytes read"""
 
-    var write: def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]], ptr: OptPtr[NoneType, ExternalOrigin[mut=False]], size: c_size_t, status: OptPtr[IOStatus, ExternalOrigin[mut=True]]) thin -> c_size_t
+    var write: def(userdata: OptPtr[NoneType, UntrackedOrigin[mut=True]], ptr: OptPtr[NoneType, UntrackedOrigin[mut=False]], size: c_size_t, status: OptPtr[IOStatus, UntrackedOrigin[mut=True]]) thin -> c_size_t
     """Write exactly `size` bytes from the area pointed at by `ptr`
      to data stream.
     
@@ -153,7 +164,7 @@ struct IOStreamInterface(ImplicitlyCopyable, Movable):
     
      \\return the number of bytes written"""
 
-    var flush: def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]], status: OptPtr[IOStatus, ExternalOrigin[mut=True]]) thin -> Bool
+    var flush: def(userdata: OptPtr[NoneType, UntrackedOrigin[mut=True]], status: OptPtr[IOStatus, UntrackedOrigin[mut=True]]) thin -> Bool
     """If the stream is buffering, make sure the data is written out.
     
      On failure, you should set `*status` to a value from the
@@ -162,7 +173,7 @@ struct IOStreamInterface(ImplicitlyCopyable, Movable):
     
      \\return true if successful or false on write error when flushing data."""
 
-    var close: def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]]) thin -> Bool
+    var close: def(userdata: OptPtr[NoneType, UntrackedOrigin[mut=True]]) thin -> Bool
     """Close and free any allocated resources.
     
      This does not guarantee file writes will sync to physical media; they
@@ -189,7 +200,7 @@ struct IOStream(ImplicitlyCopyable, Movable):
     pass
 
 
-def io_from_file(var file: String, var mode: String) raises -> Ptr[IOStream, ExternalOrigin[mut=True]]:
+def io_from_file(var file: String, var mode: String) raises -> Ptr[IOStream, UntrackedOrigin[mut=True]]:
     """Use this function to create a new SDL_IOStream structure for reading from
     and/or writing to a named file.
 
@@ -269,10 +280,10 @@ def io_from_file(var file: String, var mode: String) raises -> Ptr[IOStream, Ext
     Docs: https://wiki.libsdl.org/SDL3/SDL_IOFromFile.
     """
 
-    return _get_dylib_function[lib, "SDL_IOFromFile", def(file: Ptr[mut=False, c_char, origin_of(file)], mode: Ptr[mut=False, c_char, origin_of(mode)]) thin abi("C") -> OptPtr[IOStream, ExternalOrigin[mut=True]]]()(file.as_c_string_slice().unsafe_ptr(), mode.as_c_string_slice().unsafe_ptr()).value()
+    return _get_dylib_function[lib, "SDL_IOFromFile", def(file: Ptr[mut=False, c_char, origin_of(file)], mode: Ptr[mut=False, c_char, origin_of(mode)]) thin abi("C") -> OptPtr[IOStream, UntrackedOrigin[mut=True]]]()(file.as_c_string_slice().ptr(), mode.as_c_string_slice().ptr()).value()
 
 
-def io_from_mem[O_mem: Origin, //](mem: Ptr[NoneType, O_mem], size: c_size_t, out ret: Ptr[IOStream, ExternalOrigin[mut=True]]) raises:
+def io_from_mem[O_mem: Origin, //](mem: Ptr[NoneType, O_mem], size: c_size_t, out ret: Ptr[IOStream, UntrackedOrigin[mut=True]]) raises:
     """Use this function to prepare a read-write memory buffer for use with
     SDL_IOStream.
 
@@ -308,13 +319,13 @@ def io_from_mem[O_mem: Origin, //](mem: Ptr[NoneType, O_mem], size: c_size_t, ou
     Docs: https://wiki.libsdl.org/SDL3/SDL_IOFromMem.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_IOFromMem", def(mem: Ptr[NoneType, O_mem], size: c_size_t) thin abi("C") -> OptPtr[IOStream, ExternalOrigin[mut=True]]]()(mem, size)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_IOFromMem", def(mem: Ptr[NoneType, O_mem], size: c_size_t) thin abi("C") -> OptPtr[IOStream, UntrackedOrigin[mut=True]]]()(mem, size)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
 
 
-def io_from_const_mem[O_mem: Origin, //](mem: Ptr[NoneType, O_mem], size: c_size_t, out ret: Ptr[IOStream, ExternalOrigin[mut=True]]) raises:
+def io_from_const_mem[O_mem: Origin, //](mem: Ptr[NoneType, O_mem], size: c_size_t, out ret: Ptr[IOStream, UntrackedOrigin[mut=True]]) raises:
     """Use this function to prepare a read-only memory buffer for use with
     SDL_IOStream.
 
@@ -352,13 +363,13 @@ def io_from_const_mem[O_mem: Origin, //](mem: Ptr[NoneType, O_mem], size: c_size
     Docs: https://wiki.libsdl.org/SDL3/SDL_IOFromConstMem.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_IOFromConstMem", def(mem: Ptr[NoneType, O_mem], size: c_size_t) thin abi("C") -> OptPtr[IOStream, ExternalOrigin[mut=True]]]()(mem, size)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_IOFromConstMem", def(mem: Ptr[NoneType, O_mem], size: c_size_t) thin abi("C") -> OptPtr[IOStream, UntrackedOrigin[mut=True]]]()(mem, size)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
 
 
-def io_from_dynamic_mem(out ret: Ptr[IOStream, ExternalOrigin[mut=True]]) raises:
+def io_from_dynamic_mem(out ret: Ptr[IOStream, UntrackedOrigin[mut=True]]) raises:
     """Use this function to create an SDL_IOStream that is backed by dynamically
     allocated memory.
 
@@ -383,13 +394,13 @@ def io_from_dynamic_mem(out ret: Ptr[IOStream, ExternalOrigin[mut=True]]) raises
     Docs: https://wiki.libsdl.org/SDL3/SDL_IOFromDynamicMem.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_IOFromDynamicMem", def() thin abi("C") -> OptPtr[IOStream, ExternalOrigin[mut=True]]]()()
+    var _ffi_ret = _get_dylib_function[lib, "SDL_IOFromDynamicMem", def() thin abi("C") -> OptPtr[IOStream, UntrackedOrigin[mut=True]]]()()
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
 
 
-def open_io[O_iface: Origin, O_userdata: Origin, //](iface: Ptr[IOStreamInterface, O_iface], userdata: Ptr[NoneType, O_userdata], out ret: Ptr[IOStream, ExternalOrigin[mut=True]]) raises:
+def open_io[O_iface: Origin, O_userdata: Origin, //](iface: Ptr[IOStreamInterface, O_iface], userdata: Ptr[NoneType, O_userdata], out ret: Ptr[IOStream, UntrackedOrigin[mut=True]]) raises:
     """Create a custom SDL_IOStream.
 
     Applications do not need to use this function unless they are providing
@@ -415,7 +426,7 @@ def open_io[O_iface: Origin, O_userdata: Origin, //](iface: Ptr[IOStreamInterfac
     Docs: https://wiki.libsdl.org/SDL3/SDL_OpenIO.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_OpenIO", def(iface: Ptr[IOStreamInterface, O_iface], userdata: Ptr[NoneType, O_userdata]) thin abi("C") -> OptPtr[IOStream, ExternalOrigin[mut=True]]]()(iface, userdata)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_OpenIO", def(iface: Ptr[IOStreamInterface, O_iface], userdata: Ptr[NoneType, O_userdata]) thin abi("C") -> OptPtr[IOStream, UntrackedOrigin[mut=True]]]()(iface, userdata)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
@@ -667,7 +678,7 @@ def flush_io[O_context: Origin, //](context: Ptr[IOStream, O_context]) raises:
         raise Error(get_error())
 
 
-def load_file_io[O_src: Origin, O_datasize: Origin, //](src: Ptr[IOStream, O_src], datasize: Ptr[c_size_t, O_datasize], closeio: Bool, out ret: Ptr[NoneType, ExternalOrigin[mut=True]]) raises:
+def load_file_io[O_src: Origin, O_datasize: Origin, //](src: Ptr[IOStream, O_src], datasize: Ptr[c_size_t, O_datasize], closeio: Bool, out ret: Ptr[NoneType, UntrackedOrigin[mut=True]]) raises:
     """Load all the data from an SDL data stream.
 
     The data is allocated with a zero byte at the end (null terminated) for
@@ -693,13 +704,13 @@ def load_file_io[O_src: Origin, O_datasize: Origin, //](src: Ptr[IOStream, O_src
     Docs: https://wiki.libsdl.org/SDL3/SDL_LoadFile_IO.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_LoadFile_IO", def(src: Ptr[IOStream, O_src], datasize: Ptr[c_size_t, O_datasize], closeio: Bool) thin abi("C") -> OptPtr[NoneType, ExternalOrigin[mut=True]]]()(src, datasize, closeio)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_LoadFile_IO", def(src: Ptr[IOStream, O_src], datasize: Ptr[c_size_t, O_datasize], closeio: Bool) thin abi("C") -> OptPtr[NoneType, UntrackedOrigin[mut=True]]]()(src, datasize, closeio)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
 
 
-def load_file[O_datasize: Origin, //](var file: String, datasize: Ptr[c_size_t, O_datasize], out ret: Ptr[NoneType, ExternalOrigin[mut=True]]) raises:
+def load_file[O_datasize: Origin, //](var file: String, datasize: Ptr[c_size_t, O_datasize], out ret: Ptr[NoneType, UntrackedOrigin[mut=True]]) raises:
     """Load all the data from a file path.
 
     The data is allocated with a zero byte at the end (null terminated) for
@@ -722,7 +733,7 @@ def load_file[O_datasize: Origin, //](var file: String, datasize: Ptr[c_size_t, 
     Docs: https://wiki.libsdl.org/SDL3/SDL_LoadFile.
     """
 
-    _ffi_ret = _get_dylib_function[lib, "SDL_LoadFile", def(file: Ptr[mut=False, c_char, origin_of(file)], datasize: Ptr[c_size_t, O_datasize]) thin abi("C") -> OptPtr[NoneType, ExternalOrigin[mut=True]]]()(file.as_c_string_slice().unsafe_ptr(), datasize)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_LoadFile", def(file: Ptr[mut=False, c_char, origin_of(file)], datasize: Ptr[c_size_t, O_datasize]) thin abi("C") -> OptPtr[NoneType, UntrackedOrigin[mut=True]]]()(file.as_c_string_slice().ptr(), datasize)
     if not _ffi_ret:
         raise Error(get_error())
     ret = _ffi_ret.value()
@@ -773,7 +784,7 @@ def save_file[O_data: Origin, //](var file: String, data: Ptr[NoneType, O_data],
     Docs: https://wiki.libsdl.org/SDL3/SDL_SaveFile.
     """
 
-    var _ffi_ret = _get_dylib_function[lib, "SDL_SaveFile", def(file: Ptr[mut=False, c_char, origin_of(file)], data: Ptr[NoneType, O_data], datasize: c_size_t) thin abi("C") -> Bool]()(file.as_c_string_slice().unsafe_ptr(), data, datasize)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_SaveFile", def(file: Ptr[mut=False, c_char, origin_of(file)], data: Ptr[NoneType, O_data], datasize: c_size_t) thin abi("C") -> Bool]()(file.as_c_string_slice().ptr(), data, datasize)
     if not _ffi_ret:
         raise Error(get_error())
 

@@ -46,6 +46,15 @@ following functions:
 Properties can be removed from a group by using SDL_ClearProperty.
 """
 
+from std.ffi import _get_dylib_function, c_char, c_float
+from ._core import OptPtr, Ptr, c_string, lib
+from .sdl_error import get_error
+
+
+from std.ffi import _get_dylib_function, c_char, c_float
+from ._core import OptPtr, Ptr, c_string, lib
+from .sdl_error import get_error
+
 
 struct PropertiesID(Intable, TrivialRegisterPassable):
     """SDL properties ID.
@@ -203,7 +212,7 @@ def unlock_properties(props: PropertiesID) raises -> None:
     return _get_dylib_function[lib, "SDL_UnlockProperties", def(props: PropertiesID) thin abi("C") -> None]()(props)
 
 
-comptime CleanupPropertyCallback = def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]], value: OptPtr[NoneType, ExternalOrigin[mut=True]]) thin abi("C") -> None
+comptime CleanupPropertyCallback = def(userdata: OptPtr[NoneType, UntrackedOrigin[mut=True]], value: OptPtr[NoneType, UntrackedOrigin[mut=True]]) thin abi("C") -> None
 """A callback used to free resources when a property is deleted.
     
     This should release any resources associated with `value` that are no
@@ -257,7 +266,7 @@ def set_pointer_property_with_cleanup[O_value: Origin, O_userdata: Origin, //](p
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetPointerPropertyWithCleanup.
     """
 
-    var _ffi_ret = _get_dylib_function[lib, "SDL_SetPointerPropertyWithCleanup", def(props: PropertiesID, name: Ptr[mut=False, c_char, origin_of(name)], value: Ptr[NoneType, O_value], cleanup: CleanupPropertyCallback, userdata: Ptr[NoneType, O_userdata]) thin abi("C") -> Bool]()(props, name.as_c_string_slice().unsafe_ptr(), value, cleanup, userdata)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_SetPointerPropertyWithCleanup", def(props: PropertiesID, name: Ptr[mut=False, c_char, origin_of(name)], value: Ptr[NoneType, O_value], cleanup: CleanupPropertyCallback, userdata: Ptr[NoneType, O_userdata]) thin abi("C") -> Bool]()(props, name.as_c_string_slice().ptr(), value, cleanup, userdata)
     if not _ffi_ret:
         raise Error(get_error())
 
@@ -280,7 +289,7 @@ def set_pointer_property[O_value: Origin, //](props: PropertiesID, var name: Str
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetPointerProperty.
     """
 
-    var _ffi_ret = _get_dylib_function[lib, "SDL_SetPointerProperty", def(props: PropertiesID, name: Ptr[mut=False, c_char, origin_of(name)], value: Ptr[NoneType, O_value]) thin abi("C") -> Bool]()(props, name.as_c_string_slice().unsafe_ptr(), value)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_SetPointerProperty", def(props: PropertiesID, name: Ptr[mut=False, c_char, origin_of(name)], value: Ptr[NoneType, O_value]) thin abi("C") -> Bool]()(props, name.as_c_string_slice().ptr(), value)
     if not _ffi_ret:
         raise Error(get_error())
 
@@ -306,7 +315,7 @@ def set_string_property(props: PropertiesID, var name: String, var value: String
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetStringProperty.
     """
 
-    var _ffi_ret = _get_dylib_function[lib, "SDL_SetStringProperty", def(props: PropertiesID, name: Ptr[mut=False, c_char, origin_of(name)], value: Ptr[mut=False, c_char, origin_of(value)]) thin abi("C") -> Bool]()(props, name.as_c_string_slice().unsafe_ptr(), value.as_c_string_slice().unsafe_ptr())
+    var _ffi_ret = _get_dylib_function[lib, "SDL_SetStringProperty", def(props: PropertiesID, name: Ptr[mut=False, c_char, origin_of(name)], value: Ptr[mut=False, c_char, origin_of(value)]) thin abi("C") -> Bool]()(props, name.as_c_string_slice().ptr(), value.as_c_string_slice().ptr())
     if not _ffi_ret:
         raise Error(get_error())
 
@@ -329,7 +338,7 @@ def set_number_property(props: PropertiesID, var name: String, value: Int64) rai
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetNumberProperty.
     """
 
-    var _ffi_ret = _get_dylib_function[lib, "SDL_SetNumberProperty", def(props: PropertiesID, name: Ptr[mut=False, c_char, origin_of(name)], value: Int64) thin abi("C") -> Bool]()(props, name.as_c_string_slice().unsafe_ptr(), value)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_SetNumberProperty", def(props: PropertiesID, name: Ptr[mut=False, c_char, origin_of(name)], value: Int64) thin abi("C") -> Bool]()(props, name.as_c_string_slice().ptr(), value)
     if not _ffi_ret:
         raise Error(get_error())
 
@@ -352,7 +361,7 @@ def set_float_property(props: PropertiesID, var name: String, value: c_float) ra
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetFloatProperty.
     """
 
-    var _ffi_ret = _get_dylib_function[lib, "SDL_SetFloatProperty", def(props: PropertiesID, name: Ptr[mut=False, c_char, origin_of(name)], value: c_float) thin abi("C") -> Bool]()(props, name.as_c_string_slice().unsafe_ptr(), value)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_SetFloatProperty", def(props: PropertiesID, name: Ptr[mut=False, c_char, origin_of(name)], value: c_float) thin abi("C") -> Bool]()(props, name.as_c_string_slice().ptr(), value)
     if not _ffi_ret:
         raise Error(get_error())
 
@@ -375,7 +384,7 @@ def set_boolean_property(props: PropertiesID, var name: String, value: Bool) rai
     Docs: https://wiki.libsdl.org/SDL3/SDL_SetBooleanProperty.
     """
 
-    var _ffi_ret = _get_dylib_function[lib, "SDL_SetBooleanProperty", def(props: PropertiesID, name: Ptr[mut=False, c_char, origin_of(name)], value: Bool) thin abi("C") -> Bool]()(props, name.as_c_string_slice().unsafe_ptr(), value)
+    var _ffi_ret = _get_dylib_function[lib, "SDL_SetBooleanProperty", def(props: PropertiesID, name: Ptr[mut=False, c_char, origin_of(name)], value: Bool) thin abi("C") -> Bool]()(props, name.as_c_string_slice().ptr(), value)
     if not _ffi_ret:
         raise Error(get_error())
 
@@ -396,7 +405,7 @@ def has_property(props: PropertiesID, var name: String) raises -> Bool:
     Docs: https://wiki.libsdl.org/SDL3/SDL_HasProperty.
     """
 
-    return _get_dylib_function[lib, "SDL_HasProperty", def(props: PropertiesID, name: Ptr[mut=False, c_char, origin_of(name)]) thin abi("C") -> Bool]()(props, name.as_c_string_slice().unsafe_ptr())
+    return _get_dylib_function[lib, "SDL_HasProperty", def(props: PropertiesID, name: Ptr[mut=False, c_char, origin_of(name)]) thin abi("C") -> Bool]()(props, name.as_c_string_slice().ptr())
 
 
 def get_property_type(props: PropertiesID, var name: String) raises -> PropertyType:
@@ -416,10 +425,10 @@ def get_property_type(props: PropertiesID, var name: String) raises -> PropertyT
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetPropertyType.
     """
 
-    return _get_dylib_function[lib, "SDL_GetPropertyType", def(props: PropertiesID, name: Ptr[mut=False, c_char, origin_of(name)]) thin abi("C") -> PropertyType]()(props, name.as_c_string_slice().unsafe_ptr())
+    return _get_dylib_function[lib, "SDL_GetPropertyType", def(props: PropertiesID, name: Ptr[mut=False, c_char, origin_of(name)]) thin abi("C") -> PropertyType]()(props, name.as_c_string_slice().ptr())
 
 
-def get_pointer_property[O_default_value: Origin, //](props: PropertiesID, var name: String, default_value: Ptr[NoneType, O_default_value]) raises -> Ptr[NoneType, ExternalOrigin[mut=True]]:
+def get_pointer_property[O_default_value: Origin, //](props: PropertiesID, var name: String, default_value: Ptr[NoneType, O_default_value]) raises -> Ptr[NoneType, UntrackedOrigin[mut=True]]:
     """Get a pointer property from a group of properties.
 
     By convention, the names of properties that SDL exposes on objects will
@@ -447,10 +456,10 @@ def get_pointer_property[O_default_value: Origin, //](props: PropertiesID, var n
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetPointerProperty.
     """
 
-    return _get_dylib_function[lib, "SDL_GetPointerProperty", def(props: PropertiesID, name: Ptr[mut=False, c_char, origin_of(name)], default_value: Ptr[NoneType, O_default_value]) thin abi("C") -> OptPtr[NoneType, ExternalOrigin[mut=True]]]()(props, name.as_c_string_slice().unsafe_ptr(), default_value).value()
+    return _get_dylib_function[lib, "SDL_GetPointerProperty", def(props: PropertiesID, name: Ptr[mut=False, c_char, origin_of(name)], default_value: Ptr[NoneType, O_default_value]) thin abi("C") -> OptPtr[NoneType, UntrackedOrigin[mut=True]]]()(props, name.as_c_string_slice().ptr(), default_value).value()
 
 
-def get_string_property(props: PropertiesID, var name: String, var default_value: String) raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
+def get_string_property(props: PropertiesID, var name: String, var default_value: String) raises -> String:
     """Get a string property from a group of properties.
 
     Args:
@@ -473,7 +482,7 @@ def get_string_property(props: PropertiesID, var name: String, var default_value
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetStringProperty.
     """
 
-    return _get_dylib_function[lib, "SDL_GetStringProperty", def(props: PropertiesID, name: Ptr[mut=False, c_char, origin_of(name)], default_value: Ptr[mut=False, c_char, origin_of(default_value)]) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(props, name.as_c_string_slice().unsafe_ptr(), default_value.as_c_string_slice().unsafe_ptr()).value()
+    return c_string(_get_dylib_function[lib, "SDL_GetStringProperty", def(props: PropertiesID, name: Ptr[mut=False, c_char, origin_of(name)], default_value: Ptr[mut=False, c_char, origin_of(default_value)]) thin abi("C") -> OptPtr[c_char, UntrackedOrigin[mut=False]]]()(props, name.as_c_string_slice().ptr(), default_value.as_c_string_slice().ptr()).value())
 
 
 def get_number_property(props: PropertiesID, var name: String, default_value: Int64) raises -> Int64:
@@ -497,7 +506,7 @@ def get_number_property(props: PropertiesID, var name: String, default_value: In
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetNumberProperty.
     """
 
-    return _get_dylib_function[lib, "SDL_GetNumberProperty", def(props: PropertiesID, name: Ptr[mut=False, c_char, origin_of(name)], default_value: Int64) thin abi("C") -> Int64]()(props, name.as_c_string_slice().unsafe_ptr(), default_value)
+    return _get_dylib_function[lib, "SDL_GetNumberProperty", def(props: PropertiesID, name: Ptr[mut=False, c_char, origin_of(name)], default_value: Int64) thin abi("C") -> Int64]()(props, name.as_c_string_slice().ptr(), default_value)
 
 
 def get_float_property(props: PropertiesID, var name: String, default_value: c_float) raises -> c_float:
@@ -521,7 +530,7 @@ def get_float_property(props: PropertiesID, var name: String, default_value: c_f
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetFloatProperty.
     """
 
-    return _get_dylib_function[lib, "SDL_GetFloatProperty", def(props: PropertiesID, name: Ptr[mut=False, c_char, origin_of(name)], default_value: c_float) thin abi("C") -> c_float]()(props, name.as_c_string_slice().unsafe_ptr(), default_value)
+    return _get_dylib_function[lib, "SDL_GetFloatProperty", def(props: PropertiesID, name: Ptr[mut=False, c_char, origin_of(name)], default_value: c_float) thin abi("C") -> c_float]()(props, name.as_c_string_slice().ptr(), default_value)
 
 
 def get_boolean_property(props: PropertiesID, var name: String, default_value: Bool) raises -> Bool:
@@ -545,7 +554,7 @@ def get_boolean_property(props: PropertiesID, var name: String, default_value: B
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetBooleanProperty.
     """
 
-    return _get_dylib_function[lib, "SDL_GetBooleanProperty", def(props: PropertiesID, name: Ptr[mut=False, c_char, origin_of(name)], default_value: Bool) thin abi("C") -> Bool]()(props, name.as_c_string_slice().unsafe_ptr(), default_value)
+    return _get_dylib_function[lib, "SDL_GetBooleanProperty", def(props: PropertiesID, name: Ptr[mut=False, c_char, origin_of(name)], default_value: Bool) thin abi("C") -> Bool]()(props, name.as_c_string_slice().ptr(), default_value)
 
 
 def clear_property(props: PropertiesID, var name: String) raises:
@@ -565,12 +574,12 @@ def clear_property(props: PropertiesID, var name: String) raises:
     Docs: https://wiki.libsdl.org/SDL3/SDL_ClearProperty.
     """
 
-    var _ffi_ret = _get_dylib_function[lib, "SDL_ClearProperty", def(props: PropertiesID, name: Ptr[mut=False, c_char, origin_of(name)]) thin abi("C") -> Bool]()(props, name.as_c_string_slice().unsafe_ptr())
+    var _ffi_ret = _get_dylib_function[lib, "SDL_ClearProperty", def(props: PropertiesID, name: Ptr[mut=False, c_char, origin_of(name)]) thin abi("C") -> Bool]()(props, name.as_c_string_slice().ptr())
     if not _ffi_ret:
         raise Error(get_error())
 
 
-comptime EnumeratePropertiesCallback = def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]], props: PropertiesID, name: OptPtr[c_char, ExternalOrigin[mut=False]]) thin abi("C") -> None
+comptime EnumeratePropertiesCallback = def(userdata: OptPtr[NoneType, UntrackedOrigin[mut=True]], props: PropertiesID, name: OptPtr[c_char, UntrackedOrigin[mut=False]]) thin abi("C") -> None
 """A callback used to enumerate all the properties in a group of properties.
     
     This callback is called from SDL_EnumerateProperties(), and is called once

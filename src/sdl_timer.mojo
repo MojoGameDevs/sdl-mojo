@@ -39,6 +39,15 @@ There are also useful macros to convert between time units, like
 SDL_SECONDS_TO_NS() and such.
 """
 
+from std.ffi import _get_dylib_function
+from ._core import OptPtr, Ptr, lib
+from .sdl_error import get_error
+
+
+from std.ffi import _get_dylib_function
+from ._core import OptPtr, Ptr, lib
+from .sdl_error import get_error
+
 
 def get_ticks() raises -> UInt64:
     """Get the number of milliseconds since SDL library initialization.
@@ -186,7 +195,7 @@ struct TimerID(Intable, TrivialRegisterPassable):
         return Self(lhs.value | rhs.value)
 
 
-comptime TimerCallback = def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]], timer_id: TimerID, interval: UInt32) thin abi("C") -> UInt32
+comptime TimerCallback = def(userdata: OptPtr[NoneType, UntrackedOrigin[mut=True]], timer_id: TimerID, interval: UInt32) thin abi("C") -> UInt32
 """Function prototype for the millisecond timer callback function.
     
     The callback function is passed the current timer interval and returns the
@@ -253,7 +262,7 @@ def add_timer[O_userdata: Origin, //](interval: UInt32, callback: TimerCallback,
     return _get_dylib_function[lib, "SDL_AddTimer", def(interval: UInt32, callback: TimerCallback, userdata: Ptr[NoneType, O_userdata]) thin abi("C") -> TimerID]()(interval, callback, userdata)
 
 
-comptime NSTimerCallback = def(userdata: OptPtr[NoneType, ExternalOrigin[mut=True]], timer_id: TimerID, interval: UInt64) thin abi("C") -> UInt64
+comptime NSTimerCallback = def(userdata: OptPtr[NoneType, UntrackedOrigin[mut=True]], timer_id: TimerID, interval: UInt64) thin abi("C") -> UInt64
 """Function prototype for the nanosecond timer callback function.
     
     The callback function is passed the current timer interval and returns the

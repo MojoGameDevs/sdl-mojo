@@ -78,6 +78,17 @@ https://en.wikipedia.org/wiki/Rec._709#Transfer_characteristics
 The matrix coefficients are used to convert between YCbCr and RGB colors.
 """
 
+from std.sys import is_big_endian
+from std.ffi import _get_dylib_function, c_char, c_float, c_int
+from ._core import ArrayHelper, OptPtr, Ptr, c_string, lib
+from .sdl_error import get_error
+
+
+from std.sys import is_big_endian
+from std.ffi import _get_dylib_function, c_char, c_float, c_int
+from ._core import ArrayHelper, OptPtr, Ptr, c_string, lib
+from .sdl_error import get_error
+
 
 struct PixelType(Indexer, Intable, TrivialRegisterPassable):
     """Pixel type.
@@ -889,7 +900,7 @@ struct Palette(ImplicitlyCopyable, Movable):
 
     var ncolors: c_int
     """Number of elements in `colors`."""
-    var colors: OptPtr[Color, ExternalOrigin[mut=True]]
+    var colors: OptPtr[Color, UntrackedOrigin[mut=True]]
     """An array of colors, `ncolors` long."""
     var version: UInt32
     """Internal use only, do not touch."""
@@ -907,7 +918,7 @@ struct PixelFormatDetails(ImplicitlyCopyable, Movable):
     var format: PixelFormat
     var bits_per_pixel: UInt8
     var bytes_per_pixel: UInt8
-    var padding: ArrayHelper[UInt8, 2, ExternalOrigin[mut=True]]
+    var padding: ArrayHelper[UInt8, 2, UntrackedOrigin[mut=True]]
     var rmask: UInt32
     var gmask: UInt32
     var bmask: UInt32
@@ -922,7 +933,7 @@ struct PixelFormatDetails(ImplicitlyCopyable, Movable):
     var ashift: UInt8
 
 
-def get_pixel_format_name(format: PixelFormat) raises -> Ptr[c_char, ExternalOrigin[mut=False]]:
+def get_pixel_format_name(format: PixelFormat) raises -> String:
     """Get the human readable name of a pixel format.
 
     Args:
@@ -938,7 +949,7 @@ def get_pixel_format_name(format: PixelFormat) raises -> Ptr[c_char, ExternalOri
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetPixelFormatName.
     """
 
-    return _get_dylib_function[lib, "SDL_GetPixelFormatName", def(format: PixelFormat) thin abi("C") -> OptPtr[c_char, ExternalOrigin[mut=False]]]()(format).value()
+    return c_string(_get_dylib_function[lib, "SDL_GetPixelFormatName", def(format: PixelFormat) thin abi("C") -> OptPtr[c_char, UntrackedOrigin[mut=False]]]()(format).value())
 
 
 def get_masks_for_pixel_format[O_bpp: Origin, O_rmask: Origin, O_gmask: Origin, O_bmask: Origin, O_amask: Origin, //](format: PixelFormat, bpp: Ptr[c_int, O_bpp], rmask: Ptr[UInt32, O_rmask], gmask: Ptr[UInt32, O_gmask], bmask: Ptr[UInt32, O_bmask], amask: Ptr[UInt32, O_amask]) raises:
@@ -993,7 +1004,7 @@ def get_pixel_format_for_masks(bpp: c_int, rmask: UInt32, gmask: UInt32, bmask: 
     return _get_dylib_function[lib, "SDL_GetPixelFormatForMasks", def(bpp: c_int, rmask: UInt32, gmask: UInt32, bmask: UInt32, amask: UInt32) thin abi("C") -> PixelFormat]()(bpp, rmask, gmask, bmask, amask)
 
 
-def get_pixel_format_details(format: PixelFormat) raises -> Ptr[PixelFormatDetails, ExternalOrigin[mut=False]]:
+def get_pixel_format_details(format: PixelFormat) raises -> Ptr[PixelFormatDetails, UntrackedOrigin[mut=False]]:
     """Create an SDL_PixelFormatDetails structure corresponding to a pixel format.
 
     Returned structure may come from a shared global cache (i.e. not newly
@@ -1013,10 +1024,10 @@ def get_pixel_format_details(format: PixelFormat) raises -> Ptr[PixelFormatDetai
     Docs: https://wiki.libsdl.org/SDL3/SDL_GetPixelFormatDetails.
     """
 
-    return _get_dylib_function[lib, "SDL_GetPixelFormatDetails", def(format: PixelFormat) thin abi("C") -> OptPtr[PixelFormatDetails, ExternalOrigin[mut=False]]]()(format).value()
+    return _get_dylib_function[lib, "SDL_GetPixelFormatDetails", def(format: PixelFormat) thin abi("C") -> OptPtr[PixelFormatDetails, UntrackedOrigin[mut=False]]]()(format).value()
 
 
-def create_palette(ncolors: c_int) raises -> Ptr[Palette, ExternalOrigin[mut=True]]:
+def create_palette(ncolors: c_int) raises -> Ptr[Palette, UntrackedOrigin[mut=True]]:
     """Create a palette structure with the specified number of color entries.
 
     The palette entries are initialized to white.
@@ -1035,7 +1046,7 @@ def create_palette(ncolors: c_int) raises -> Ptr[Palette, ExternalOrigin[mut=Tru
     Docs: https://wiki.libsdl.org/SDL3/SDL_CreatePalette.
     """
 
-    return _get_dylib_function[lib, "SDL_CreatePalette", def(ncolors: c_int) thin abi("C") -> OptPtr[Palette, ExternalOrigin[mut=True]]]()(ncolors).value()
+    return _get_dylib_function[lib, "SDL_CreatePalette", def(ncolors: c_int) thin abi("C") -> OptPtr[Palette, UntrackedOrigin[mut=True]]]()(ncolors).value()
 
 
 def set_palette_colors[O_palette: Origin, O_colors: Origin, //](palette: Ptr[Palette, O_palette], colors: Ptr[Color, O_colors], firstcolor: c_int, ncolors: c_int) raises:

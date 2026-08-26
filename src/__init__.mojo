@@ -1,9 +1,10 @@
-# +--------------------------------------------------------------------------+ #
+# x--------------------------------------------------------------------------x #
 # | SDL3 Bindings in Mojo
-# +--------------------------------------------------------------------------+ #
+# x--------------------------------------------------------------------------x #
 
 """SDL3 Bindings in Mojo."""
-from std.memory import UnsafePointer, OptionalUnsafePointer
+
+from ._core import ArrayHelper, OptPtr, Ptr, c_string
 from .sdl_audio import *
 from .sdl_blendmode import *
 from .sdl_camera import *
@@ -38,35 +39,3 @@ from .sdl_timer import *
 from .sdl_touch import *
 from .sdl_version import *
 from .sdl_video import *
-
-
-comptime Ptr = UnsafePointer
-comptime OptPtr = OptionalUnsafePointer
-
-from std.builtin.globals import global_constant
-from std.sys import CompilationTarget, is_little_endian, is_big_endian
-from std.ffi import _Global, OwnedDLHandle, _get_dylib_function, c_char, c_uchar, c_int, c_uint, c_short, c_ushort, c_long, c_long_long, c_size_t, c_ssize_t, c_float, c_double, UnsafeUnion
-
-comptime lib = _Global["SDL", _init_sdl_handle]()
-
-
-def _init_sdl_handle() -> OwnedDLHandle:
-    try:
-        comptime if CompilationTarget.is_macos():
-            return OwnedDLHandle(".pixi/envs/default/lib/libSDL3.dylib")
-        elif CompilationTarget.is_linux():
-            return OwnedDLHandle(".pixi/envs/default/lib/libSDL3.so")
-        else:
-            comptime assert False, "OS is not supported"
-    except:
-        print("libSDL3 not found at .pixi/envs/default/lib/")
-        return _uninit[OwnedDLHandle]()
-
-
-@always_inline
-def _uninit[T: AnyType](out value: T):
-    """Returns uninitialized data."""
-    __mlir_op.`lit.ownership.mark_initialized`(__get_mvalue_as_litref(value))
-
-
-comptime ArrayHelper[type: ImplicitlyCopyable & Movable, size: Int, origin: Origin] = Ptr[InlineArray[type, size], origin]
